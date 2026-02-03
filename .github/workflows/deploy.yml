@@ -58,6 +58,7 @@ jobs:
           load: true
           tags: app:test
           cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Security Check - Dependencies
         run: |

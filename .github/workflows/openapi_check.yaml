@@ -13,14 +13,15 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:16-alpine
         env:
-          POSTGRES_DB: symfony
+          POSTGRES_DB: app_db
+          POSTGRES_USER: user
           POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U user -d app_db"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
@@ -32,8 +33,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql
+          php-version: '8.5'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql, redis
           coverage: none
 
       - name: Install Dependencies
@@ -63,7 +64,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.5'
 
       - name: Install Dependencies
         run: composer install --no-interaction --no-progress
