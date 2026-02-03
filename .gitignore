@@ -1,0 +1,95 @@
+# =============================================================================
+# Symfony / FrankenPHP Project .gitignore
+# =============================================================================
+
+# Dependencies
+/vendor
+/composer.lock
+
+# Symfony Cache & Logs
+/var/cache/*
+!/var/cache/.gitkeep
+/var/log/*
+!/var/log/.gitkeep
+/var/sessions/*
+/var/backups/*
+/var/test/*
+/var/preload_load.php
+
+# Doctrine Proxies
+/src/*/Entity/*Proxy.php
+/src/*/Entity/__proxies
+
+# Environment
+/.env
+/.env.local
+/.env.*.local
+/.env.prod
+/.env.prod.local
+
+# IDE
+/.idea
+/.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+*.orig
+*.rej
+
+# PHPUnit
+/.phpunit
+.phpunit.result.cache
+/coverage
+/.php-cs-fixer.cache
+
+# Composer
+/vendor
+/composer.phar
+
+# NPM / Yarn
+/node_modules
+/dist
+/build
+/yarn-error.log
+/npm-debug.log*
+/.yarn-integrity
+
+# PHPStorm
+.idea/*
+
+# Vim
+*.swp
+*.swo
+
+# Linux
+*~
+
+# PHPUnit
+.phpunit.result.cache
+
+# OpenAPI
+/public/openapi.yaml
+
+# FrankenPHP
+/.frankenphp
+
+# Docker
+/.docker
+docker-compose.override.yml
+.phpunit*
+
+# CS Fixer
+.php-cs-fixer.cache
+.php-cs-fixer.php
+
+# PHPStan
+/phpstan.neon
+/phpstan.neon.dist
+
+# Coverage
+/coverage
