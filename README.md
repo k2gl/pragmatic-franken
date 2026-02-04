@@ -37,6 +37,19 @@
 
 See [Why FrankenPHP?](docs/why-frankenphp.md) for detailed benchmarks.
 
+## ⚖️ Template Comparison
+
+| Feature | This Template | Traditional Symfony | Laravel Vanilla |
+|---------|---------------|---------------------|----------------|
+| **FrankenPHP Worker Mode** | ✅ Native | ❌ Separate process | ❌ RoadRunner |
+| **103 Early Hints** | ✅ Supported | ❌ | ❌ |
+| **AI-Ready (AGENTS.md)** | ✅ Configured | ⚠️ Manual | ⚠️ Manual |
+| **Modular DDD** | ✅ Vertical Slices | ⚠️ Manual | ❌ |
+| **Multi-stage Docker** | ✅ Optimized | ⚠️ Basic | ⚠️ Basic |
+| **Outbox Pattern** | ✅ Built-in | ⚠️ Manual | ❌ |
+| **Messenger Workers** | ✅ In Caddyfile | ❌ Supervisor needed | ❌ RoadRunner |
+| **Mercure Native** | ✅ Integrated | ⚠️ Manual | ⚠️ Manual |
+
 ## 🚀 Quick Start
 
 1. **Start the project:**

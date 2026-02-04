@@ -146,6 +146,15 @@ cs-check: ## Check code style
 	@echo "$(YELLOW)Checking code style...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/php-cs-fixer check --dry-run --diff
 
+format: cs-fix ## Auto-format code (alias)
+	@echo "$(GREEN)Code formatted!$(RESET)"
+
+check: lint test ## Run all checks before commit
+	@echo "$(GREEN)All checks passed!$(RESET)"
+
+ci: cs-check phpstan test-coverage ## Simulate CI pipeline
+	@echo "$(GREEN)CI pipeline complete!$(RESET)"
+
 ##—————— Maintenance ——————
 clean: ## Clean cache and temporary files
 	@echo "Cleaning cache and temporary files..."
@@ -157,3 +166,23 @@ metrics: ## Show project metrics
 	@echo "  PHP files: $$(find src -name '*.php' 2>/dev/null | wc -l)"
 	@echo "  Test files: $$(find tests -name '*.php' 2>/dev/null | wc -l)"
 	@echo "  Docs: $$(find docs -name '*.md' 2>/dev/null | wc -l)"
+
+docker-stats: ## Show container resource usage
+	@echo "$(GREEN)Container stats:$(RESET)"
+	@docker stats --no-color $$(docker compose ps -q)
+
+##—————— Dev Utilities ——————
+open-api: ## Generate OpenAPI spec
+	@echo "$(GREEN)Generating OpenAPI documentation...$(RESET)"
+	$(DC) exec $(DC_APP) bin/console nelmio:api-doc:dump > docs/openapi.yaml
+	@echo "$(GREEN)OpenAPI spec written to docs/openapi.yaml$(RESET)"
+
+xdebug-on: ## Enable Xdebug
+	@echo "$(YELLOW)Enabling Xdebug...$(RESET)"
+	$(DC) exec $(DC_APP) bash -c 'echo "xdebug.mode=debug" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini'
+	@echo "$(GREEN)Xdebug enabled. Restart container to apply.$(RESET)"
+
+xdebug-off: ## Disable Xdebug
+	@echo "$(YELLOW)Disabling Xdebug...$(RESET)"
+	$(DC) exec $(DC_APP) rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+	@echo "$(GREEN)Xdebug disabled. Restart container to apply.$(RESET)"
