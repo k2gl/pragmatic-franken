@@ -12,15 +12,7 @@ updates:
       - "composer"
     commit-message:
       prefix: "chore"
-      include: "all"
-    groups:
-      php-updates:
-        patterns:
-          - "php/*"
-          - "symfony/*"
-        update-types:
-          - "minor"
-          - "patch"
+      prefix-scope: "deps"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -31,6 +23,9 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    commit-message:
+      prefix: "chore"
+      prefix-scope: "ci"
 
   # Docker
   - package-ecosystem: "docker"
@@ -43,4 +38,4 @@ updates:
       - "docker"
     commit-message:
       prefix: "chore"
-      include: "all"
+      prefix-scope: "docker"
