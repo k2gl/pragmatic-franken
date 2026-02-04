@@ -1,1 +1,0 @@
-{"version":2,"defects":{"App\\Task\\Tests\\Features\\TaskLifecycleTest::test_full_task_lifecycle":8,"App\\Task\\Tests\\Features\\TaskLifecycleTest::test_task_creation_validates_input":8,"App\\Task\\Tests\\Features\\TaskLifecycleTest::test_task_creation_with_tags":8},"times":[]}
