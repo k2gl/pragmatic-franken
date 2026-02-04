@@ -67,23 +67,6 @@ jobs:
             app:test \
             sh -c "curl -s https://github.com/FriendsOfPHP/security-advisories/raw/master/symfony/symfony.yaml -o symfony.yaml 2>/dev/null || true"
 
-      - name: Install Local PHP Security Checker
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -w /app \
-            app:test \
-            sh -c "curl -sL https://github.com/mlocati/local-php-security-checker/releases/download/v1.0.0/local-php-security-checker_1.0.0_linux_amd64 -o /usr/local/bin/local-php-security-checker && chmod +x /usr/local/bin/local-php-security-checker && local-php-security-checker install"
-
-      - name: Run Security Checker
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/app \
-            -w /app \
-            -e HOME=/tmp \
-            app:test \
-            /usr/local/bin/local-php-security-checker || true
-
       - name: PHPStan Static Analysis
         run: |
           docker run --rm \
