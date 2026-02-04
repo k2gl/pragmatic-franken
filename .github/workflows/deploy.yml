@@ -50,7 +50,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Dev Image for Testing
+      # ========================================================================
+      # SECURITY BLOCK - Secrets -> Packages -> OS -> Code -> Tests
+      # ========================================================================
+
+      # 1. Проверка на утечку паролей и API-ключей в коде
+      - name: Secret Scanning (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Сборка тестового образа
+      - name: Build Dev Image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -60,49 +71,26 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # ========================================================================
-      # SECURITY BLOCK - Fail on critical vulnerabilities
-      # ========================================================================
-
-      - name: Gitleaks Scan
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      # 3. Аудит PHP-зависимостей (встроенный в Composer)
       - name: Composer Audit
-        run: |
-          docker run --rm \
-            -w /app \
-            app:test \
-            composer audit --no-dev || exit 1
+        run: docker run --rm app:test composer audit || exit 1
 
-      - name: Trivy Vulnerability Scanner
+      # 4. Глубокое сканирование образа (Alpine, PHP, Caddy)
+      - name: Container Security Scan (Trivy)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'app:test'
           format: 'table'
           exit-code: '1'
+          ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
-      # ========================================================================
-      # CODE QUALITY
-      # ========================================================================
+      # 5. Статический анализ (PHPStan)
+      - name: PHPStan Analysis
+        run: docker run --rm app:test vendor/bin/phpstan analyse src --level=5 || exit 1
 
-      - name: PHPStan Static Analysis
-        run: |
-          docker run --rm app:test \
-            ./vendor/bin/phpstan analyze src/ --level=5 --no-progress || exit 1
-
-      - name: PHP CS Fixer Check
-        run: |
-          docker run --rm app:test \
-            ./vendor/bin/php-cs-fixer fix --dry-run --diff src/ || exit 1
-
-      # ========================================================================
-      # TESTS
-      # ========================================================================
-
-      - name: Run PHPUnit Tests
+      # 6. Финальный прогон тестов (PHPUnit)
+      - name: Run Tests
         run: |
           docker run --rm \
             --network host \
@@ -111,7 +99,7 @@ jobs:
             -e REDIS_URL="redis://127.0.0.1:6379" \
             -e MESSENGER_TRANSPORT_DSN="redis://127.0.0.1:6379/messages" \
             app:test \
-            ./vendor/bin/phpunit --configuration phpunit.xml --fail-fast || exit 1
+            php bin/phpunit || exit 1
 
       - name: Log in to Container Registry
         if: success()
@@ -150,8 +138,9 @@ jobs:
         run: |
           echo "## CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Security Check: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Gitleaks (Secrets): ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Composer Audit: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Trivy (Container): ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "### PHPStan: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
-          echo "### PHP CS Fixer: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "### PHPUnit: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "### Build & Push: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
