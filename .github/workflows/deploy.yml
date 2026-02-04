@@ -74,13 +74,13 @@ jobs:
             app:test \
             composer audit || true
 
-      - name: Snyk Container Scan
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Trivy Container Scan
+        uses: aquasecurity/trivy-action@master
         with:
-          image: app:test
-          args: --severity-threshold=high
+          image-ref: 'app:test'
+          format: 'table'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
         continue-on-error: true
 
       - name: PHPStan Static Analysis
