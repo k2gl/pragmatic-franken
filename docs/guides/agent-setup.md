@@ -6,7 +6,7 @@ This guide explains how to configure AI agents (Cursor, Windsurf, Copilot) to wo
 
 | File | Purpose | Tracked |
 |------|---------|---------|
-| `agents.md` | Core project rules for AI agents | ✅ |
+| `AGENTS.md` | Core project rules for AI agents | ✅ |
 | `SYSTEM_PROMPT.md` | Prompt template for context-aware agents | ✅ |
 | `agents.local.md` | Your personal local settings | ❌ (gitignored) |
 
@@ -56,7 +56,7 @@ Add to Cursor settings:
 ```
 You are working on a Pragmatic Franken project.
 First, read SYSTEM_PROMPT.md for context-aware instructions.
-Then, read agents.md for core architectural rules.
+Then, read AGENTS.md for core architectural rules.
 If agents.local.md exists, use it for your local environment.
 ```
 
@@ -64,7 +64,7 @@ If agents.local.md exists, use it for your local environment.
 
 ```bash
 # Add to ~/.zshrc or ~/.bashrc
-alias agents-refresh='cat agents.md SYSTEM_PROMPT.md agents.local.md 2>/dev/null'
+alias agents-refresh='cat AGENTS.md SYSTEM_PROMPT.md agents.local.md 2>/dev/null'
 ```
 
 ## Troubleshooting
@@ -86,13 +86,13 @@ Update `agents.local.md` with correct Git path:
 ### Missing Context
 
 Ensure files are in root directory:
-- `agents.md`
+- `AGENTS.md`
 - `SYSTEM_PROMPT.md`
 - `agents.local.md` (your copy)
 
 ## Best Practices
 
 1. **Keep secrets out**: Never add API keys to any `.md` files
-2. **Refresh regularly**: Run `git pull` to get latest `agents.md`
-3. **Share rules**: Update `agents.md` for team-wide rules
+2. **Refresh regularly**: Run `git pull` to get latest `AGENTS.md`
+3. **Share rules**: Update `AGENTS.md` for team-wide rules
 4. **Local only**: Use `agents.local.md` for your personal settings

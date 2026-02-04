@@ -2,7 +2,7 @@
 
 ## Context Loading Logic
 You must form your working instructions from two sources:
-1. **Core Settings (`agents.md`)**: Project base rules, mandatory for all
+1. **Core Settings (`AGENTS.md`)**: Project base rules, mandatory for all
 2. **Local Settings (`agents.local.md`)**: Personal environment settings
 
 **Important:** Local settings take priority over core rules.
