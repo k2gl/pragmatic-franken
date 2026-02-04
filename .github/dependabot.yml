@@ -11,8 +11,7 @@ updates:
       - "dependencies"
       - "composer"
     commit-message:
-      prefix: "chore"
-      prefix-scope: "deps"
+      prefix: "chore(deps)"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -24,8 +23,7 @@ updates:
       - "dependencies"
       - "github-actions"
     commit-message:
-      prefix: "chore"
-      prefix-scope: "ci"
+      prefix: "chore(ci)"
 
   # Docker
   - package-ecosystem: "docker"
@@ -37,5 +35,4 @@ updates:
       - "dependencies"
       - "docker"
     commit-message:
-      prefix: "chore"
-      prefix-scope: "docker"
+      prefix: "chore(docker)"

@@ -1,9 +1,10 @@
 .PHONY: help shell install start up down build rebuild ps logs \
-         db-migrate db-rollback db-seed db-console \
+         db-migrate db-rollback db-seed db-console db-fresh db-reset \
          test test-coverage coverage-html \
-         lint phpstan cs-fix cs-check \
-         clean metrics \
-         env-create
+         lint phpstan cs-fix cs-check format check ci \
+         clean metrics docker-stats \
+         env-create \
+         open-api xdebug-on xdebug-off
 
 # Variables (local)
 USER_ID := $(shell id -u)
@@ -107,6 +108,15 @@ db-seed: ## Load fixtures
 db-console: ## Connect to PostgreSQL console
 	@echo "$(CYAN)Connecting to PostgreSQL...$(RESET)"
 	$(DC) exec postgres psql -U postgres -d app
+
+db-fresh: db-rollback db-migrate db-seed ## Full reset: rollback, migrate, seed
+	@echo "$(GREEN)Database freshened!$(RESET)"
+
+db-reset: down ## Destroy and rebuild database
+	@echo "$(RED)Resetting database volumes...$(RESET)"
+	$(DC) down -v
+	$(DC) up -d $(DC_APP)
+	$(MAKE) db-migrate db-seed
 
 ##—————— Tests ——————
 test: ## Run PHPUnit tests
