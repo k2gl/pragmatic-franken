@@ -44,6 +44,12 @@ RUN install-php-extensions xdebug
 
 COPY ./docker/php/xdebug.ini $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
 
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+COPY composer.json composer.lock ./
+
+RUN composer install --no-scripts --prefer-dist || true
+
 COPY . .
 
 EXPOSE 80
