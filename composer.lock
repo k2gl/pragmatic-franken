@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "107b14085f674600ceca57e12011338d",
+    "content-hash": "bd53c2336a3504eafab447e5e847a7a3",
     "packages": [
         {
             "name": "doctrine/collections",
@@ -5359,24 +5359,24 @@
         },
         {
             "name": "k2gl/phpunit-fluent-assertions",
-            "version": "1.0.6",
+            "version": "12.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/phpunit-fluent-assertions.git",
-                "reference": "f2699ffac6718d9250bd1e4b527a5881d6308e64"
+                "reference": "e05e2f8c7d8745c266d3b039a91fd37aefe83c4e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/phpunit-fluent-assertions/zipball/f2699ffac6718d9250bd1e4b527a5881d6308e64",
-                "reference": "f2699ffac6718d9250bd1e4b527a5881d6308e64",
+                "url": "https://api.github.com/repos/k2gl/phpunit-fluent-assertions/zipball/e05e2f8c7d8745c266d3b039a91fd37aefe83c4e",
+                "reference": "e05e2f8c7d8745c266d3b039a91fd37aefe83c4e",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.1"
+                "php": ">=8.1",
+                "phpunit/phpunit": "^9|^10|^11|^12"
             },
             "require-dev": {
-                "phpunit/php-code-coverage": "^9.2",
-                "phpunit/phpunit": "^9.6"
+                "phpstan/phpstan": "^2.1"
             },
             "type": "library",
             "autoload": {
@@ -5384,7 +5384,7 @@
                     "src/aliases.php"
                 ],
                 "psr-4": {
-                    "k2gl\\PHPUnitFluentAssertions\\": "src/"
+                    "K2gl\\PHPUnitFluentAssertions\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -5406,9 +5406,9 @@
             ],
             "support": {
                 "issues": "https://github.com/k2gl/phpunit-fluent-assertions/issues",
-                "source": "https://github.com/k2gl/phpunit-fluent-assertions/tree/1.0.6"
+                "source": "https://github.com/k2gl/phpunit-fluent-assertions/tree/12.4.0"
             },
-            "time": "2023-03-10T06:39:25+00:00"
+            "time": "2026-01-22T01:23:50+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -8343,7 +8343,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "ext-pdo_pgsql": "*"
     },
     "platform-dev": {},

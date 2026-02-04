@@ -31,7 +31,7 @@
         "dama/doctrine-test-bundle": "^8.2",
         "phpstan/phpstan": "^2.1",
         "php-cs-fixer/shim": "^3.65",
-        "k2gl/phpunit-fluent-assertions": "^1.0"
+        "k2gl/phpunit-fluent-assertions": "^12.4"
     },
     "autoload": {
         "psr-4": {
