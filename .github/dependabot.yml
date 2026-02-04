@@ -14,11 +14,6 @@ updates:
       prefix: "chore"
       include: "all"
     groups:
-      security-updates:
-        patterns:
-          - "*"
-        update-types:
-          - "security"
       php-updates:
         patterns:
           - "php/*"
