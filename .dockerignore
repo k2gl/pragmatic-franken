@@ -4,7 +4,6 @@
 
 # Dependencies (installed during build)
 /vendor
-/composer.lock
 /node_modules
 
 # Git
