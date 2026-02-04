@@ -1,5 +1,0 @@
-# False positives in third-party vendor code
-vendor/
-*.min.js
-*.min.css
-*.map
