@@ -141,8 +141,26 @@ Tasks are executed via Symfony Scheduler inside the main FrankenPHP container. P
 
 ## 📚 Documentation
 
-See `/docs/` folder for Architecture Decision Records:
+See `/docs/` folder for:
 
+### Architecture
 - **why-frankenphp.md**: Performance benefits, 103 Early Hints, Mercure integration.
 - **why-modular-monolith.md**: How to separate modules for future microservices.
 - **decision-on-outbox.md**: Guaranteed event delivery patterns.
+
+### Guides
+- **development.md**: Quick start and daily commands.
+- **testing.md**: Testing strategies (Unit, Integration, E2E).
+- **agent-setup.md**: AI agent configuration.
+- **agents-local-config.md**: Personal preferences for AI agents.
+- **ai-automation.md**: Free AI tools for repository maintenance.
+
+## 🔧 Automation & AI Tools
+
+The project is configured with:
+
+- **Conventional Commits**: Automatic PR validation.
+- **Dependabot**: Auto-update dependencies.
+- **CodiumAI**: Free PR reviews (setup required).
+
+See `docs/guides/ai-automation.md` for setup instructions.
