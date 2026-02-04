@@ -46,7 +46,10 @@ COPY ./docker/php/xdebug.ini $PHP_INI_DIR/conf.d/docker-php-ext-xdebug.ini
 
 COPY . .
 
-EXPOSE 80 443 443/9003
+EXPOSE 80
+EXPOSE 443
+EXPOSE 443/udp
+EXPOSE 9003
 
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
 
@@ -92,6 +95,8 @@ RUN chmod +x /usr/local/bin/docker-entrypoint
 
 ENTRYPOINT ["docker-entrypoint"]
 
-EXPOSE 80 443 443/udp
+EXPOSE 80
+EXPOSE 443
+EXPOSE 443/udp
 
 CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
