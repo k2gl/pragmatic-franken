@@ -40,6 +40,8 @@ jobs:
           target: php_dev
           load: true
           tags: app:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Generate OpenAPI Schema
         run: |
@@ -70,6 +72,8 @@ jobs:
           target: php_dev
           load: true
           tags: app:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Security Check
         run: |

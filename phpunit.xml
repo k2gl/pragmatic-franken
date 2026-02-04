@@ -24,7 +24,9 @@
     <php>
         <env name="APP_ENV" value="test"/>
         <env name="KERNEL_CLASS" value="App\Kernel"/>
-        <env name="DATABASE_URL" value="mysql://user:password@db:3306/app_db"/>
+        <env name="DATABASE_URL" value="postgres://user:password@db:5432/app_db?serverVersion=16"/>
+        <env name="REDIS_URL" value="redis://redis:6379"/>
+        <env name="MESSENGER_TRANSPORT_DSN" value="redis://redis:6379/messages"/>
     </php>
     <extensions>
         <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>

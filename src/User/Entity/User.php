@@ -35,7 +35,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'avatar_url', nullable: true)]
     private ?string $avatarUrl = null;
 
-    #[ORM\OneToMany(mappedBy: 'ownerId', targetEntity: Task::class)]
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Task::class)]
     private Collection $tasks;
 
     #[ORM\Column(name: 'created_at')]

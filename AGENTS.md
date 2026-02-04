@@ -1,20 +1,20 @@
-# 🤖 AI Agent Instructions (Architecture Enforcement)
+# AI Agent Instructions (Architecture Enforcement)
 
 **Version:** 2.0  
-**Last Updated:** 2026-02-03  
+**Last Updated:** 2026-02-04  
 **Applies To:** All AI assistants, code reviewers, and automated tools
 
 ---
 
-## 🎯 Твоя Роль
+## 🎯 Your Role
 
-Ты — ведущий архитектор и разработчик проекта **Kanban Pragmatic Architecture**. Твоя задача — писать код строго в соответствии с **Pragmatic Vertical Slice Architecture**.
+You are the lead architect and developer of the **Kanban Pragmatic Architecture** project. Your task is to write code strictly according to **Pragmatic Vertical Slice Architecture**.
 
-Ты должен следовать этим правилам при ВСЕХ изменениях кода, написании документации или рефакторинге.
+You must follow these rules for ALL code changes, documentation, or refactoring.
 
 ---
 
-## 🛡 Технический Стек
+## 🛡 Tech Stack
 
 | Component | Version | Notes |
 |-----------|---------|-------|
@@ -26,54 +26,54 @@
 | Doctrine ORM | 3.3 | Database layer |
 | Docker | Latest | Containerization |
 
-### ⚠️ Важно: Composer и PHP
+### ⚠️ Important: Composer and PHP
 
-**ВСЕГДА запускай composer inside Docker:**
+**ALWAYS run composer inside Docker:**
 ```bash
 UID=1000 GID=1000 docker compose exec frankenphp composer install
 ```
 
-**ВСЕГДА запускай тесты inside Docker:**
+**ALWAYS run tests inside Docker:**
 ```bash
 UID=1000 GID=1000 docker compose exec frankenphp ./vendor/bin/phpunit
 ```
 
-**ВСЕГДА используй make shell для доступа к контейнеру:**
+**ALWAYS use make shell to access the container:**
 ```bash
 make shell
 ```
 
-**ЗАПРЕЩЕНО:**
-- Запускать `composer` из хост-машины напрямую
-- Запускать тесты из хост-машины
-- Запускать `docker compose` без UID/GID
+**FORBIDDEN:**
+- Running `composer` from the host machine directly
+- Running tests from the host machine
+- Running `docker compose` without UID/GID
 
 ---
 
-## 🏗 Архитектура
+## 🏗 Architecture
 
-### 1. Vertical Slice Architecture (Обязательно!)
+### 1. Vertical Slice Architecture (Required!)
 
-**ВСЕГДА** создавай новую папку для каждой фичи:
+**ALWAYS** create a new folder for each feature:
 ```
 src/[Module]/Features/[FeatureName]/
 ```
 
-**ЗАПРЕЩЕНО:**
-- Размазывать код фичи по глобальным папкам (`Services/`, `DTO/`, `Controllers/`)
-- Создавать общие "utils" файлы без привязки к модулю
-- Использовать глобальные сервисы без необходимости
+**FORBIDDEN:**
+- Spreading feature code across global folders (`Services/`, `DTO/`, `Controllers/`)
+- Creating common "utils" files without module binding
+- Using global services without necessity
 
-**СТРУКТУРА ФИЧИ:**
+**FEATURE STRUCTURE:**
 ```
 src/Task/Features/CreateTask/
-├── CreateTaskAction.php       # Контроллер с #[Route]
+├── CreateTaskAction.php       # Controller with #[Route]
 ├── CreateTaskMessage.php      # DTO + #[Assert] + #[OA\Property]
-├── CreateTaskHandler.php      # Логика с бизнес-правилами
-└── CreateTaskResponse.php    # Ответ (если нужен)
+├── CreateTaskHandler.php      # Business logic
+└── CreateTaskResponse.php    # Response (if needed)
 ```
 
-### 2. #[MapRequestPayload] (Обязательно)
+### 2. #[MapRequestPayload] (Required)
 
 ```php
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -92,7 +92,7 @@ final class CreateTaskAction extends AbstractController
 
 ### 3. Doctrine ORM (Pragmatic)
 
-**Допустимо** использовать EntityManager напрямую:
+**Allowed** to use EntityManager directly:
 ```php
 readonly class ReorderTasksHandler
 {
@@ -113,11 +113,11 @@ readonly class ReorderTasksHandler
 
 ---
 
-## 📝 Правила Кода
+## 📝 Code Rules
 
-### 1. DTO и Атрибуты
+### 1. DTO and Attributes
 
-**КАЖДЫЙ** Message.php **ДОЛЖЕН** содержать атрибуты:
+**EVERY** Message.php **MUST** contain attributes:
 ```php
 #[OA\Schema(description: "Request to create a new task")]
 final readonly class CreateTaskMessage
@@ -132,16 +132,16 @@ final readonly class CreateTaskMessage
         public int $columnId,
 
         /** @var array<string> */
-        #[Assert\All([new Assert\Type('string')])]
+        #[Assert\All([new Assert.Type('string')])]
         #[OA\Property(type: "array", items: new OA\Items(type: "string"))]
         public array $tags = []
     ) {}
 }
 ```
 
-### 2. readonly Классы (Обязательно!)
+### 2. readonly Classes (Required!)
 
-**ВСЕ** DTO, Message, Response **ДОЛЖНЫ** быть readonly:
+**ALL** DTO, Message, Response **MUST** be readonly:
 ```php
 #[OA\Schema(description: "Task response")]
 final readonly class TaskResponse
@@ -154,7 +154,7 @@ final readonly class TaskResponse
 }
 ```
 
-### 3. Entities — Бизнес-Логика
+### 3. Entities - Business Logic
 
 ```php
 #[ORM\Entity]
@@ -177,13 +177,13 @@ class Task
 
 ---
 
-## 🔄 Коммуникация
+## 🔄 Communication
 
 ### Messenger
 ```php
-use Symfony\Component\Messenger\Attributes\AsMessage;
+use Symfony\Component\Messenger\Attributes\AsMessageHandler;
 
-#[AsMessage]
+#[AsMessageHandler]
 final readonly class TaskCompletedEvent
 {
     public function __construct(
@@ -204,7 +204,7 @@ readonly class CreateTaskHandler
 
     public function handle(CreateTaskMessage $message): TaskResponse
     {
-        // ... создание таски ...
+        // ... task creation ...
         
         if ($this->hub !== null) {
             $update = new Update(
@@ -221,9 +221,9 @@ readonly class CreateTaskHandler
 
 ---
 
-## 🗄️ База Данных
+## 🗄️ Database
 
-### Fractional Indexing (DECIMAL для Drag&Drop)
+### Fractional Indexing (DECIMAL for Drag&Drop)
 ```sql
 CREATE TABLE tasks (
     id SERIAL PRIMARY KEY,
@@ -234,7 +234,7 @@ CREATE TABLE tasks (
 CREATE INDEX idx_tasks_position ON tasks(column_id, position);
 ```
 
-### JSONB для Метаданных
+### JSONB for Metadata
 ```php
 $task->setMetadata([
     'tags' => ['bug', 'high-priority'],
@@ -268,10 +268,11 @@ docker compose exec frankenphp php bin/console doctrine:migrations:migrate
 ### Production Build
 ```bash
 # Build production image
-docker compose build --target php_prod
+docker build -t kanban-app:latest .
 
-# Push to registry
-docker compose push
+# Multi-stage build targets
+docker build --target php_dev -t kanban-app:dev .
+docker build --target php_prod -t kanban-app:prod .
 ```
 
 ---
@@ -299,7 +300,7 @@ docker compose push
 
 ---
 
-## 🧪 Тестирование
+## 🧪 Testing
 
 ### PHPUnit
 ```bash
@@ -313,15 +314,15 @@ npm test
 
 ### GitHub Actions CI
 
-**Просмотр логов CI:**
+**View CI logs:**
 ```bash
-# Посмотреть последний failed run
+# View last failed run
 gh run list --limit 1 --status failure
 
-# Посмотреть логи конкретного run
+# View logs for specific run
 gh run view <run-id> --log
 
-# Ссылка на run
+# Link to run
 gh run list
 ```
 
@@ -352,20 +353,20 @@ docker compose up -d --no-deps php
 
 ---
 
-## ⚠️ Что НЕЛЬЗЯ
+## ⚠️ What NOT to Do
 
-| ❌ Запрещено | ✅ Правильно |
+| ❌ Forbidden | ✅ Correct |
 |-------------|-------------|
-| Возвращать Entity из контроллера | ResponseDTO |
-| Интерфейсы Repository без необходимости | ServiceEntityRepository |
-| static свойства | readonly stateless классы |
-| Размазывать фичи по модулям | Одна папка = одна фича |
-| Забывать `#[OA\Property]` | Каждый Message с атрибутами |
-| Магические числа | Константы или Value Objects |
+| Return Entity from controller | ResponseDTO |
+| Repository interfaces without necessity | ServiceEntityRepository |
+| static properties | readonly stateless classes |
+| Spreading features across modules | One folder = one feature |
+| Forgetting `#[OA\Property]` | Every Message with attributes |
+| Magic numbers | Constants or Value Objects |
 
 ---
 
-## 📁 Структура Проекта
+## 📁 Project Structure
 
 ```
 ├── src/
@@ -392,21 +393,19 @@ docker compose up -d --no-deps php
 │       └── deploy.yml          # CI/CD pipeline
 ├── Caddyfile                   # FrankenPHP config
 ├── docker-compose.yml          # Development
-├── Dockerfile                  # Multi-stage builds
+├── Dockerfile                 # Multi-stage builds
 └── composer.json
 ```
 
 ---
 
-## ✅ Чеклист Перед Push
+## ✅ Pre-Push Checklist
 
-- [ ] Тесты проходят (`docker compose exec frankenphp ./vendor/bin/phpunit --fail-fast`)
-- [ ] PHPStan не выдает ошибок
-- [ ] Нет `dd()`, `var_dump()`
-- [ ] Коммит по формату
-- [ ] `#[OA\Property]` во всех MessageDTO
-- [ ] Entity содержит бизнес-логику
+- [ ] Tests pass (`docker compose exec frankenphp ./vendor/bin/phpunit --fail-fast`)
+- [ ] PHPStan shows no errors
+- [ ] No `dd()`, `var_dump()`
+- [ ] Commit follows format
+- [ ] `#[OA\Property]` in all MessageDTOs
+- [ ] Entity contains business logic
 
----
-
-**Помни:** Код пишется один раз, но читается сотни раз. Пиши для людей.
+**Remember:** Code is written once but read hundreds of times. Write for humans.

@@ -25,11 +25,15 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY composer.json composer.lock ./
 
+ENV COMPOSER_MEMORY_LIMIT=-1
+
 RUN composer install \
     --no-dev \
     --no-scripts \
     --no-autoloader \
-    --optimize-autoloader
+    --optimize-autoloader \
+    --prefer-dist \
+    --no-interaction
 
 # ============================================================================
 # STAGE 3: Development - Local development environment
@@ -48,9 +52,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY composer.json composer.lock ./
 
-RUN composer install --no-scripts --prefer-dist --no-interaction --no-dev || true
+ENV COMPOSER_MEMORY_LIMIT=-1
+
+RUN composer install --no-scripts --prefer-dist --no-interaction
 
 COPY . .
+
+RUN composer dump-autoload --optimize
 
 EXPOSE 80
 EXPOSE 443

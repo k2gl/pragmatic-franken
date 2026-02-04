@@ -1,61 +1,61 @@
 # 🚀 Symfony + FrankenPHP 8.5 Enterprise Stack
 
-Современный стек для высокопроизводительных приложений на Symfony, упакованный в Docker с максимальной защитой и мониторингом.
+Modern stack for high-performance Symfony applications, packaged in Docker with maximum security and monitoring.
 
-## 🛠 Технологии
-- **PHP 8.5 (Alpine)**: Новейшие фичи (Pipe operator, URI extension).
-- **FrankenPHP**: Сервер приложений на базе Go с поддержкой Worker Mode.
-- **PostgreSQL 16**: Основная база данных.
-- **Redis 7**: Кэш, сессии и Messenger.
-- **Caddy**: Автоматический HTTPS и HTTP/3.
+## 🛠 Technologies
+- **PHP 8.5 (Alpine)**: Latest features (Pipe operator, URI extension).
+- **FrankenPHP**: Go-based application server with Worker Mode support.
+- **PostgreSQL 16**: Primary database.
+- **Redis 7**: Cache, sessions, and Messenger.
+- **Caddy**: Automatic HTTPS and HTTP/3.
 
-## 🚀 Быстрый старт
+## 🚀 Quick Start
 
-1. **Запуск проекта:**
+1. **Start the project:**
    ```bash
    docker compose up -d
    ```
 
-2. **Установка зависимостей:**
+2. **Install dependencies:**
    ```bash
    docker compose exec app composer install
    ```
 
-3. **Выполнение миграций:**
+3. **Run migrations:**
    ```bash
    docker compose exec app php bin/console doctrine:migrations:migrate
    ```
 
-Проект будет доступен по адресу: https://localhost (или http://localhost).
+Project will be available at: https://localhost (or http://localhost).
 
-## 🏗 Архитектура Docker
+## 🏗 Docker Architecture
 
-Используется Multi-stage build:
-- **php_base**: Базовый слой с расширениями (intl, bcmath, pdo_pgsql, apcu).
-- **php_dev**: Слой для разработки (Xdebug, dev-зависимости).
-- **php_prod**: Оптимизированный слой для продакшена (Worker Mode, Preload, AssetMapper).
+Multi-stage build is used:
+- **php_base**: Base layer with extensions (intl, bcmath, pdo_pgsql, apcu).
+- **php_dev**: Development layer (Xdebug, dev dependencies).
+- **php_prod**: Optimized layer for production (Worker Mode, Preload, AssetMapper).
 
-## 🛡 Безопасность и CI/CD
+## 🛡 Security and CI/CD
 
-При каждом пуше в main GitHub Actions выполняет:
-1. **Gitleaks**: Поиск секретов в коде.
-2. **Composer Audit**: Проверка уязвимостей в PHP-пакетах.
-3. **Trivy**: Сканирование образа на системные уязвимости.
-4. **PHPStan**: Статический анализ (Level 5).
-5. **PHPUnit**: Запуск тестов.
+On each push to main, GitHub Actions performs:
+1. **Gitleaks**: Search for secrets in code.
+2. **Composer Audit**: Check for vulnerabilities in PHP packages.
+3. **Trivy**: Scan image for system vulnerabilities.
+4. **PHPStan**: Static analysis (Level 5).
+5. **PHPUnit**: Run tests.
 
-## 📊 Мониторинг и метрики
+## 📊 Monitoring and Metrics
 
-- **Prometheus**: Собирает метрики FrankenPHP на порту 2019.
-- **Grafana**: Визуализация (порт 3000).
-- **Healthcheck**: Контейнер автоматически перезагружается, если эндпоинт /healthz недоступен.
+- **Prometheus**: Collects FrankenPHP metrics on port 2019.
+- **Grafana**: Visualization (port 3000).
+- **Healthcheck**: Container automatically restarts if /healthz endpoint is unavailable.
 
-## ⏰ Планировщик (Cron)
+## ⏰ Scheduler (Cron)
 
-Задачи запускаются через Symfony Scheduler внутри основного контейнера FrankenPHP. Управление процессом осуществляется через exec в Caddyfile.
+Tasks are executed via Symfony Scheduler inside the main FrankenPHP container. Process management is handled via exec in Caddyfile.
 
-## 🐞 Отладка (Xdebug)
+## 🐞 Debugging (Xdebug)
 
-- Xdebug настроен на порт 9003.
+- Xdebug configured on port 9003.
 - Host: host.docker.internal
-- IDE Key: PHPSTORM или расширение VS Code "PHP Debug".
+- IDE Key: PHPSTORM or VS Code "PHP Debug" extension.

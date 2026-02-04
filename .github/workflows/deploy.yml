@@ -59,9 +59,22 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
+        continue-on-error: false
 
-      # 2. Сборка тестового образа
+      # 2. Диагностика зависимостей
+      - name: Check Composer Dependencies
+        run: |
+          echo "=== Composer.json ==="
+          cat composer.json
+          echo ""
+          echo "=== Composer.lock packages count ==="
+          grep -c '"name"' composer.lock || echo "0"
+          echo ""
+          echo "=== PHP Version ==="
+          php -v || echo "PHP not installed locally"
+        shell: bash
+
+      # 3. Сборка тестового образа
       - name: Build Dev Image
         uses: docker/build-push-action@v5
         with:
@@ -69,11 +82,12 @@ jobs:
           target: php_dev
           load: true
           tags: app:test
-          no-cache: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       # 3. Аудит PHP-зависимостей (встроенный в Composer)
       - name: Composer Audit
-        run: docker run --rm app:test composer audit || true
+        run: docker run --rm app:test composer audit --format=json || true
         continue-on-error: true
 
       # 4. Глубокое сканирование образа (Alpine, PHP, Caddy)
@@ -83,13 +97,15 @@ jobs:
           image-ref: 'app:test'
           format: 'table'
           exit-code: '1'
-          ignore-unfixed: true
+          ignore-unfixed: false
           severity: 'CRITICAL,HIGH'
         continue-on-error: true
 
       # 5. Статический анализ (PHPStan)
       - name: PHPStan Analysis
-        run: docker run --rm app:test vendor/bin/phpstan analyse src --level=5 || true
+        run: |
+          echo "=== PHPStan Analysis ==="
+          docker run --rm app:test vendor/bin/phpstan analyse src --level=5 --no-progress || true
         continue-on-error: true
 
       # 6. Финальный прогон тестов (PHPUnit)
