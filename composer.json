@@ -15,7 +15,7 @@
         "doctrine/orm": "^3.3",
         "doctrine/dbal": "^4.0",
         "doctrine/migrations": "^3.8",
-        "nelmio/api-doc-bundle": "^4.26",
+        "nelmio/api-doc-bundle": "^5.9",
         "nelmio/cors-bundle": "^2.5",
         "predis/predis": "^2.2",
         "ext-pdo_pgsql": "*"
