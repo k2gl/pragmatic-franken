@@ -23,7 +23,7 @@
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.62",
-        "symfony/phpunit-bridge": "^7.2",
+        "symfony/phpunit-bridge": "^8.0",
         "phpunit/phpunit": "^11.0",
         "zenstruck/messenger-test": "^1.6",
         "zenstruck/foundry": "^2.0",
