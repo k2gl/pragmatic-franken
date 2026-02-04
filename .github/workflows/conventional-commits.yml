@@ -8,7 +8,7 @@ jobs:
   conventional-commits:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check Conventional Commits
         uses: webiny/action-conventional-commits@v1.3.1

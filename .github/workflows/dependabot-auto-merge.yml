@@ -34,7 +34,7 @@ jobs:
 
       - name: Auto-approve
         if: steps.should-merge.outputs.should_merge == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
         run: |
