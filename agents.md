@@ -43,4 +43,14 @@ You are an expert PHP developer specializing in Pragmatic Domain-Driven Design (
 - **Source**: All business logic is in `src/`.
 - **Docs**: Architecture decisions are in `docs/`.
 
+## 7. Configuration Loading
+
+1. **First Check**: Look for `agents.local.md` in the current directory.
+2. **Context Merge**:
+   - If the file exists, read it and integrate into your working instructions.
+   - **Priority**: In case of conflicts between this file (`agents.md`) and `agents.local.md`, LOCAL settings take absolute priority.
+3. **Local Environment**: Pay special attention to CLI tool paths and environment variable rules specified in the local config.
+
+---
+
 When I ask to "Create a new feature", follow these layers step-by-step and explain your reasoning based on Pragmatic DDD.
