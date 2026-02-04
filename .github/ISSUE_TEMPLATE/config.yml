@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/k2gl/pragmatic-franken/tree/main/docs
+    about: Check the docs for answers
+  - name: Discussions
+    url: https://github.com/k2gl/pragmatic-franken/discussions
+    about: Ask questions and share ideas

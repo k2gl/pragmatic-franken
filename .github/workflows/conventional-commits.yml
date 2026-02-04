@@ -1,0 +1,27 @@
+name: Conventional Commits
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  conventional-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Conventional Commits
+        uses: webiny/action-conventional-commits@v1.1.0
+        with:
+          # Allowed types: feat, fix, docs, style, refactor, test, chore, perf, ci, build
+          allowed-types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            perf
+            ci
+            build
