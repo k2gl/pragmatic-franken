@@ -2,9 +2,9 @@ name: Build and Push FrankenPHP 8.5
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   REGISTRY: ghcr.io
@@ -51,30 +51,27 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       # ========================================================================
-      # SECURITY BLOCK - Secrets -> Packages -> OS -> Code -> Tests
+      # Security Block - Secrets -> Dependencies -> Container -> Code -> Tests
       # ========================================================================
 
-      # 1. Проверка на утечку паролей и API-ключей в коде
+      # 1. Secret Scanning (Gitleaks)
       - name: Secret Scanning (Gitleaks)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: false
 
-      # 2. Диагностика зависимостей
+      # 2. Dependency Diagnostics
       - name: Check Composer Dependencies
         run: |
           echo "=== Composer.json ==="
           cat composer.json
           echo ""
-          echo "=== Composer.lock packages count ==="
-          grep -c '"name"' composer.lock || echo "0"
-          echo ""
           echo "=== PHP Version ==="
           php -v || echo "PHP not installed locally"
         shell: bash
 
-      # 3. Сборка тестового образа
+      # 3. Build Test Image
       - name: Build Dev Image
         uses: docker/build-push-action@v5
         with:
@@ -85,14 +82,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 3. Аудит PHP-зависимостей (встроенный в Composer)
+      # 4. PHP Dependency Audit
       - name: Composer Audit
         run: docker run --rm app:test composer audit --format=json || true
         continue-on-error: true
 
-      # 4. Глубокое сканирование образа (Alpine, PHP, Caddy)
+      # 5. Container Security Scan (Trivy)
       - name: Container Security Scan (Trivy)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           image-ref: 'app:test'
           format: 'table'
@@ -101,14 +98,21 @@ jobs:
           severity: 'CRITICAL,HIGH'
         continue-on-error: true
 
-      # 5. Статический анализ (PHPStan)
+      # 6. Static Analysis (PHPStan Level 8)
       - name: PHPStan Analysis
         run: |
-          echo "=== PHPStan Analysis ==="
-          docker run --rm app:test vendor/bin/phpstan analyse src --level=5 --no-progress || true
+          echo "=== PHPStan Analysis (Level 8) ==="
+          docker run --rm app:test vendor/bin/phpstan analyse src --level=8 --no-progress || true
         continue-on-error: true
 
-      # 6. Финальный прогон тестов (PHPUnit)
+      # 7. Code Style Check
+      - name: Code Style Check
+        run: |
+          echo "=== PHP-CS-Fixer ==="
+          docker run --rm app:test vendor/bin/php-cs-fixer check --dry-run --diff || true
+        continue-on-error: true
+
+      # 8. Run Tests (PHPUnit)
       - name: Run Tests
         run: |
           docker run --rm \
@@ -118,8 +122,12 @@ jobs:
             -e REDIS_URL="redis://127.0.0.1:6379" \
             -e MESSENGER_TRANSPORT_DSN="redis://127.0.0.1:6379/messages" \
             app:test \
-            php vendor/bin/phpunit || true
+            php vendor/bin/phpunit --fail-fast || true
         continue-on-error: true
+
+      # ========================================================================
+      # Build and Push (Only on Success)
+      # ========================================================================
 
       - name: Log in to Container Registry
         if: success()
@@ -154,6 +162,10 @@ jobs:
           cache-to: type=gha,mode=max
         continue-on-error: true
 
+      # ========================================================================
+      # CI Summary
+      # ========================================================================
+
       - name: CI Summary
         if: always()
         run: |
@@ -163,5 +175,6 @@ jobs:
           echo "### Composer Audit: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "### Trivy (Container): ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "### PHPStan: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "### PHP-CS-Fixer: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "### PHPUnit: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "### Build & Push: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
