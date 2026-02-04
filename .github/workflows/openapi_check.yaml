@@ -37,6 +37,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          dockerfile: docker/frankenphp/Dockerfile
           target: php_dev
           load: true
           tags: app:test
@@ -69,6 +70,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          dockerfile: docker/frankenphp/Dockerfile
           target: php_dev
           load: true
           tags: app:test
