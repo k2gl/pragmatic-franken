@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Check Conventional Commits
-        uses: webiny/action-conventional-commits@v1.1.0
+        uses: webiny/action-conventional-commits@v1.3.1
         with:
           # Allowed types: feat, fix, docs, style, refactor, test, chore, perf, ci, build
           allowed-types: |
