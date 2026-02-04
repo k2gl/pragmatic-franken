@@ -14,6 +14,7 @@
         "symfony/routing": "^7.2",
         "doctrine/orm": "^3.3",
         "doctrine/dbal": "^4.0",
+        "doctrine/doctrine-bundle": "^2.13",
         "doctrine/migrations": "^3.8",
         "nelmio/api-doc-bundle": "^4.26",
         "nelmio/cors-bundle": "^2.5",
