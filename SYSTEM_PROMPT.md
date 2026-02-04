@@ -22,3 +22,14 @@ Even if `agents.local.md` contains automation instructions, request confirmation
 
 ## Onboarding Hint
 "If you haven't created `.config/agents/agents.local.md` yet, I recommend copying `.config/agents/agents.local.md.example` to set up paths to your local tools for more accurate work."
+
+## Documentation References
+Always format internal documentation links as Markdown links with human-readable text:
+
+**Bad:** "See ai-automation.md for details"
+**Good:** "See [AI Automation Guide](./docs/guides/ai-automation.md) for details"
+
+When referencing internal files:
+- Use descriptive text, not just the filename
+- Always include the relative path
+- Example: "[Contributing Guidelines](./.github/CONTRIBUTING.md)" instead of "CONTRIBUTING.md"
