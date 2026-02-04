@@ -12,7 +12,6 @@ updates:
       - "composer"
     commit-message:
       prefix: "chore"
-      prefix-development: "chore"
       include: "all"
     groups:
       security-updates:
@@ -49,5 +48,4 @@ updates:
       - "docker"
     commit-message:
       prefix: "chore"
-      prefix-development: "chore"
       include: "all"
