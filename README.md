@@ -148,6 +148,19 @@ Vertical Slices mean:
 
 ---
 
+## 🚀 Roadmap 2026
+
+| Quarter | Focus | What's Coming |
+|---------|-------|---------------|
+| **Q1** | Real-time & Connectivity | Mercure Hub, Event Sourcing Lite, TypeScript SDK Generator |
+| **Q2** | AI & Agentic Autonomy | Self-Healing CI, Interactive Scaffolding, Context Injection |
+| **Q3** | Edge & Performance | Static Binary Builds, Memory Management, SQLite + Litestream |
+| **Q4** | Frontend & Ecosystem | HTMX/LiveWire Presets, Public Templates Marketplace |
+
+[See full Roadmap →](docs/ROADMAP.md)
+
+---
+
 ## 🛠 What to Do Next?
 
 1. **Self-Check:** Run `make slice module=Demo feature=Success` — if files are created, your machine is ready.
