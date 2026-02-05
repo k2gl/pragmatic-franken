@@ -490,7 +490,7 @@ ruleset:
 
 1. **No empty directories**: Create directories only when files exist
 2. **Shared namespace**: For truly cross-cutting concerns only
-3. **Features naming**: Features organized under `Features/` namespace with `Input/`, `Output/`, `Handler/` subdirectories
+3. **Features naming**: Features organized under `Features/` namespace with flat structure (no subfolders like Input/, Output/, Handler/)
 4. **Gradual migration**: Start new features with VSA, migrate old code incrementally
 
 ### Directory Structure
@@ -501,7 +501,7 @@ src/
 ├── Shared/                 # Truly shared (infrastructure only)
 │   ├── Exception/
 │   └── Services/
-├── User/
+├── User/                   # Module
 │   ├── Entity/
 │   ├── Enums/
 │   ├── ValueObject/
@@ -516,7 +516,9 @@ src/
 │           ├── {FeatureName}Query.php
 │           ├── {FeatureName}Handler.php
 │           ├── {FeatureName}Request.php
-│           └── {FeatureName}Response.php
+│           ├── {FeatureName}Response.php
+│           ├── {FeatureName}Controller.php
+│           └── {FeatureName}HandlerTest.php  # Tests live with code
 ├── Board/                  # Module (same pattern)
 ├── Task/                   # Module (same pattern)
 └── Health/                 # Technical feature (same pattern)
@@ -528,6 +530,86 @@ Create directories only when files exist. Do not create:
 - Empty Feature directories
 - Empty subdirectories (Input/, Output/, Handler/, etc.)
 - Placeholder directories for "future use"
+
+### Rule: One Folder = One Feature
+
+**The Principle**: Deleting a feature folder must completely remove the feature from the system without leaving "tails".
+
+**What This Means:**
+- All files related to a feature live in one folder: `src/{Module}/Features/{FeatureName}/`
+- No scattered files in controllers/, services/, repositories/, or other technical directories
+- Deleting the folder removes: logic, controllers, DTOs, tests, and infrastructure bindings
+
+**Example:**
+```bash
+# Complete feature removal
+rm -rf src/User/Features/Login/
+
+# No tails left behind
+# - No LoginController in controllers/
+# - No LoginService in services/
+# - No LoginRepository in repositories/
+# - No LoginTest in tests/
+```
+
+**Why This Matters:**
+| Scenario | Legacy Architecture | VSA with One Folder |
+|----------|---------------------|---------------------|
+| Find feature code | Search 5+ directories | One folder |
+| Remove feature | Delete files in 5+ places | Delete one folder |
+| Risk of missing files | High (scattered) | Zero (all in one place) |
+| Code archaeology | Required | Not needed |
+
+### Rule: Tests Are Part of Feature
+
+**The Principle**: Tests belong with the code they test, not in a separate `tests/` directory hierarchy.
+
+**Standard Location:**
+```
+src/User/Features/Login/
+├── LoginCommand.php
+├── LoginHandler.php
+├── LoginRequest.php
+└── LoginHandlerTest.php     # ← Tests live here
+```
+
+**Benefits:**
+1. **Locality of Change**: When modifying Login feature, all related files (logic + tests) are in one place
+2. **Easy Cleanup**: Delete folder = delete feature + its tests
+3. **AI-Friendly**: AI agents can see test + implementation together
+4. **No Test Directory Archaeology**: No searching `tests/Unit/User/Handler/Login/` vs `tests/Integration/User/`
+
+**Test Naming Convention:**
+| Type | File |
+|------|------|
+| Handler Test | `{FeatureName}HandlerTest.php` |
+| Controller Test | `{FeatureName}ControllerTest.php` |
+| Integration Test | `{FeatureName}IntegrationTest.php` |
+
+**Example:**
+```php
+// src/User/Features/Login/LoginHandlerTest.php
+declare(strict_types=1);
+
+namespace App\User\Features\Login;
+
+use App\User\Features\Login\LoginHandler;
+use App\User\Features\Login\LoginCommand;
+use PHPUnit\Framework\TestCase;
+
+final class LoginHandlerTest extends TestCase
+{
+    public function test_returns_token_on_valid_credentials(): void
+    {
+        $handler = new LoginHandler($this->userRepository);
+        $response = $handler->handle(new LoginCommand('user@example.com', 'password'));
+
+        self::assertNotEmpty($response->token);
+    }
+}
+```
+
+**Note:** While tests can technically live anywhere due to PHPUnit's flexibility, placing them inside the feature folder follows the VSA principle of maximum cohesion.
 
 ### Duplication Budget
 
