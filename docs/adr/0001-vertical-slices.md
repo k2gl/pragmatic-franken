@@ -67,6 +67,8 @@ rm -rf src/User/Features/Login/
 - **Truly common code:** Use `Shared/` within the module or global `src/Shared/`.
 - **Inter-module events:** Place in `src/[Module]/Shared/Events/`.
 
+> **See [ADR-0009](0009-shared-architecture.md) for detailed Shared architecture rules.**
+
 ### 5. Events
 
 **Intra-feature events:** If an event is used only by this feature, keep it inside the feature folder.
@@ -114,6 +116,37 @@ src/User/Features/CleanInactiveAccounts/
 | **No Global Overview** | Use grep/search to find all features |
 | **Multiple Entry Points Confusion** | Consistent naming convention (`*Action.php`, `*Command.php`) |
 
+## Shared Architecture
+
+> **TL;DR:** Shared is for glue, not for domain. See [ADR-0009](0009-shared-architecture.md) for complete rules.
+
+### Two-Level Shared System
+
+| Level | Location | Purpose |
+|-------|----------|---------|
+| **Global Shared** | `src/Shared/` | Infrastructure glue (Messenger, Sentry, base exceptions) |
+| **Module Shared** | `src/{Module}/` | Module entities, enums, services |
+
+### Rule of Three
+
+Don't extract code to Shared until it's needed in **3+ places**:
+
+| Duplication | Action |
+|-------------|--------|
+| 1-2 places | Keep in feature (duplication is OK) |
+| 3+ places | Extract to Shared |
+
+### What Goes Where
+
+| Type | Global Shared | Module Shared | Feature |
+|------|---------------|---------------|---------|
+| Messenger Bus | ✅ | ❌ | ❌ |
+| Sentry Wrapper | ✅ | ❌ | ❌ |
+| User Entity | ❌ | ✅ | ❌ |
+| UserRole Enum | ❌ | ✅ | ❌ |
+| PasswordHasher | ❌ | ✅ | ❌ |
+| Domain Logic | ❌ | ❌ | ✅ |
+
 ## Compliance
 
 1. **Generate with `make slice`**: All new features MUST use the scaffold script.
@@ -123,6 +156,36 @@ src/User/Features/CleanInactiveAccounts/
 ## Directory Structure
 
 ```
+src/
+├── Kernel.php              # System core (Symfony MicroKernel)
+├── Shared/                 # Global Shared (infrastructure only)
+│   ├── Infrastructure/
+│   │   ├── Bus/           # Messenger configuration
+│   │   ├── Persistence/   # Doctrine extensions
+│   │   └── Logging/       # Sentry, monitoring
+│   └── Domain/
+│       ├── ValueObject/    # Global value objects
+│       └── Exception/      # Base exceptions
+├── User/                   # Module
+│   ├── Entity/             # User.php
+│   ├── Enum/               # UserRole.php
+│   ├── Service/            # PasswordHasher.php
+│   ├── Events/             # UserRegisteredEvent.php
+│   ├── Repositories/
+│   └── Features/           # Vertical Slices
+│       └── {FeatureName}/
+│           ├── {FeatureName}Action.php
+│           ├── {FeatureName}Handler.php
+│           ├── {FeatureName}Dto.php
+│           └── {FeatureName}HandlerTest.php
+├── Task/                   # Module (same pattern)
+├── Board/                  # Module (same pattern)
+└── Health/                 # Technical feature (same pattern)
+```
+
+> **Note:** Module Shared folders (`Entity/`, `Enum/`, `Service/`, `Events/`) are optional. Create only when code is used across 3+ features within the module.
+
+---
 src/
 ├── Kernel.php              # System core (Symfony MicroKernel)
 ├── Shared/                 # Truly shared (infrastructure only)

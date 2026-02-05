@@ -20,19 +20,21 @@ This project uses structured instructions for AI assistants.
 
 src/
 ├── Kernel.php              # System core (Symfony MicroKernel)
-├── Shared/                 # Global infrastructure
-│   ├── Exception/
-│   └── Services/
+├── Shared/                 # Global Shared (infrastructure only)
+│   ├── Infrastructure/
+│   │   ├── Bus/           # Messenger configuration
+│   │   ├── Persistence/   # Doctrine extensions
+│   │   └── Logging/       # Sentry, monitoring
+│   └── Domain/
+│       ├── ValueObject/    # Global value objects
+│       └── Exception/      # Base exceptions
 │
 ├── {Module}/
-│   ├── Entity/             # Doctrine Entities
-│   ├── Enums/
-│   ├── ValueObject/
-│   ├── Event/
-│   ├── Services/
-│   ├── Clients/
+│   ├── Entity/            # Module-wide entities
+│   ├── Enum/              # Module-wide enums
+│   ├── Service/           # Module-domain services
+│   ├── Events/            # Module events
 │   ├── Repositories/
-│   ├── Exception/
 │   └── Features/           # Vertical Slices (flat structure)
 │       └── {FeatureName}/
 │           ├── {FeatureName}Command.php     # Command (Write)
@@ -116,6 +118,19 @@ $this->eventBus->dispatch(new {FeatureName}Event($data));
 | Handler | `{FeatureName}Handler.php` |
 | EntryPoint HTTP | `{FeatureName}Controller.php` |
 | EntryPoint CLI | `{FeatureName}Console.php` |
+
+### Shared Architecture
+
+> **See [ADR-0009](docs/adr/0009-shared-architecture.md) for complete rules.**
+
+**Two-Level Shared System:**
+
+| Level | Location | Purpose |
+|-------|----------|---------|
+| **Global Shared** | `src/Shared/` | Infrastructure glue (Messenger, Sentry, base exceptions) |
+| **Module Shared** | `src/{Module}/` | Module entities, enums, services |
+
+**Rule of Three:** Don't extract to Shared until code is needed in 3+ places.
 
 ### Pragmatic Rules
 
