@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Factory;
 
 use App\Board\Entity\Column;
 use App\Task\Entity\Task;
-use App\User\Entity\User;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
 final class TaskFactory extends PersistentProxyObjectFactory

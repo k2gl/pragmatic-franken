@@ -6,8 +6,6 @@ namespace App\Board\Features\CreateBoard;
 
 use App\Board\Entity\Board;
 use App\Board\Entity\Column;
-use App\Board\Features\CreateBoard\CreateBoardMessage;
-use App\Board\Features\CreateBoard\BoardCreatedResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -18,7 +16,8 @@ readonly class CreateBoardHandler
 
     public function __construct(
         private EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
 
     public function handle(CreateBoardMessage $message): BoardCreatedResponse
     {

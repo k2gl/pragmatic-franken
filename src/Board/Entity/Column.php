@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Board\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'board_columns')]

@@ -18,12 +18,10 @@ final class CreateTaskMessage
         #[Assert\Positive]
         #[OA\Property(description: "Column ID where task will be created", example: 1)]
         public int $columnId,
-
         #[Assert\NotBlank]
         #[Assert\Length(min: 1, max: 255)]
         #[OA\Property(example: "Fix login bug")]
         public string $title,
-
         #[Assert\Length(max: 5000)]
         #[OA\Property(description: "Task description", nullable: true)]
         public ?string $description = null,
@@ -36,7 +34,8 @@ final class CreateTaskMessage
             description: "Tags for the task"
         )]
         public array $tags = []
-    ) {}
+    ) {
+    }
 
     public function setUser(User $user): void
     {

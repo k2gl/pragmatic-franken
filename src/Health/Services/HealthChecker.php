@@ -11,7 +11,8 @@ readonly class HealthChecker
     public function __construct(
         private ?Connection $connection = null,
         private ?\Redis $redis = null
-    ) {}
+    ) {
+    }
 
     public function check(): array
     {

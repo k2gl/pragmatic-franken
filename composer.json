@@ -4,7 +4,7 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "php": ">=8.5",
+        "php": ">=8.4",
         "symfony/framework-bundle": "^7.2",
         "symfony/runtime": "^7.2",
         "symfony/messenger": "^7.2",
@@ -22,16 +22,17 @@
         "ext-pdo_pgsql": "*"
     },
     "require-dev": {
+        "dama/doctrine-test-bundle": "^8.2",
+        "k2gl/phpunit-fluent-assertions": "^12.4",
+        "laravel/pint": "*",
+        "php-cs-fixer/shim": "^3.65",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.0",
         "symfony/maker-bundle": "^1.62",
         "symfony/phpunit-bridge": "^8.0",
-        "phpunit/phpunit": "^11.0",
-        "zenstruck/messenger-test": "^1.6",
-        "zenstruck/foundry": "^2.0",
         "zenstruck/browser": "^1.6",
-        "dama/doctrine-test-bundle": "^8.2",
-        "phpstan/phpstan": "^2.1",
-        "php-cs-fixer/shim": "^3.65",
-        "k2gl/phpunit-fluent-assertions": "^12.4"
+        "zenstruck/foundry": "^2.0",
+        "zenstruck/messenger-test": "^1.6"
     },
     "autoload": {
         "psr-4": {
@@ -54,9 +55,13 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "lint": "php-cs-fixer fix --dry-run --diff",
-        "fix": "php-cs-fixer fix",
-        "analyze": "phpstan analyze src/ --level=5"
+        "lint": "pint --test",
+        "fix": "pint",
+        "analyze": "phpstan analyze --level=9",
+        "check": [
+            "@lint",
+            "@analyze"
+        ]
     },
     "config": {
         "optimize-autoloader": true,

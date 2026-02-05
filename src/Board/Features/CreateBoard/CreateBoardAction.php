@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Board\Features\CreateBoard;
 
-use App\Board\Features\CreateBoard\CreateBoardMessage;
-use App\Board\Features\CreateBoard\BoardCreatedResponse;
 use App\User\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

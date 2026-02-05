@@ -28,7 +28,8 @@ final class CreateBoardMessage
             items: new OA\Items(ref: "#/components/schemas/ColumnInput")
         )]
         public array $columns = []
-    ) {}
+    ) {
+    }
 
     public function setUser(User $user): void
     {
@@ -44,9 +45,9 @@ final readonly class ColumnInput
         #[Assert\Length(min: 1, max: 100)]
         #[OA\Property(description: "Column name", example: "Backlog")]
         public string $name,
-
         #[Assert\PositiveOrZero]
         #[OA\Property(description: "Column position order", example: 0)]
         public int $position = 0
-    ) {}
+    ) {
+    }
 }

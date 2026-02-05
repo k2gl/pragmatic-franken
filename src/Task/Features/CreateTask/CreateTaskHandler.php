@@ -6,8 +6,6 @@ namespace App\Task\Features\CreateTask;
 
 use App\Board\Entity\Column;
 use App\Task\Entity\Task;
-use App\Task\Features\CreateTask\CreateTaskMessage;
-use App\Task\Features\CreateTask\TaskCreatedResponse;
 use App\Task\Repositories\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -20,7 +18,8 @@ readonly class CreateTaskHandler
     public function __construct(
         private EntityManagerInterface $em,
         private TaskRepository $taskRepository
-    ) {}
+    ) {
+    }
 
     public function handle(CreateTaskMessage $message): TaskCreatedResponse
     {

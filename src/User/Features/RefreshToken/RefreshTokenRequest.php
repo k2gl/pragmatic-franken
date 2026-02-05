@@ -12,5 +12,6 @@ final readonly class RefreshTokenRequest
     public function __construct(
         #[OA\Property(description: "Refresh token string")]
         public string $refreshToken
-    ) {}
+    ) {
+    }
 }

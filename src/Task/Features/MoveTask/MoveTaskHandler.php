@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Task\Features\MoveTask;
 
-use App\Task\Entity\Task;
-use App\Task\Features\MoveTask\MoveTaskMessage;
-use App\Task\Features\MoveTask\MoveTaskResult;
 use App\Task\Repositories\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -17,7 +14,8 @@ readonly class MoveTaskHandler
     public function __construct(
         private TaskRepository $taskRepository,
         private EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
 
     public function handle(MoveTaskMessage $message): MoveTaskResult
     {

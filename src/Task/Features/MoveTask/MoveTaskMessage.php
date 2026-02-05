@@ -16,7 +16,6 @@ final readonly class MoveTaskMessage
         #[Assert\Positive]
         #[OA\Property(description: "Task identifier", example: 1)]
         public int $taskId,
-
         #[Assert\NotNull]
         #[OA\Property(
             description: "New task status",
@@ -25,7 +24,8 @@ final readonly class MoveTaskMessage
             enum: ["backlog", "todo", "in_progress", "done"]
         )]
         public TaskStatus $newStatus
-    ) {}
+    ) {
+    }
 
     public function withTaskId(int $taskId): self
     {

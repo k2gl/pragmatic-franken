@@ -12,11 +12,10 @@ final readonly class ReorderTasksResult
     public function __construct(
         #[OA\Property(description: "Task ID")]
         public int $taskId,
-
         #[OA\Property(description: "New position")]
         public float $position,
-
         #[OA\Property(description: "Strategy used")]
         public string $strategy
-    ) {}
+    ) {
+    }
 }

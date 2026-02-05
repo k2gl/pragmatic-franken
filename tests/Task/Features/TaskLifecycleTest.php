@@ -1,11 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Task\Features;
 
-use App\Task\Entity\Task;
-use App\User\Entity\User;
-use DAMA\DoctrineTestBundle\DoctrineTestBundle;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Browser\Test\HasBrowser;
 use Zenstruck\Foundry\Factory\Test\ResetDatabase;
@@ -13,11 +11,12 @@ use k2gl\PHPUnitFluentAssertions\FluentAssertions;
 use App\Factory\UserFactory;
 use App\Factory\BoardFactory;
 use App\Factory\TaskFactory;
-use App\Factory\ColumnFactory;
 
 class TaskLifecycleTest extends KernelTestCase
 {
-    use HasBrowser, ResetDatabase, FluentAssertions;
+    use HasBrowser;
+    use ResetDatabase;
+    use FluentAssertions;
 
     protected function setUp(): void
     {

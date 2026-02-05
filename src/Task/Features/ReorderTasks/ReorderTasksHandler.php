@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Task\Features\ReorderTasks;
 
-use App\Task\Features\ReorderTasks\ReorderTasksMessage;
-use App\Task\Features\ReorderTasks\ReorderTasksResult;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -18,7 +16,8 @@ readonly class ReorderTasksHandler
 
     public function __construct(
         private EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
 
     public function handle(ReorderTasksMessage $message): ReorderTasksResult
     {

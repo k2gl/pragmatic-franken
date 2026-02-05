@@ -12,16 +12,14 @@ final readonly class LoginResponse
     public function __construct(
         #[OA\Property(description: "JWT Access Token")]
         public string $token,
-
         #[OA\Property(description: "Token type (Bearer)")]
         public string $tokenType,
-
         #[OA\Property(description: "Token expiration time in seconds")]
         public int $expiresIn,
-
         #[OA\Property(description: "User information")]
         public UserInfo $user
-    ) {}
+    ) {
+    }
 
     public static function fromData(string $token, int $expiresIn, array $userData): self
     {
@@ -45,5 +43,6 @@ final readonly class UserInfo
         public int $id,
         public string $email,
         public string $name
-    ) {}
+    ) {
+    }
 }

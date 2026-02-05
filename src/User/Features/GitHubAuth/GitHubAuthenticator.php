@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\Passport\SelfValidatingPassport;
-use KnpU\OAuth2ClientBundle\Client\Provider\GithubClient;
 use League\OAuth2\Client\Provider\GithubResourceOwner;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -18,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\SessionAuthenticationStrategy;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 final class GitHubAuthenticator extends OAuth2Authenticator implements AuthenticationEntryPointInterface
@@ -28,7 +26,8 @@ final class GitHubAuthenticator extends OAuth2Authenticator implements Authentic
         private EntityManagerInterface $entityManager,
         private JWTTokenManagerInterface $jwtManager,
         private string $frontendUrl = 'http://localhost:5173'
-    ) {}
+    ) {
+    }
 
     public function supports(Request $request): bool
     {
@@ -41,7 +40,7 @@ final class GitHubAuthenticator extends OAuth2Authenticator implements Authentic
         $accessToken = $this->fetchAccessToken($client);
 
         return new SelfValidatingPassport(
-            new UserBadge($accessToken->getToken(), function() use ($accessToken, $client) {
+            new UserBadge($accessToken->getToken(), function () use ($accessToken, $client) {
                 /** @var GithubResourceOwner $githubUser */
                 $githubUser = $client->fetchUserFromToken($accessToken);
 

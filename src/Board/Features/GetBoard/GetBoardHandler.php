@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Board\Features\GetBoard;
 
-use App\Board\Features\GetBoard\GetBoardQuery;
-use App\Board\Features\GetBoard\BoardResponse;
-use App\Board\Features\GetBoard\ColumnDTO;
-use App\Board\Features\GetBoard\TaskDTO;
 use App\Board\Repositories\BoardRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -17,7 +13,8 @@ readonly class GetBoardHandler
 {
     public function __construct(
         private BoardRepository $repository
-    ) {}
+    ) {
+    }
 
     public function handle(GetBoardQuery $query): BoardResponse
     {
@@ -37,11 +34,11 @@ readonly class GetBoardHandler
 
     private function mapToResponse($board): BoardResponse
     {
-        $columns = array_map(fn($column) => new ColumnDTO(
+        $columns = array_map(fn ($column) => new ColumnDTO(
             $column->getId(),
             $column->getName(),
             (float) $column->getPosition(),
-            array_map(fn($task) => new TaskDTO(
+            array_map(fn ($task) => new TaskDTO(
                 $task->getId(),
                 $task->getUuid(),
                 $task->getTitle(),

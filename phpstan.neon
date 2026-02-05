@@ -1,13 +1,8 @@
-includes:
-    - vendor/symfony/phpstan-bridge/config/symfony.level9.neon
-
 parameters:
     level: 9
-
     paths:
         - src
         - scripts
-
     excludePaths:
         - tests/*
         - src/*/Shared/Entity/*
@@ -15,16 +10,3 @@ parameters:
         - src/*/Shared/Service/*
         - src/*/Features/*/Entity/*
         - src/*/Features/*/Events/*
-
-    checkMissingIterableValueType: false
-
-    checkGenericClassInNonGenericObjectType: false
-
-    treatPhpDocTypesAsCertain: true
-
-    parallel:
-        processNumber: 4
-
-    memoryLimit: 1G
-
-    customRulesetUsed: true

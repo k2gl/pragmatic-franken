@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Board\Features\GetBoard;
 
-use App\Board\Features\GetBoard\GetBoardQuery;
-use App\Board\Features\GetBoard\BoardResponse;
 use App\User\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Routing\Annotation\Route;

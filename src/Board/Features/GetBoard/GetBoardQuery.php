@@ -17,7 +17,8 @@ final class GetBoardQuery
         #[Assert\Positive]
         #[OA\Property(description: "Board ID", example: 1)]
         public int $boardId
-    ) {}
+    ) {
+    }
 
     public function setUser(User $user): void
     {

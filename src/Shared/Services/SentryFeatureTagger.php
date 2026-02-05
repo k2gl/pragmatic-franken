@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Shared\Services;
 
 use Sentry\State\Scope;
@@ -14,7 +16,8 @@ final class SentryFeatureTagger
 {
     public function __construct(
         private bool $enabled = true
-    ) {}
+    ) {
+    }
 
     public function onKernelException(ExceptionEvent $event): void
     {

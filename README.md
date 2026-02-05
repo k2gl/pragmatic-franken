@@ -1,11 +1,9 @@
 # 🧑‍💻 Pragmatic Franken
 
-> **The PHP Cheat Code for 2026.**
+> **"Stop refactoring. Start delivering. Here the PHP Cheat Code for 2026"**
 > Build robust, high-performance Modular Monoliths while your AI Agent does the heavy lifting.
 
-> **"Stop refactoring. Start delivering."**
-
-[![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777bb4?logo=php&logoColor=white)](https://www.php.net/releases/8.5/)
+[![PHP 8.5](https://img.shields.io/badge/PHP-8.4-777bb4?logo=php&logoColor=white)](https://www.php.net/releases/8.5/)
 [![FrankenPHP 1.x](https://img.shields.io/badge/FrankenPHP-1.x-006b5b?logo=docker&logoColor=white)](https://frankenphp.dev/)
 [![Symfony 8.0](https://img.shields.io/badge/Symfony-8.0-000000?logo=symfony&logoColor=white)](https://symfony.com/)
 [![License MIT](https://img.shields.io/badge/License-MIT-yellowgreen)](https://opensource.org/licenses/MIT)
@@ -249,7 +247,7 @@ flowchart TD
 
 ---
 
-## 📁 Architecture: Vertical Slices & Modular Monolith 2.0
+## 📁 Architecture: Vertical Slices & Modular Monolith v2.0
 We don't do "folders by type" (all controllers in one place, all models in another). That's 2010. We group by Business Value.
 
 ```
