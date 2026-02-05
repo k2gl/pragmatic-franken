@@ -68,4 +68,32 @@ class ${FEATURE}Handler
 }
 EOF
 
+# 4. Создаем Feature Test (прямо в папке фичи)
+cat <<EOF > "$DIR/${FEATURE}Test.php"
+<?php
+
+declare(strict_types=1);
+
+namespace App\\$MODULE\\Features\\$FEATURE;
+
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+class ${FEATURE}Test extends WebTestCase
+{
+    public function testSuccess(): void
+    {
+        \$client = static::createClient();
+
+        // Быстрый старт для теста твоего API
+        \$client->request('POST', '/${MODULE,,}/${FEATURE,,}', [], [], [
+            'CONTENT_TYPE' => 'application/json'
+        ], json_encode([
+            // 'key' => 'value'
+        ]));
+
+        \$this->assertResponseIsSuccessful();
+    }
+}
+EOF
+
 echo "✅ Slice $FEATURE in Module $MODULE created at $DIR"
