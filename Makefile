@@ -2,7 +2,7 @@
          db-migrate db-rollback db-seed db-console db-fresh db-reset \
          test test-coverage coverage-html \
          lint phpstan cs-fix cs-check format check ci \
-         clean metrics docker-stats \
+         clean metrics docker-stats stats \
          env-create \
          open-api xdebug-on xdebug-off
 
@@ -46,13 +46,17 @@ env-create:
 	@echo "GID=$(GROUP_ID)" >> .env
 	@echo "$(GREEN).env created with UID:$(USER_ID) and GID:$(GROUP_ID)$(RESET)"
 
-setup: env-create up install db-migrate ## One-command setup: create env, start containers, install deps, run migrations
+setup: env-create up install db-migrate ## 🚀 Full setup: Container, Dependencies, Database
 	@echo ""
-	@echo "🐘 $(GREEN)PHP 8.5 is ready$(RESET)"
-	@echo "🔥 $(RED)FrankenPHP is warming up...$(RESET)"
-	@echo "✅ $(GREEN)Ready at https://localhost$(RESET)"
+	@echo "🐘 $(BLUE)Pragmatic Franken is igniting...$(RESET)"
+	@echo ""
+	@echo "📦 Installing dependencies..."
+	@echo ""
+	@echo "💾 Running migrations..."
+	@echo ""
+	@echo "🔥 $(GREEN)Done! Application live at https://localhost$(RESET)"
 
-install: setup ## One-command setup: create env, start containers, install deps, run migrations
+install: setup ## 🚀 Full setup: Container, Dependencies, Database
 
 start: rebuild up
 
@@ -188,5 +192,10 @@ xdebug-on: ## Enable Xdebug
 
 xdebug-off: ## Disable Xdebug
 	@echo "$(YELLOW)Disabling Xdebug...$(RESET)"
-	$(DC) exec $(DC_APP) rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+	@$(DC) exec $(DC_APP) rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 	@echo "$(GREEN)Xdebug disabled. Restart container to apply.$(RESET)"
+
+##—————— 📊 Metrics ——————
+stats: ## 📊 Check FrankenPHP metrics
+	@echo "$(GREEN)Fetching FrankenPHP metrics...$(RESET)"
+	@curl -s http://localhost:2019/metrics | head -20

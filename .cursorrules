@@ -1,0 +1,23 @@
+# Pragmatic Franken Architectural Rules
+
+You are an expert PHP/Symfony architect. Follow these rules strictly:
+
+## 1. Vertical Slices (Ref: ADR-0001)
+- NEVER create global `Controllers`, `Services`, or `Repositories` folders.
+- ALL feature logic must reside in `src/{Module}/Features/{FeatureName}/`.
+- Each feature slice must contain its own `EntryPoint/Http/` (Controller), `Command`, and `Handler`.
+
+## 2. Infrastructure (Ref: ADR-0004)
+- We use FrankenPHP in Worker Mode.
+- AVOID using static variables that persist state between requests.
+- Use `Symfony\Component\Runtime\RunnerInterface` for long-running processes.
+
+## 3. Communication (Ref: ADR-0002)
+- Use Symfony Messenger for ALL side effects.
+- Command -> Handler (Synchronous).
+- Events -> Async Handlers (via Messenger/Redis).
+
+## 4. Coding Style
+- PHP 8.5 features only (property promotion, readonly classes, enums).
+- Strict types must be declared in every file.
+- Use `Attributes` for routing and dependency injection.

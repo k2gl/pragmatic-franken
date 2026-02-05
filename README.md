@@ -34,6 +34,23 @@ make install
 
 ---
 
+## 🤖 AI Copilot Mode
+
+This repo is **self-documenting for AI**.
+
+If you use **Cursor** or **Windsurf**, just type:
+```
+@AGENTS.md How do I add a new Task management feature?
+```
+
+The AI will:
+1. Read `docs/adr/0001` to understand Vertical Slices.
+2. Create the folder structure in `src/Task/Features/`.
+3. Set up the Command Bus and Messenger transport.
+4. Ensure everything is compatible with FrankenPHP Worker Mode.
+
+---
+
 ## 🤖 AI-Driven Development
 
 - **AGENTS.md** — The entry point for your AI.
