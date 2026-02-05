@@ -1,4 +1,4 @@
-# Why FrankenPHP?
+# ADR 0005: FrankenPHP Application Server
 
 **Date:** 2026-02-04
 **Status:** Accepted

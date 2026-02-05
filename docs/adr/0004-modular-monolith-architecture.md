@@ -1,4 +1,4 @@
-# Why Modular Monolith?
+# ADR 0004: Modular Monolith Architecture
 
 **Date:** 2026-02-04
 **Status:** Accepted

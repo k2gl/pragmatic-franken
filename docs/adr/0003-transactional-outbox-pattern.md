@@ -1,4 +1,4 @@
-# Decision on Outbox Pattern
+# ADR 0003: Transactional Outbox Pattern
 
 **Date:** 2026-02-04
 **Status:** Accepted

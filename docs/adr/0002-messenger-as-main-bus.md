@@ -1,4 +1,4 @@
-# ADR 2: Symfony Messenger as Main Bus
+# ADR 0002: Symfony Messenger as Main Bus
 
 **Date:** 2026-02-04  
 **Status:** Accepted  
