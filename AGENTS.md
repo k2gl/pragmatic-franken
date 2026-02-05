@@ -314,3 +314,17 @@ final class LoginHandlerTest extends TestCase
     }
 }
 ```
+
+## CI Compliance
+
+**Before push, ensure:**
+
+1. **Code Style:** `vendor/bin/pint --test` passes
+2. **Static Analysis:** `vendor/bin/phpstan analyze --level=9` passes
+3. **Tests:** `vendor/bin/phpunit --fail-fast` passes
+
+**AI Agent Rule:**
+
+> Before finishing a task, run the compliance checks. Do not commit code that breaks CI.
+
+## Configuration Priority

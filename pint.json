@@ -1,0 +1,40 @@
+{
+    "preset": "psr12",
+    "rules": {
+        "declare_strict_types": true,
+        "single_import_per_statement": true,
+        "ordered_imports": true,
+        "phpdoc_scalar": true,
+        "phpdoc_separation": false,
+        "phpdoc_align": true,
+        "visibility_required": true,
+        "method_argument_space": true,
+        "concat_space": true,
+        "ternary_to_null_coalescing": true,
+        "unary_operator_spaces": true,
+        "blank_line_before_statement": true,
+        "no_superfluous_elseif": true,
+        "no_unused_imports": true,
+        "not_operator_with_successor_space": true,
+        "trailing_comma_in_multiline": true,
+        "array_syntax": {"syntax": "short"},
+        "whitespace_parens_parenthesis": true,
+        "no_mixed_echo_print": true,
+        "no_php4_constructor": true,
+        "class_definition": {
+            "multi_line_extends_each_single_line": false,
+            "anonymous_classes": {"braces": true}
+        },
+        "braces": {
+            "classes_close": "same",
+            "functions_close": "same",
+            "control_structures_close": "same"
+        }
+    },
+    "exclude": [
+        "vendor",
+        "node_modules",
+        "coverage",
+        ".phpunit.result.cache"
+    ]
+}

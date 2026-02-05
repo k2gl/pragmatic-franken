@@ -1,15 +1,30 @@
+includes:
+    - vendor/symfony/phpstan-bridge/config/symfony.level9.neon
+
 parameters:
-    level: 5
+    level: 9
+
     paths:
-        - src/Board
-        - src/Shared/Domain
-        - src/SharedKernel/Infrastructure/Sentry
-        - src/Task
+        - src
+        - scripts
 
     excludePaths:
-        - src/SharedKernel/Infrastructure/Sentry/SentryFeatureTagger.php
-        - src/Shared/Domain/Timestampable.php
+        - tests/*
+        - src/*/Shared/Entity/*
+        - src/*/Shared/Events/*
+        - src/*/Shared/Service/*
+        - src/*/Features/*/Entity/*
+        - src/*/Features/*/Events/*
 
-    ignoreErrors:
-        - '/Property .+ is never written, only read./'
-        - '/Deprecated in PHP 8\.(0|1): Required parameter .+ follows optional./'
+    checkMissingIterableValueType: false
+
+    checkGenericClassInNonGenericObjectType: false
+
+    treatPhpDocTypesAsCertain: true
+
+    parallel:
+        processNumber: 4
+
+    memoryLimit: 1G
+
+    customRulesetUsed: true

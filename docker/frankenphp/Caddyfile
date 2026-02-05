@@ -1,32 +1,37 @@
 {
-	frankenphp {
-		num_threads 8
-	}
+    # FrankenPHP configuration
+    frankenphp {
+        num_threads 8
+    }
 
-	admin off
+    admin off
 }
 
 :80 {
-	log {
-		format json
-		level INFO
-	}
+    log {
+        format json
+        level INFO
+    }
 
-	root * public/
-	encode zstd gzip
+    # Enable compression
+    encode zstd gzip
 
-	handle_path /assets/* {
-		header Cache-Control "public, max-age=31536000"
-		file_server
-	}
+    # Root directory
+    root * public/
 
-	php_server {
-		worker index.php
-	}
+    # PHP Server with Worker Mode
+    php_server {
+        root public/
+        index index.php
+        # Worker mode for Symfony - keeps Kernel in memory
+        env FRANKENPHP_WORKER_COMMAND "php public/index.php"
+        num_workers 4
+    }
 
-	exec php bin/console messenger:consume scheduler_default --memory-limit=128M -vv
+    file_server
 }
 
 :2019 {
-	metrics
+    # Prometheus metrics endpoint
+    metrics
 }

@@ -1,32 +1,66 @@
-# 🧑‍💻 Pragmatic Franken 
+# 🧑‍💻 Pragmatic Franken
 
-> **Why waste time on repetitive boilerplate?**
-> Pragmatic Franken is a unified, production-ready foundation built on Symfony and FrankenPHP. Focus on logic, not configuration.
+> **The PHP Cheat Code for 2026.**
+> Build robust, high-performance Modular Monoliths while your AI Agent does the heavy lifting.
+
+> **"Stop refactoring. Start delivering."**
 
 [![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777bb4?logo=php&logoColor=white)](https://www.php.net/releases/8.5/)
 [![FrankenPHP 1.x](https://img.shields.io/badge/FrankenPHP-1.x-006b5b?logo=docker&logoColor=white)](https://frankenphp.dev/)
 [![Symfony 8.0](https://img.shields.io/badge/Symfony-8.0-000000?logo=symfony&logoColor=white)](https://symfony.com/)
 [![License MIT](https://img.shields.io/badge/License-MIT-yellowgreen)](https://opensource.org/licenses/MIT)
 [![CI Pipeline](https://img.shields.io/github/actions/workflow/status/k2gl/pragmatic-franken/ci.yml?branch=main&label=CI)](https://github.com/k2gl/pragmatic-franken/actions)
-[![PHPStan](https://img.shields.io/badge/PHPStan-Level%208-cyan)](https://phpstan.org)
+[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-cyan)](https://phpstan.org)
 [![AI-Ready](https://img.shields.io/badge/AI--Ready-gold)](#)
 
 ---
 
-## ⚡️ The "Vibe"
+## 🛸 Why Pragmatic Franken?
 
-- **One Binary to Rule Them All**: No Nginx, no FPM. Just FrankenPHP.
-- **Worker Mode by Default**: Insane performance (boot once, handle thousands of requests).
-- **AI-Native**: Pre-configured contexts for Cursor, Windsurf, and Copilot.
-- **Pragmatic Architecture**: Vertical Slices instead of messy layers.
+> **Stop refactoring. Start delivering.**
+
+| Problem | Solution |
+|---------|----------|
+| Complex layered architecture | **Vertical Slices** — code grouped by business value |
+| Nginx + FPM configuration hell | **FrankenPHP Worker Mode** — one binary, HTTP/3, 2ms latency |
+| AI generates spaghetti code | **AI-Native structure** — agents understand context instantly |
+| Code review debates | **Pint + PHPStan Level 9** — tools decide, humans review logic |
+| Fear of deletion | **Rule of Deletion** — optimized for removal, not reuse |
 
 ---
 
-## 🧑‍🎤 Instant Start
+## ⚡️ Zero Infrastructure Pain
+
+| Feature | Traditional | Pragmatic Franken |
+|---------|------------|-------------------|
+| Web Server | Nginx + FPM | **FrankenPHP** (single binary) |
+| Latency | ~50-100ms | **~2ms** (Kernel stays in memory) |
+| HTTP Protocol | HTTP/1.1 | **HTTP/3** (built-in) |
+| Configuration | 5 config files | **One Caddyfile** |
+
+---
+
+## 🦸 AI-First DX
+
+This repo is **Agent-Native**. Cursor, Windsurf, and Copilot understand your architecture better than you do.
+
+```bash
+@AGENTS.md Implement a new 'Subscription' module following our architecture.
+```
+
+The AI Agent will:
+1. **Analyze ADRs** — Reads architecture decisions for consistency
+2. **Scaffold & Code** — Creates folders per Vertical Slice patterns
+3. **Verify** — Runs `make check` to ensure nothing is broken
+4. **Deliver** — Prepares a PR, ready for your review
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 # 1. Clone and ignite
-git clone https://github.com && cd pragmatic-franken
+git clone https://github.com/k2gl/pragmatic-franken.git && cd pragmatic-franken
 
 # 2. The Magic Command
 make install
@@ -36,50 +70,93 @@ make install
 
 ---
 
-## 🤓 Pragmatic Stack
-
-| Feature | Tech | Why? |
-|---------|------|------|
-| Runtime | FrankenPHP | 103 Early Hints, Mercure, and Go-speed. |
-| Architecture | [Vertical Slices](docs/adr/0001-vertical-slices.md)  | Features are isolated. High cohesion, low coupling. |
-| Database | PostgreSQL 16 | Robust, modern, ready for scale. |
-| Async | Messenger + Redis | Built-in CQRS for background heavy lifting. |
-| Observability | Prometheus + Grafana | Built-in metrics on port 2019 |
-
----
-
-## 🦸 AI-First DX (Your New Superpower)
-
-This repo isn't just code; it's Agent-Native. We've optimized the structure so Cursor, Windsurf, or GitHub Copilot understand your project better than you do.
-How to summon the magic:
+## 🛠 Build Your First Feature
 
 ```bash
-@AGENTS.md Implement a new 'Subscription' module following our architecture.
+# Generate a complete feature slice
+make slice module=User feature=Login
 ```
-The AI Agent will:
-1. Analyze ADRs: It reads your Architecture Decision Records to keep the code consistent.
-2. Scaffold & Code: Creates folders and writes logic according to the project's patterns.
-3. Verify: Runs tests to ensure nothing is broken.
-4. Deliver: Prepares a PR, ready for your final look.
 
-- **Local Vibe** — Custom tool paths in `.config/agents/agents.local.md`.
+This creates:
+```
+src/User/Features/Login/
+├── LoginAction.php      # HTTP entry point
+├── LoginHandler.php     # Business logic
+├── LoginDto.php         # Data contract
+└── LoginHandlerTest.php # Feature test
+```
 
 ---
 
-## 📐 ADR: Architecture Decision Records
-
-We don't do "because I said so". Every decision is documented:
+## 📐 Architecture Decision Records
 
 | ADR | Topic | Priority |
 |-----|-------|----------|
 | [0001](docs/adr/0001-vertical-slices.md) | Vertical Slices Architecture | P0 |
 | [0002](docs/adr/0002-messenger-transport.md) | Messenger Transport (CQRS) | P0 |
 | [0003](docs/adr/0003-pragmatic-symfony-architecture.md) | Pragmatic Symfony | P0 |
-| [0004](docs/adr/0004-frankenphp-runtime.md) | FrankenPHP Runtime | P1 |
-| [0005](docs/adr/0005-health-checks.md) | Health Checks | P1 |
-| [0006](docs/adr/0006-memory-management.md) | Memory Management | P2 |
-| [0007](docs/adr/0007-asset-mapper.md) | AssetMapper | P2 |
 | [0008](docs/adr/0008-testing-strategy.md) | Testing Strategy (PHPUnit) | P1 |
+| [0009](docs/adr/0009-shared-architecture.md) | Shared Architecture | P1 |
+
+---
+
+## 🛡 Bulletproof Quality
+
+| Check | Tool | Command |
+|-------|------|---------|
+| Code Style | **Pint** | `make lint` |
+| Static Analysis | **PHPStan Level 9** | `make analyze` |
+| Tests | **PHPUnit** | `make test` |
+| All Checks | **CI Pipeline** | `make check` |
+
+> **Rule:** Do not push code that breaks CI.
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── Kernel.php              # Symfony MicroKernel
+├── Shared/                 # Global infrastructure
+│   ├── Infrastructure/    # Bus, Persistence, Logging
+│   └── Domain/            # ValueObjects, Exceptions
+├── User/                   # Module
+│   ├── Entity/           # User.php
+│   ├── Enum/             # UserRole.php
+│   └── Features/          # Vertical Slices
+│       └── Login/
+│           ├── LoginAction.php
+│           ├── LoginHandler.php
+│           ├── LoginDto.php
+│           └── LoginHandlerTest.php
+└── ...
+```
+
+> **See [ADR-0001](docs/adr/0001-vertical-slices.md) for complete architecture rules.**
+
+---
+
+## 🎯 The Manifesto
+
+> **"We optimize for Deletion, not for Reusability."**
+
+Vertical Slices mean:
+- **Features are isolated** — change one, break nothing else
+- **Tests live with code** — delete folder = delete feature + tests
+- **Duplication is OK** — 2 copies are cheaper than wrong abstraction
+
+---
+
+## 🛠 What to Do Next?
+
+1. **Self-Check:** Run `make slice module=Demo feature=Success` — if files are created, your machine is ready.
+2. **Push It:** Deploy to public repo and share.
+3. **First Feature:** Try implementing real business logic (Telegram auth, Stripe integration) using `@AGENTS.md`. You'll be amazed how simple it became.
+
+---
+
+**"Stop refactoring. Start delivering."**
 
 ---
 

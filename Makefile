@@ -140,28 +140,78 @@ coverage-html: ## Generate HTML coverage report
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --coverage-html=coverage
 
 ##—————— Code Quality ——————
-lint: phpstan cs-check ## Run all linters
 
-phpstan: ## Run PHPStan static analysis
-	@echo "$(YELLOW)Running PHPStan...$(RESET)"
+# Quick commands for developers
+lint: ## 🚀 Auto-fix code style (Laravel Pint)
+	@echo "$(GREEN)Fixing code style with Pint...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/pint
+
+analyze: ## 🔍 Run PHPStan static analysis (Level 9)
+	@echo "$(YELLOW)Running PHPStan (Level 9)...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --memory-limit=1G
+
+check: lint analyze ## ✅ Run all checks before commit
+	@echo "$(GREEN)✨ All checks passed! Code is bulletproof.$(RESET)"
+
+# Advanced commands
+lint-check: ## Check code style without fixing
+	@echo "$(YELLOW)Checking code style...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/pint --test
+
+phpstan: ## Run PHPStan (level 5 - medium strictness)
+	@echo "$(YELLOW)Running PHPStan (level 5)...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --level=5
 
-cs-fix: ## Fix code style with PHP-CS-Fixer
-	@echo "$(YELLOW)Fixing code style...$(RESET)"
+phpstan-level-8: ## Run PHPStan (level 8 - maximum strictness)
+	@echo "$(YELLOW)Running PHPStan (level 8)...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --level=8
+
+phpstan-level-9: ## Run PHPStan (level 9 - bleeding edge)
+	@echo "$(YELLOW)Running PHPStan (Level 9 - maximum)...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --memory-limit=1G
+
+phpstan-baseline: ## Generate PHPStan baseline
+	@echo "$(YELLOW)Generating PHPStan baseline...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --level=9 --generate-baseline
+
+cs-fix: ## Fix code style with PHP-CS-Fixer (legacy)
+	@echo "$(YELLOW)Fixing code style with PHP-CS-Fixer...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/php-cs-fixer fix
 
-cs-check: ## Check code style
+cs-check: ## Check code style with PHP-CS-Fixer (legacy)
 	@echo "$(YELLOW)Checking code style...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/php-cs-fixer check --dry-run --diff
+
+pint: ## Fix code style with Laravel Pint (modern PSR-12)
+	@echo "$(GREEN)Fixing code style with Pint...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/pint
+
+pint-check: ## Check code style with Laravel Pint
+	@echo "$(YELLOW)Checking code style with Pint...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/pint --test
+
+format: lint ## Auto-format code (alias)
+	@echo "$(GREEN)Code formatted!$(RESET)"
+
+ci: lint-check phpstan-level-9 test-coverage ## Simulate CI pipeline
+	@echo "$(GREEN)CI pipeline complete!$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/pint --test
 
 format: cs-fix ## Auto-format code (alias)
 	@echo "$(GREEN)Code formatted!$(RESET)"
 
-check: lint test ## Run all checks before commit
+check: phpstan-level-8 cs-check ## Run all checks before commit
 	@echo "$(GREEN)All checks passed!$(RESET)"
 
-ci: cs-check phpstan test-coverage ## Simulate CI pipeline
+ci: cs-check phpstan-level-8 test-coverage ## Simulate CI pipeline
 	@echo "$(GREEN)CI pipeline complete!$(RESET)"
+
+##—————— Static Analysis ——————
+sa: phpstan ## Static analysis (alias)
+	@echo "$(GREEN)Static analysis complete!$(RESET)"
+
+sa-full: phpstan-level-8 cs-check ## Full static analysis
+	@echo "$(GREEN)Full static analysis complete!$(RESET)"
 
 ##—————— Maintenance ——————
 clean: ## Clean cache and temporary files
