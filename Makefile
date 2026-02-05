@@ -48,8 +48,9 @@ env-create:
 
 setup: env-create up install db-migrate ## One-command setup: create env, start containers, install deps, run migrations
 	@echo ""
-	@echo "$(GREEN)🎉 Your app is live at https://localhost!$(RESET)"
-	@echo "$(CYAN)Next: Run 'make shell' to enter the container.$(RESET)"
+	@echo "🐘 $(GREEN)PHP 8.5 is ready$(RESET)"
+	@echo "🔥 $(RED)FrankenPHP is warming up...$(RESET)"
+	@echo "✅ $(GREEN)Ready at https://localhost$(RESET)"
 
 install: setup ## One-command setup: create env, start containers, install deps, run migrations
 

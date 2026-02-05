@@ -1,0 +1,37 @@
+# No Spaghetti Code
+
+## Core Principle
+Keep features isolated. High cohesion, low coupling.
+
+## Rules
+
+### ✅ DO
+- Import what you use: `use App\User\Features\Login\LoginHandler`
+- Keep features in their own folder
+- Use Events for cross-module communication
+- Share infrastructure via `src/Shared/`
+
+### ❌ DON'T
+- Create god-objects that know about everything
+- Use global state or singletons
+- Import from unrelated modules
+- Put unrelated logic in the same file
+
+## Coupling Rules
+- **User module** → Can depend on: Shared, Events
+- **Task module** → Can depend on: Shared, Events, User (read-only)
+- **Shared module** → No dependencies on other modules
+
+## Cross-Module Communication
+Use Domain Events instead of direct imports:
+
+```php
+// ❌ BAD: Direct coupling
+$user = $this->userRepository->find($task->userId);
+
+// ✅ GOOD: Event-driven
+$dispatcher->dispatch(new UserCreatedEvent($user));
+```
+
+## Refactor Trigger
+If you see files importing from more than 2 unrelated modules → Refactor needed.

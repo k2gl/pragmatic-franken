@@ -1,0 +1,36 @@
+# Vertical Slices Architecture Enforcement
+
+## Core Principle
+All feature code MUST be organized in `src/{Module}/Features/{FeatureName}/` structure.
+
+## Rules
+
+### ✅ DO
+- Create new features under `src/*/Features/{FeatureName}/`
+- Use Command/Query pattern for write/read operations
+- Put EntryPoints (Controllers, Console commands) in `EntryPoint/` subfolder
+- Keep related files together: Command, Handler, Request, Response
+
+### ❌ DON'T
+- Create controllers directly in `src/*/UI/` or `src/*/Controller/`
+- Mix features from different modules
+- Use generic "Services" folder for feature logic
+- Create "Domain" folders with no feature context
+
+## Structure Template
+```
+src/
+└── User/
+    └── Features/
+        └── RegisterUser/
+            ├── RegisterUserCommand.php
+            ├── RegisterUserHandler.php
+            ├── EntryPoint/
+            │   └── Http/
+            │       └── RegisterUserController.php
+            ├── Request/
+            └── Response/
+```
+
+## Violations
+If you see code outside this structure, refactor it into the correct location or ask before creating.

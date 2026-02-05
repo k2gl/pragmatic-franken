@@ -53,6 +53,19 @@ make install
 
 ---
 
+## ⚖️ Legacy vs Pragmatic
+
+| Layer | Legacy | Pragmatic |
+|-------|--------|-----------|
+| Web Server | Nginx + FPM | **FrankenPHP** |
+| Process Manager | Supervisord | **Worker Mode** |
+| Scheduler | Crontab | **Symfony Scheduler** |
+| Graceful Shutdown | Manual config | **Out of the box** |
+
+**4 configs = 4 failure points. 1 Caddyfile = 1 source of truth.**
+
+---
+
 ## 📐 The Pragmatic Way
 
 How we write code:
@@ -168,3 +181,7 @@ pragmatic-franken/
 ## 🤝 Contributing
 
 See [Contributing Guidelines](.github/CONTRIBUTING.md) for details.
+
+---
+
+**Build for 2026, not 2015. FrankenPHP is the engine, Symfony is the brain, AI is the hands.**

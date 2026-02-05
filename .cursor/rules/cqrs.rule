@@ -1,0 +1,41 @@
+# CQRS Pattern Enforcement
+
+## Core Principle
+Separate read and write operations using Command and Query objects.
+
+## Rules
+
+### Commands (Write Operations)
+- Name: `*{FeatureName}Command.php`
+- Return: `void`, `id`, or Domain Event
+- Handle: Business logic, validation, persistence
+- Location: `src/{Module}/Features/{FeatureName}/`
+
+### Queries (Read Operations)
+- Name: `*{FeatureName}Query.php`
+- Return: `Response` DTO, array, or primitive
+- Handle: Data retrieval, projections, optimizations
+- Location: `src/{Module}/Features/{FeatureName}/`
+
+### ❌ DON'T
+- Return entities from Query handlers
+- Put business logic in Controllers
+- Use "Service" classes for feature logic
+- Mix read and write in the same handler
+
+## ✅ DO
+- Use `#[AsMessageHandler]` attribute for handlers
+- Dispatch via MessageBus: `$bus->dispatch($command)`
+- Return DTOs/responses from Queries
+- Keep handlers focused on single operation
+
+## Example
+```php
+// Write
+$command = new CreateUserCommand($email, $password);
+$bus->dispatch($command);
+
+// Read
+$query = new GetUserQuery($id);
+$response = $bus->dispatch($query);
+```
