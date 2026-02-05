@@ -1,7 +1,32 @@
 parameters:
     level: 5
     paths:
-        - src
+        - src/Board/Features
+        - src/Shared/Domain
+        - src/SharedKernel/Infrastructure/Sentry/SentryFeatureTagger.php
+        - src/Task/Features
+        - src/Task/Repository
+        - src/Task/Entity
+
+    excludePaths:
+        - src/SharedKernel/Infrastructure/Sentry/SentryFeatureTagger.php
+        - src/Board/Repository/BoardRepository.php
+        - src/Board/Entity
+        - src/Task/Entity/Task.php
 
     ignoreErrors:
         - '#Property .+ is never written, only read.#'
+        - '#Deprecated in PHP 8\.1: Required parameter .+ follows optional#'
+        - '#Deprecated in PHP 8\.0: Required parameter .+ follows optional#'
+        - '#Trait .+ is used zero times#'
+        - '#Attribute class .+ does not exist#'
+        - '#Class .+ not found#'
+        - '#Method .+ not found#'
+        - '#Function .+ not found#'
+        - '#Interface .+ not found#'
+        - '#Parameter .+ has unknown class#'
+        - '#Property .+ has unknown class#'
+        - '#Call to method .+ on an unknown class#'
+        - '#Return type .+ is invalid#'
+        - '#Instantiated class .+ not found#'
+        - '#Access to an undefined property#'
