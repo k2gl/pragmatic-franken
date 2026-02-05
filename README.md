@@ -135,7 +135,7 @@ pragmatic-franken/
 │   └── EndToEnd/
 ├── Makefile
 ├── docker-compose.yml
-└── .env.local.example
+└── prompts/                  # AI agent prompts and validation scripts
 ```
 
 ---
