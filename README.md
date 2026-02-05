@@ -22,18 +22,6 @@
 
 ---
 
-## ⚡️ Key Features
-
-| 🚀 Turbo Speed | 🔒 Auto SSL | 🤖 AI-Ready | ⚡️ Worker Mode |
-|---|---|---|---|
-| 15x faster cold boot | Caddy bundled | Cursor/Windsurf rules | Zero config |
-
-| 📦 Zero Config | 🔍 Static Analysis | 🌍 Modern PHP | 🎯 Production-Ready |
-|---|---|---|---|
-| Works out of the box | PHPStan Level 8 | PHP 8.5 | FrankenPHP |
-
----
-
 ## 🏗 Pragmatic Stack
 
 | Feature | Tech | Why? |
@@ -43,19 +31,6 @@
 | Database | PostgreSQL 16 | Robust, modern, ready for scale. |
 | Async | Messenger + Redis | Built-in CQRS for background heavy lifting. |
 | Observability | Prometheus + Grafana | Built-in metrics on port 2019 |
-
----
-
-## 📊 Performance
-
-FrankenPHP Worker Mode vs PHP-FPM benchmarks:
-
-| Metric | PHP-FPM | FrankenPHP Worker | Source |
-|--------|----------|-------------------|---------|
-| Cold Boot | ~150ms | ~10ms | [FrankenPHP](https://frankenphp.dev/docs/benchmarks/) |
-| Requests/sec | ~500 | ~8,000 | [TechEmpower](https://www.techempower.com/benchmarks/) |
-
-*[Full benchmarks →](docs/PERFORMANCE.md)*
 
 ---
 
@@ -94,6 +69,22 @@ The AI will:
 
 ---
 
+## 🛠 ADR: Architecture Decision Records
+
+We don't do "because I said so". Every decision is documented:
+
+| ADR | Topic | Priority |
+|-----|-------|----------|
+| [0001](docs/adr/0001-vertical-slices.md) | Vertical Slices Architecture | P0 |
+| [0002](docs/adr/0002-messenger-transport.md) | Messenger Transport (CQRS) | P0 |
+| [0003](docs/adr/0003-pragmatic-symfony-architecture.md) | Pragmatic Symfony | P0 |
+| [0004](docs/adr/0004-frankenphp-runtime.md) | FrankenPHP Runtime | P1 |
+| [0005](docs/adr/0005-health-checks.md) | Health Checks | P1 |
+| [0006](docs/adr/0006-memory-management.md) | Memory Management | P2 |
+| [0007](docs/adr/0007-asset-mapper.md) | AssetMapper | P2 |
+
+---
+
 ## ⚖️ Legacy vs Pragmatic
 
 | Layer | Legacy | Pragmatic |
@@ -116,6 +107,19 @@ How we write code:
 3. Handle it
 
 **No over-engineering.**
+
+---
+
+## 📊 Performance
+
+FrankenPHP Worker Mode vs PHP-FPM benchmarks:
+
+| Metric | PHP-FPM | FrankenPHP Worker | Source |
+|--------|----------|-------------------|---------|
+| Cold Boot | ~150ms | ~10ms | [FrankenPHP](https://frankenphp.dev/docs/benchmarks/) |
+| Requests/sec | ~500 | ~8,000 | [TechEmpower](https://www.techempower.com/benchmarks/) |
+
+*[Full benchmarks →](docs/PERFORMANCE.md)*
 
 ---
 
