@@ -13,7 +13,7 @@ This guide explains how to configure AI agents (Cursor, Windsurf, Copilot) to wo
 
 ## Directory Structure
 
-```
+`````
 .config/agents/
 ├── agents.md              ← Core rules (tracked)
 ├── agents.local.md.example ← Template (tracked)

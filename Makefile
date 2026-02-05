@@ -46,6 +46,11 @@ env-create:
 	@echo "GID=$(GROUP_ID)" >> .env
 	@echo "$(GREEN).env created with UID:$(USER_ID) and GID:$(GROUP_ID)$(RESET)"
 
+setup: env-create up install db-migrate ## One-command setup: create env, start containers, install deps, run migrations
+	@echo ""
+	@echo "$(GREEN)🎉 Your app is live at https://localhost!$(RESET)"
+	@echo "$(CYAN)Next: Run 'make shell' to enter the container.$(RESET)"
+
 install:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
 	$(DC) exec $(DC_APP) composer install --no-scripts
