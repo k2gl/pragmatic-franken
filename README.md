@@ -1,13 +1,15 @@
-# 🧑‍💻 Pragmatic Franken
+# 🧑‍💻 Pragmatic Franken 
 
 > **Why waste time on repetitive boilerplate?**
 > Pragmatic Franken is a unified, production-ready foundation built on Symfony and FrankenPHP. Focus on logic, not configuration.
 
 [![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777bb4?logo=php&logoColor=white)](https://www.php.net/releases/8.5/)
 [![FrankenPHP 1.x](https://img.shields.io/badge/FrankenPHP-1.x-006b5b?logo=docker&logoColor=white)](https://frankenphp.dev/)
-[![Symfony 7.2](https://img.shields.io/badge/Symfony-7.2-000000?logo=symfony&logoColor=white)](https://symfony.com/)
+[![Symfony 8.0](https://img.shields.io/badge/Symfony-8.0-000000?logo=symfony&logoColor=white)](https://symfony.com/)
 [![License MIT](https://img.shields.io/badge/License-MIT-yellowgreen)](https://opensource.org/licenses/MIT)
 [![CI Pipeline](https://img.shields.io/github/actions/workflow/status/k2gl/pragmatic-franken/ci.yml?branch=main&label=CI)](https://github.com/k2gl/pragmatic-franken/actions)
+[![PHPStan](https://img.shields.io/badge/PHPStan-Level%208-cyan)](https://phpstan.org)
+[![AI-Ready](https://img.shields.io/badge/AI--Ready-gold)](#)
 
 ---
 
@@ -20,6 +22,18 @@
 
 ---
 
+## ⚡️ Key Features
+
+| 🚀 Turbo Speed | 🔒 Auto SSL | 🤖 AI-Ready | ⚡️ Worker Mode |
+|---|---|---|---|
+| 15x faster cold boot | Caddy bundled | Cursor/Windsurf rules | Zero config |
+
+| 📦 Zero Config | 🔍 Static Analysis | 🌍 Modern PHP | 🎯 Production-Ready |
+|---|---|---|---|
+| Works out of the box | PHPStan Level 8 | PHP 8.5 | FrankenPHP |
+
+---
+
 ## 🏗 Pragmatic Stack
 
 | Feature | Tech | Why? |
@@ -29,6 +43,19 @@
 | Database | PostgreSQL 16 | Robust, modern, ready for scale. |
 | Async | Messenger + Redis | Built-in CQRS for background heavy lifting. |
 | Observability | Prometheus + Grafana | Built-in metrics on port 2019 |
+
+---
+
+## 📊 Performance
+
+FrankenPHP Worker Mode vs PHP-FPM benchmarks:
+
+| Metric | PHP-FPM | FrankenPHP Worker | Source |
+|--------|----------|-------------------|---------|
+| Cold Boot | ~150ms | ~10ms | [FrankenPHP](https://frankenphp.dev/docs/benchmarks/) |
+| Requests/sec | ~500 | ~8,000 | [TechEmpower](https://www.techempower.com/benchmarks/) |
+
+*[Full benchmarks →](docs/PERFORMANCE.md)*
 
 ---
 
@@ -92,7 +119,7 @@ How we write code:
 
 ---
 
-## ⚡️ Worker Mode Rules
+## 🐘 Worker Mode Rules
 
 | Rule | Bad | Good |
 |------|-----|------|
