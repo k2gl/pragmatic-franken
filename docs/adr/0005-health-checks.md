@@ -20,10 +20,10 @@ Production environments require health endpoints to:
 ### PHP Health Endpoint
 
 ```php
-// src/Health/UseCase/HealthCheck/HealthCheckController.php
+// src/Health/Features/HealthCheck/HealthCheckController.php
 declare(strict_types=1);
 
-namespace App\Health\UseCase\HealthCheck;
+namespace App\Health\Features\HealthCheck;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

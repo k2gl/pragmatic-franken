@@ -56,10 +56,10 @@ graph LR
 **Naming:** `*Command` for commands, `*Handler` for handlers
 
 ```php
-// src/Task/UseCase/CreateTask/CreateTaskCommand.php
+// src/Task/Features/CreateTask/CreateTaskCommand.php
 declare(strict_types=1);
 
-namespace App\Task\UseCase\CreateTask;
+namespace App\Task\Features\CreateTask;
 
 final readonly class CreateTaskCommand
 {
@@ -72,10 +72,10 @@ final readonly class CreateTaskCommand
 ```
 
 ```php
-// src/Task/UseCase/CreateTask/CreateTaskHandler.php
+// src/Task/Features/CreateTask/CreateTaskHandler.php
 declare(strict_types=1);
 
-namespace App\Task\UseCase\CreateTask;
+namespace App\Task\Features\CreateTask;
 
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -98,10 +98,10 @@ final readonly class CreateTaskHandler
 **Purpose:** Handle read operations (data retrieval)
 
 ```php
-// src/Task/UseCase/GetTask/GetTaskQuery.php
+// src/Task/Features/GetTask/GetTaskQuery.php
 declare(strict_types=1);
 
-namespace App\Task\UseCase\GetTask;
+namespace App\Task\Features\GetTask;
 
 final readonly class GetTaskQuery
 {
@@ -114,10 +114,10 @@ final readonly class GetTaskQuery
 **Purpose:** Notify other modules of domain changes
 
 ```php
-// src/Task/UseCase/Task/Event/TaskCompletedEvent.php
+// src/Task/Features/Task/Event/TaskCompletedEvent.php
 declare(strict_types=1);
 
-namespace App\Task\UseCase\Task\Event;
+namespace App\Task\Features\Task\Event;
 
 use App\Shared\Services\EventBus;
 

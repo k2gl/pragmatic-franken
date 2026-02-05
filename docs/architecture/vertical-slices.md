@@ -20,7 +20,7 @@ src/
 ├── User/                       # Module
 │   ├── Entity/
 │   ├── Enums/
-│   ├── UseCase/
+│   ├── Features/
 │   │   └── {FeatureName}/
 │   │       ├── Input/
 │   │       ├── Output/
@@ -38,7 +38,7 @@ src/
 │
 └── Health/                     # Technical feature
     ├── Services/
-    └── UseCase/
+    └── Features/
 ```
 
 ## What Goes to Shared?
@@ -55,7 +55,7 @@ src/
 
 | Type | Example |
 |------|---------|
-| UseCase | `CreateUser/` |
+| Features | `CreateUser/` |
 | Command | `CreateUserCommand.php` |
 | Query | `CreateUserQuery.php` |
 | Response | `CreateUserResponse.php` |

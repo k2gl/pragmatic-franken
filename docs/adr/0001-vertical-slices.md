@@ -27,9 +27,9 @@ src/
 ```
 src/
 └── FeatureName/
-    ├── FeatureNameMessage.php      # Command/Query
+    ├── FeatureNameCommand.php      # Command/Query
     ├── FeatureNameHandler.php      # Handler
-    ├── FeatureNameAction.php       # Controller
+    ├── FeatureNameController.php   # Controller
     ├── FeatureNameRequest.php      # Validation
     └── FeatureNameResponse.php     # DTO
 ```
@@ -43,7 +43,7 @@ src/
 | **Organization Principle** | Технические слои (горизонтально) | Бизнес-фичи (вертикально) |
 | **Cohesion** | Низкая (код размазан по папкам) | Максимальная (всё в одной папке) |
 | **Coupling** | Высокий (слои зависят друг от друга) | Низкий (фичи изолированы) |
-| **Abstractions** | Много (Repository, Service, Interface) | Минимум (Handler, Message) |
+| **Abstractions** | Много (Repository, Service, Interface) | Минимум (Handler, Command) |
 | **DRY vs WET** | Фанатичный DRY | WET ради independence |
 | **Learning Curve** | Высокий (нужно знать все слои) | Низкий (открыл папку — видишь всё) |
 
@@ -112,8 +112,8 @@ src/
 | Task | DDD Files to Open | VSA Files to Open | Context Saved |
 |------|------------------|-------------------|---------------|
 | Add new field | 5-7 (Entity, DTO, Request, Response, Service, Repository, Tests) | 2-3 (DTO, Handler, Tests) | 50-60% |
-| Fix authentication bug | 4-6 (Security, Controller, Service, TokenHandler) | 1-2 (Auth UseCase) | 70-80% |
-| Add new API endpoint | 6-8 (Controller, Request, DTO, Service, Repository, Handler, Tests) | 3-4 (UseCase folder) | 50% |
+| Fix authentication bug | 4-6 (Security, Controller, Service, TokenHandler) | 1-2 (Auth Features) | 70-80% |
+| Add new API endpoint | 6-8 (Controller, Request, DTO, Service, Repository, Handler, Tests) | 3-4 (Features folder) | 50% |
 
 ### Code Generation Accuracy
 
@@ -340,7 +340,7 @@ To address VSA challenges:
 
 5. Noback, M. (2020). "Principles of Package Design". Leanpub.
 
-6. Dahan, U. (2013). "Events, Commands, and the Message Flow". Particular Software.
+6. Dahan, U. (2013). "Events, Commands, and the Command Flow". Particular Software.
 
 ### Research Papers
 
@@ -422,7 +422,7 @@ The most common mistake: create one giant Entity User used in 20 slices.
 
 **Example**:
 ```php
-// Order/UseCase/GetOrder/Output/OrderReadModel.php
+// Order/Features/GetOrder/Output/OrderReadModel.php
 final readonly class OrderReadModel
 {
     public function __construct(
@@ -449,10 +449,10 @@ src/
 │   ├── Shared/          # Module-level Shared (contracts, events)
 │   │   ├── Events/
 │   │   └── DTO/
-│   └── UseCase/
+│   └── Features/
 ├── Order/
 │   ├── Shared/          # Module-level Shared
-│   └── UseCase/
+│   └── Features/
 ```
 
 ### Controlling Growth with Architecture Tests
@@ -469,20 +469,20 @@ Use **Deptrac** (PHP/Symfony) to prevent cross-slice dependencies:
 paths:
   - src/
 layers:
-  - name: UseCase
+  - name: Features
     collectors:
       - type: directory
-        regex: 'src/.*/UseCase/.*'
+        regex: 'src/.*/Features/.*'
   - name: Shared
     collectors:
       - type: directory
         regex: 'src/Shared/.*'
 ruleset:
-  - from: UseCase
+  - from: Features
     to: Shared
       allow: true
-  - from: UseCase
-    to: UseCase
+  - from: Features
+    to: Features
       allow: false  # Slices cannot depend on each other
 ```
 
@@ -490,7 +490,7 @@ ruleset:
 
 1. **No empty directories**: Create directories only when files exist
 2. **Shared namespace**: For truly cross-cutting concerns only
-3. **UseCase naming**: Features organized under `UseCase/` namespace with `Input/`, `Output/`, `Handler/` subdirectories
+3. **Features naming**: Features organized under `Features/` namespace with `Input/`, `Output/`, `Handler/` subdirectories
 4. **Gradual migration**: Start new features with VSA, migrate old code incrementally
 
 ### Directory Structure
@@ -509,7 +509,7 @@ src/
 │   ├── Clients/
 │   ├── Repositories/
 │   ├── Exception/
-│   └── UseCase/
+│   └── Features/
 │       └── {FeatureName}/
 │           ├── Input/
 │           ├── Output/
@@ -520,7 +520,7 @@ src/
 ├── Task/                 # Аналогично User
 └── Health/              # Technical feature
     ├── Services/
-    └── UseCase/
+    └── Features/
         └── HealthCheck/
 ```
 
@@ -574,18 +574,18 @@ AI Solution: Clearly goes to GetUserProfile/Output/
 #### Implementation Cost in Symfony (Messenger)
 
 ```php
-// Command (Write) - CreateTaskMessage.php
-#[AsMessageHandler]
+// Command (Write) - CreateTaskCommand.php
+#[AsCommandHandler]
 readonly class CreateTaskHandler
 {
-    public function handle(CreateTaskMessage $message): TaskCreatedResponse
+    public function handle(CreateTaskCommand $message): TaskCreatedResponse
     {
         // Write logic only
     }
 }
 
 // Query (Read) - GetTaskQuery.php
-#[AsMessageHandler]
+#[AsCommandHandler]
 readonly class GetTaskHandler
 {
     public function handle(GetTaskQuery $query): TaskResponse
@@ -599,7 +599,7 @@ readonly class GetTaskHandler
 
 | Aspect | Without CQRS | With CQRS |
 |--------|--------------|-----------|
-| **Initial files** | 1 service file | 2 files (Message + Handler) |
+| **Initial files** | 1 service file | 2 files (Command + Handler) |
 | **Time to create** | 5 minutes | 5-10 minutes |
 | **Time to add Redis caching** | 2-4 hours (refactor) | 30 minutes (add to Query) |
 | **Risk of breaking writes** | High | Zero |
@@ -622,13 +622,13 @@ Without CQRS: Risk breaking write validation while optimizing read.
 
 ```bash
 # Create Command (Write)
-src/User/UseCase/RegisterUser/Input/RegisterUserCommand.php
-src/User/UseCase/RegisterUser/Handler/RegisterUserHandler.php
+src/User/Features/RegisterUser/Input/RegisterUserCommand.php
+src/User/Features/RegisterUser/Handler/RegisterUserHandler.php
 
 # Create Query (Read)
-src/User/UseCase/GetUserProfile/Input/GetUserProfileQuery.php
-src/User/UseCase/GetUserProfile/Handler/GetUserProfileHandler.php
-src/User/UseCase/GetUserProfile/Output/UserProfileResponse.php
+src/User/Features/GetUserProfile/Input/GetUserProfileQuery.php
+src/User/Features/GetUserProfile/Handler/GetUserProfileHandler.php
+src/User/Features/GetUserProfile/Output/UserProfileResponse.php
 ```
 
 **Total additional files**: 1-2 per feature
@@ -650,7 +650,7 @@ src/User/UseCase/GetUserProfile/Output/UserProfileResponse.php
 ├── Task/                 # Аналогично User
 └── Health/              # Техническая фича
     ├── Services/
-    └── UseCase/
+    └── Features/
         └── HealthCheck/
 ```
 
