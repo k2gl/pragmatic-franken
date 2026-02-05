@@ -1,4 +1,4 @@
-# ADR 007: Vertical Slices Architecture vs Classic DDD
+# ADR 1: Vertical Slices Architecture
 
 ## Status
 
@@ -622,7 +622,7 @@ Without CQRS: Risk breaking write validation while optimizing read.
 
 ```bash
 # Create Command (Write)
-src/User/UseCase/RegisterUser/Input/RegisterUserMessage.php
+src/User/UseCase/RegisterUser/Input/RegisterUserCommand.php
 src/User/UseCase/RegisterUser/Handler/RegisterUserHandler.php
 
 # Create Query (Read)

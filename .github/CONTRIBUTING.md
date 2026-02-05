@@ -55,7 +55,7 @@ pragmatic-franken/
 ├── src/
 │   ├── Kernel.php              # Symfony MicroKernel
 │   ├── User/                   # Module (Bounded Context)
-│   │   ├── Features/          # Vertical Slices
+│   │   ├── UseCase/          # Feature Slices
 │   │   ├── Entity/
 │   │   └── Repository/
 │   └── Shared/                # Cross-module Shared Kernel

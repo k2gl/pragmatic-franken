@@ -1,4 +1,4 @@
-# ADR 005: Health Checks
+# ADR 5: Health Checks
 
 **Date:** 2026-02-05
 **Status:** Accepted
@@ -20,16 +20,16 @@ Production environments require health endpoints to:
 ### PHP Health Endpoint
 
 ```php
-// src/Health/Features/HealthCheck/HealthCheckAction.php
+// src/Health/UseCase/HealthCheck/HealthCheckController.php
 declare(strict_types=1);
 
-namespace App\Health\Features\HealthCheck;
+namespace App\Health\UseCase\HealthCheck;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-final readonly class HealthCheckAction
+final readonly class HealthCheckController
 {
     #[Route('/healthz', methods: ['GET'])]
     public function __invoke(): JsonResponse

@@ -1,4 +1,4 @@
-# ADR 001: Pragmatic Symfony Architecture
+# ADR 3: Pragmatic Symfony Architecture
 
 ## Status
 
@@ -65,18 +65,18 @@ We use built-in Symfony tools (Serializers or `#[MapRequestPayload]`) for automa
 ```php
 use Symfony\Component\Messenger\MessageBusInterface;
 
-final readonly class CreateTaskAction
+final readonly class CreateTaskController
 {
     public function __invoke(
-        #[MapRequestPayload] CreateTaskMessage $message,
+        #[MapRequestPayload] CreateTaskCommand $command,
         MessageBusInterface $bus,
     ): TaskResponse {
-        return $bus->dispatch($message);
+        return $bus->dispatch($command);
     }
 }
 ```
 
-See [ADR 004: Messenger Transport](adr-004-messenger-transport.md) for implementation details.
+See [ADR 2: Messenger Transport](0002-messenger-transport.md) for implementation details.
 
 **Acceptable Alternative:** Direct service calls are still allowed for simple CRUD (see Appendix B).
 
@@ -151,12 +151,12 @@ declare(strict_types=1);
 
 namespace App\User\UI\Http;
 
-use App\User\Application\Message\CreateUserMessage;
+use App\User\Application\Command\CreateUserCommand;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-final readonly class CreateUserAction
+final readonly class CreateUserController
 {
     public function __construct(
         private MessageBusInterface $bus
@@ -164,9 +164,9 @@ final readonly class CreateUserAction
 
     #[Route('/api/users', methods: ['POST'])]
     public function __invoke(
-        #[MapRequestPayload] CreateUserMessage $message
+        #[MapRequestPayload] CreateUserCommand $command
     ): JsonResponse {
-        $response = $this->bus->dispatch($message);
+        $response = $this->bus->dispatch($command);
         return $this->json(['id' => $response->id], 201);
     }
 }
@@ -179,7 +179,7 @@ declare(strict_types=1);
 
 namespace App\User\Application\Handler;
 
-use App\User\Application\Message\CreateUserMessage;
+use App\User\Application\Command\CreateUserCommand;
 use App\User\Application\Response\UserResponse;
 use App\User\Infrastructure\UserRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -191,9 +191,9 @@ final readonly class CreateUserHandler
         private UserRepository $repository
     ) {}
 
-    public function handle(CreateUserMessage $message): UserResponse
+    public function handle(CreateUserCommand $command): UserResponse
     {
-        $user = User::register($message->email, $message->username);
+        $user = User::register($command->email, $command->username);
         $this->repository->save($user);
         return UserResponse::fromEntity($user);
     }
@@ -202,7 +202,7 @@ final readonly class CreateUserHandler
 
 ---
 
-## Appendix A: ADR 001 Compliance Checklist
+## Appendix A: ADR 003 Compliance Checklist
 
 ### 1. Structure and Layers
 
@@ -253,7 +253,7 @@ use App\User\Application\Service\UserService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-final readonly class CreateUserAction
+final readonly class CreateUserController
 {
     public function __construct(private UserService $userService) {}
 

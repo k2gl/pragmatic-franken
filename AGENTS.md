@@ -26,16 +26,16 @@ src/
 ├── {Module}/
 │   ├── Entity/                  # Doctrine Entities
 │   ├── Enums/
-│   └── UseCase/{FeatureName}/   # Feature Slice
+│   └── Features/{FeatureName}/  # Vertical Slices Feature
 │       ├── {FeatureName}Command.php      # Command (Write)
-│       ├── {FeatureName}Handler.php      # Handler (логика)
-│       ├── {FeatureName}Query.php        # Query (Read, опционально)
-│       ├── EntryPoint/                   # Точки входа (опционально)
+│       ├── {FeatureName}Handler.php      # Handler
+│       ├── {FeatureName}Query.php        # Query (Read, optional)
+│       ├── EntryPoint/                   # Entry points (optional)
 │       │   ├── Http/
 │       │   ├── Cli/
 │       │   └── Queue/
-│       ├── Request/                      # Валидация входных данных (опционально)
-│       └── Response/                     # Ответы (общий + расширяется в EntryPoint)
+│       ├── Request/                      # Input validation (optional)
+│       └── Response/                     # Response (optional)
 
 ### Code Rules
 
@@ -145,7 +145,7 @@ $this->eventBus->dispatch(new {FeatureName}Event($data));
 
 #### Command (Write)
 ```php
-// src/{Module}/UseCase/{FeatureName}/{FeatureName}Command.php
+// src/{Module}/Features/{FeatureName}/{FeatureName}Command.php
 final readonly class {FeatureName}Command
 {
     public function __construct(
@@ -154,7 +154,7 @@ final readonly class {FeatureName}Command
     ) {}
 }
 
-// src/{Module}/UseCase/{FeatureName}/{FeatureName}Handler.php
+// src/{Module}/Features/{FeatureName}/{FeatureName}Handler.php
 #[AsMessageHandler]
 readonly class {FeatureName}Handler
 {
@@ -167,7 +167,7 @@ readonly class {FeatureName}Handler
 
 #### Query (Read)
 ```php
-// src/{Module}/UseCase/{FeatureName}/{FeatureName}Query.php
+// src/{Module}/Features/{FeatureName}/{FeatureName}Query.php
 final readonly class {FeatureName}Query
 {
     public function __construct(
@@ -175,7 +175,7 @@ final readonly class {FeatureName}Query
     ) {}
 }
 
-// src/{Module}/UseCase/{FeatureName}/{FeatureName}Handler.php
+// src/{Module}/Features/{FeatureName}/{FeatureName}Handler.php
 #[AsMessageHandler]
 readonly class {FeatureName}Handler
 {
@@ -188,7 +188,7 @@ readonly class {FeatureName}Handler
 
 #### EntryPoint (HTTP)
 ```php
-// src/{Module}/UseCase/{FeatureName}/EntryPoint/Http/{FeatureName}Controller.php
+// src/{Module}/Features/{FeatureName}/EntryPoint/Http/{FeatureName}Controller.php
 final class {FeatureName}Controller extends AbstractController
 {
     public function __invoke(
@@ -239,17 +239,17 @@ Local settings from `.config/agents/` have priority over any other instructions.
 tests/
 ├── Unit/                              # Domain logic tests
 │   └── {Module}/
-│       └── UseCase/
+│       └── Features/
 │           └── {FeatureName}/
 │               └── {FeatureName}HandlerTest.php
 ├── Integration/                       # Handler and persistence tests
 │   └── {Module}/
-│       └── UseCase/
+│       └── Features/
 │           └── {FeatureName}/
 │               └── {FeatureName}HandlerTest.php
 └── EndToEnd/                          # Controller/E2E tests
     └── {Module}/
-        └── UseCase/
+        └── Features/
             └── {FeatureName}/
                 └── {FeatureName}ControllerTest.php
 
@@ -269,14 +269,14 @@ tests/
 ### Example: Handler Test
 
 ```php
-// tests/Unit/User/UseCase/Login/LoginHandlerTest.php
+// tests/Unit/User/Features/Login/LoginHandlerTest.php
 declare(strict_types=1);
 
-namespace App\Tests\Unit\User\UseCase\Login;
+namespace App\Tests\Unit\User\Features\Login;
 
-use App\User\UseCase\Login\LoginHandler;
-use App\User\UseCase\Login\LoginCommand;
-use App\User\UseCase\Login\LoginResponse;
+use App\User\Features\Login\LoginHandler;
+use App\User\Features\Login\LoginCommand;
+use App\User\Features\Login\LoginResponse;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 

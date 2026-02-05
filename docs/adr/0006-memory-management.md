@@ -1,4 +1,4 @@
-# ADR 006: Memory Management
+# ADR 6: Memory Management
 
 **Date:** 2026-02-05
 **Status:** Accepted

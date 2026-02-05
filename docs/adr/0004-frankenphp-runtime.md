@@ -1,4 +1,4 @@
-# ADR 002: FrankenPHP Runtime
+# ADR 4: FrankenPHP Runtime
 
 **Date:** 2026-02-04
 **Status:** Accepted

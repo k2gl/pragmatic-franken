@@ -1,4 +1,4 @@
-# ADR 004: Messenger Transport
+# ADR 2: Messenger Transport
 
 **Date:** 2026-02-04
 **Status:** Accepted
@@ -22,7 +22,7 @@ We use **Symfony Messenger** as the main communication bus implementing CQRS pat
 - **Queries** for read operations (synchronous)
 - **Events** for cross-module communication (asynchronous by default)
 
-See [ADR 001: Pragmatic Symfony Architecture](adr-001-pragmatic-symfony-architecture.md) for the Message Bus Rule and compliance requirements.
+See [ADR 3: Pragmatic Symfony Architecture](0003-pragmatic-symfony-architecture.md) for the Message Bus Rule and compliance requirements.
 
 ## Command-Query Responsibility Segregation
 
@@ -53,7 +53,7 @@ graph LR
 
 **Purpose:** Handle write operations (state changes)
 
-**Naming:** `*Message` for messages, `*Handler` for handlers
+**Naming:** `*Command` for commands, `*Handler` for handlers
 
 ```php
 // src/Task/UseCase/CreateTask/CreateTaskCommand.php

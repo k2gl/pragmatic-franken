@@ -1,23 +1,23 @@
-# Vertical Slices Architecture — Краткое руководство
+# Vertical Slices Architecture — Quick Guide
 
-## Принципы
+## Principles
 
-| Принцип | Описание |
-|---------|----------|
-| **Slices** | Код группируется по бизнес-фичам, не по техническим слоям |
-| **CQRS** | Разделение Command (запись) и Query (чтение) |
-| **Low Coupling** | Минимум зависимостей между срезами |
-| **High Cohesion** | Всё для фичи — в одной папке |
+| Principle | Description |
+|-----------|-------------|
+| **Slices** | Code grouped by business features, not technical layers |
+| **CQRS** | Command (write) and Query (read) separation |
+| **Low Coupling** | Minimum dependencies between slices |
+| **High Cohesion** | Everything for a feature in one folder |
 
-## Структура проекта
+## Project Structure
 
 ```
 src/
-├── Shared/                      # Инфраструктура (исключения, сервисы)
+├── Shared/                      # Infrastructure (exceptions, services)
 │   ├── Exception/
 │   └── Services/
 │
-├── User/                       # Модуль
+├── User/                       # Module
 │   ├── Entity/
 │   ├── Enums/
 │   ├── UseCase/
@@ -25,41 +25,45 @@ src/
 │   │       ├── Input/
 │   │       ├── Output/
 │   │       ├── Handler/
-│   │       ├── Action/
+│   │       ├── EntryPoint/
+│   │       │   ├── Http/
+│   │       │   └── Cli/
 │   │       └── Client/
 │
-├── Board/                      # Модуль
+├── Board/                      # Module
 │   └── ...
 │
-├── Task/                       # Модуль
+├── Task/                       # Module
 │   └── ...
 │
-└── Health/                     # Техническая фича
+└── Health/                     # Technical feature
     ├── Services/
     └── UseCase/
 ```
 
-## Что выносить в Shared?
+## What Goes to Shared?
 
-### Выносим (Always)
-- Инфраструктурные обёртки (Helpers)
-- Базовые исключения
+### Extract (Always)
+- Infrastructure wrappers (Helpers)
+- Base exceptions
 
-### НЕ выносим (Never)
-- Бизнес-логику
-- Похожий код в разных срезах (WET > DRY)
+### Do NOT Extract (Never)
+- Business logic
+- Similar code in different slices (WET > DRY)
 
 ## Naming Conventions
 
-| Тип | Пример |
-|-----|--------|
+| Type | Example |
+|------|---------|
 | UseCase | `CreateUser/` |
-| Input/Command | `CreateUserMessage.php` |
-| Output/Response | `CreateUserResponse.php` |
+| Command | `CreateUserCommand.php` |
+| Query | `CreateUserQuery.php` |
+| Response | `CreateUserResponse.php` |
 | Handler | `CreateUserHandler.php` |
-| Action/Controller | `CreateUserAction.php` |
+| Controller | `CreateUserController.php` |
+| EntryPoint/Http | `CreateUserController.php` |
 
-## Конфигурация
+## Configuration
 
 ### services.yaml
 ```yaml
@@ -83,20 +87,20 @@ controllers:
     type: attribute
 ```
 
-## Ключевые инструменты
+## Key Tools
 
-1. **Symfony Messenger** — для Command/Query Bus
-2. **Deptrac** — для контроля границ модулей
-3. **PHPStan** — статический анализ
+1. **Symfony Messenger** — Command/Query Bus
+2. **Deptrac** — Module boundary control
+3. **PHPStan** — Static analysis
 
-## Преимущества для ИИ-агентов
+## AI Agent Benefits
 
-- **Локализация контекста**: одна папка = один запрос к ИИ
-- **Простота тестирования**: один вход → один выход
-- **Безопасные изменения**: изменение одного среза не ломает другие
+- **Context localization**: One folder = one AI request
+- **Simple testing**: One input → one output
+- **Safe changes**: Changing one slice doesn't break others
 
-## Ссылки
+## References
 
-- [ADR-007: Vertical Slices vs Classic DDD](../adr/adr-007-vertical-slices-vs-classic-ddd.md)
+- [ADR 1: Vertical Slices Architecture](0001-vertical-slices.md)
 - [Symfony Messenger](https://symfony.com/doc/current/messenger.html)
 - [Deptrac](https://github.com/qossmic/deptrac)

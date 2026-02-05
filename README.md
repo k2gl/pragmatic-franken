@@ -77,7 +77,7 @@ pragmatic-franken/
 │   ├── User/                   # Module (Bounded Context)
 │   │   ├── Entity/             # Doctrine Entities
 │   │   ├── Enums/
-│   │   └── UseCase/            # Vertical Slices
+│   │   └── Features/            # Vertical Slices
 │   │       ├── RegisterUser/
 │   │       │   ├── RegisterUserCommand.php      # Command
 │   │       │   ├── RegisterUserHandler.php      # Handler
@@ -99,13 +99,13 @@ pragmatic-franken/
 │   └── ...
 ├── docs/                       # Architecture decisions (ADRs) and guides
 │   ├── adr/                    # Architectural Decision Records
-│   │   ├── adr-001-pragmatic-symfony-architecture.md
-│   │   ├── adr-002-frankenphp-runtime.md
-│   │   ├── adr-003-asset-mapper.md
-│   │   ├── adr-004-messenger-transport.md
-│   │   ├── adr-005-health-checks.md
-│   │   ├── adr-006-memory-management.md
-│   │   └── adr-007-vertical-slices-vs-classic-ddd.md
+│   │   ├── 0001-vertical-slices.md       # Folder Structure (P0)
+│   │   ├── 0002-messenger-transport.md  # CQRS Pattern (P0)
+│   │   ├── 0003-pragmatic-symfony-architecture.md  # Core Architecture (P0)
+│   │   ├── 0004-frankenphp-runtime.md    # Server Runtime (P1)
+│   │   ├── 0005-health-checks.md         # Production Health (P1)
+│   │   ├── 0006-memory-management.md     # Performance (P2)
+│   │   └── 0007-asset-mapper.md          # Frontend Assets (P2)
 │   ├── architecture/           # Architecture documentation
 │   │   └── vertical-slices.md
 │   └── guides/                 # Development guides
@@ -122,50 +122,13 @@ pragmatic-franken/
 ├── AGENTS.md                  # AI Agent entry point
 └── .config/agents/            # AI Agent configurations
 ```
-pragmatic-franken/
-├── src/
-│   ├── Kernel.php              # Symfony MicroKernel
-│   ├── User/                   # Module (Bounded Context)
-│   │   ├── Features/          # Vertical Slices
-│   │   │   ├── RegisterUser/
-│   │   │   │   ├── RegisterUserAction.php       # Controller
-│   │   │   │   ├── RegisterUserMessage.php      # DTO
-│   │   │   │   ├── RegisterUserHandler.php       # Business Logic
-│   │   │   │   └── RegisterUserResponse.php      # Response
-│   │   │   └── Events/
-│   │   │       └── UserRegisteredEvent.php       # Domain Event
-│   │   ├── Entity/
-│   │   │   └── User.php
-│   │   └── Repository/
-│   └── Shared/                 # Cross-module Shared Kernel
-│       ├── Messaging/          # Messenger config
-│       └── EventBus.php
-├── config/                     # Symfony configuration
-├── docker/
-│   ├── frankenphp/            # FrankenPHP config + Caddyfile
-│   ├── php/                   # PHP extensions
-│   └── ...
-├── docs/                       # Architecture decisions (ADRs) and guides
-│   ├── adr/                    # Architectural Decision Records
-│   ├── architecture/           # Architecture documentation
-│   └── guides/                 # Development guides
-├── tests/                      # PHPUnit tests
-├── .github/
-│   ├── workflows/             # CI/CD pipelines
-│   └── CONTRIBUTING.md        # Contribution guidelines
-├── Caddyfile                  # FrankenPHP server config (symlinked)
-├── docker-compose.yml
-├── Makefile
-├── AGENTS.md                  # AI Agent entry point
-└── .config/agents/            # AI Agent configurations
-```
 
 ## 🔄 Application Flow
 
 ```mermaid
 flowchart TD
-    A[HTTP Request] --> B[Action / Controller]
-    B --> C[Message / Command]
+    A[HTTP Request] --> B[Controller / EntryPoint]
+    B --> C[Command / Query]
     C --> D[Handler]
     D --> E[Entity / Domain]
     D --> F[Repository]

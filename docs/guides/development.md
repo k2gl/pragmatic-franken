@@ -88,7 +88,7 @@ pragmatic-franken/
 │   ├── {Module}/
 │   │   ├── Entity/             # Doctrine Entities
 │   │   ├── Enums/
-│   │   └── UseCase/{FeatureName}/   # Feature Slice
+│   │   └── Features/{FeatureName}/   # Feature Slice
 │   │       ├── {FeatureName}Command.php
 │   │       ├── {FeatureName}Handler.php
 │   │       ├── EntryPoint/Http/{FeatureName}Controller.php
@@ -136,20 +136,20 @@ pragmatic-franken/
 
 ## Creating a New Feature
 
-### Step 1: Create UseCase Structure
+### Step 1: Create Features Structure
 
 ```bash
-# Create UseCase directories
-mkdir -p src/Task/UseCase/CreateTask/{EntryPoint/Http,Request,Response}
+# Create Features directories
+mkdir -p src/Task/Features/CreateTask/{EntryPoint/Http,Request,Response}
 ```
 
 ### Step 2: Define Command
 
 ```php
-// src/Task/UseCase/CreateTask/CreateTaskCommand.php
+// src/Task/Features/CreateTask/CreateTaskCommand.php
 declare(strict_types=1);
 
-namespace App\Task\UseCase\CreateTask;
+namespace App\Task\Features\CreateTask;
 
 final readonly class CreateTaskCommand
 {
@@ -164,14 +164,14 @@ final readonly class CreateTaskCommand
 ### Step 3: Create Handler
 
 ```php
-// src/Task/UseCase/CreateTask/CreateTaskHandler.php
+// src/Task/Features/CreateTask/CreateTaskHandler.php
 declare(strict_types=1);
 
-namespace App\Task\UseCase\CreateTask;
+namespace App\Task\Features\CreateTask;
 
 use App\Task\Entity\Task;
-use App\Task\UseCase\CreateTask\Request\CreateTaskRequest;
-use App\Task\UseCase\CreateTask\Response\CreateTaskResponse;
+use App\Task\Features\CreateTask\Request\CreateTaskRequest;
+use App\Task\Features\CreateTask\Response\CreateTaskResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -196,10 +196,10 @@ final readonly class CreateTaskHandler
 ### Step 4: Create Request DTO with Validation
 
 ```php
-// src/Task/UseCase/CreateTask/Request/CreateTaskRequest.php
+// src/Task/Features/CreateTask/Request/CreateTaskRequest.php
 declare(strict_types=1);
 
-namespace App\Task\UseCase\CreateTask\Request;
+namespace App\Task\Features\CreateTask\Request;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Attributes as OA;
@@ -227,14 +227,14 @@ final readonly class CreateTaskRequest
 ### Step 5: Create Controller
 
 ```php
-// src/Task/UseCase/CreateTask/EntryPoint/Http/CreateTaskController.php
+// src/Task/Features/CreateTask/EntryPoint/Http/CreateTaskController.php
 declare(strict_types=1);
 
-namespace App\Task\UseCase\CreateTask\EntryPoint\Http;
+namespace App\Task\Features\CreateTask\EntryPoint\Http;
 
-use App\Task\UseCase\CreateTask\CreateTaskCommand;
-use App\Task\UseCase\CreateTask\Request\CreateTaskRequest;
-use App\Task\UseCase\CreateTask\Response\CreateTaskResponse;
+use App\Task\Features\CreateTask\CreateTaskCommand;
+use App\Task\Features\CreateTask\Request\CreateTaskRequest;
+use App\Task\Features\CreateTask\Response\CreateTaskResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -258,13 +258,13 @@ final class CreateTaskController
 ### Step 6: Write Tests
 
 ```php
-// tests/Unit/Task/UseCase/CreateTask/CreateTaskHandlerTest.php
+// tests/Unit/Task/Features/CreateTask/CreateTaskHandlerTest.php
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Task\UseCase\CreateTask;
+namespace App\Tests\Unit\Task\Features\CreateTask;
 
-use App\Task\UseCase\CreateTask\CreateTaskHandler;
-use App\Task\UseCase\CreateTask\CreateTaskCommand;
+use App\Task\Features\CreateTask\CreateTaskHandler;
+use App\Task\Features\CreateTask\CreateTaskCommand;
 use PHPUnit\Framework\TestCase;
 
 final class CreateTaskHandlerTest extends TestCase

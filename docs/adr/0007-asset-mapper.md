@@ -1,4 +1,4 @@
-# ADR 003: AssetMapper
+# ADR 7: AssetMapper
 
 **Date:** 2026-02-05
 **Status:** Accepted

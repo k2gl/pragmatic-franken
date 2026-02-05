@@ -25,17 +25,17 @@ This project follows a layered testing strategy matching the application archite
 tests/
 ├── Unit/                              # Handler tests (isolated)
 │   └── {Module}/
-│       └── UseCase/
+│       └── Features/
 │           └── {FeatureName}/
 │               └── {FeatureName}HandlerTest.php
 ├── Integration/                       # Handler + persistence tests
 │   └── {Module}/
-│       └── UseCase/
+│       └── Features/
 │           └── {FeatureName}/
 │               └── {FeatureName}HandlerTest.php
 └── EndToEnd/                          # Controller tests
     └── {Module}/
-        └── UseCase/
+        └── Features/
             └── {FeatureName}/
                 └── {FeatureName}ControllerTest.php
 ```
@@ -53,11 +53,11 @@ tests/
 ```php
 declare(strict_types=1);
 
-namespace App\Tests\Unit\User\UseCase\Login;
+namespace App\Tests\Unit\User\Features\Login;
 
-use App\User\UseCase\Login\LoginHandler;
-use App\User\UseCase\Login\LoginCommand;
-use App\User\UseCase\Login\LoginResponse;
+use App\User\Features\Login\LoginHandler;
+use App\User\Features\Login\LoginCommand;
+use App\User\Features\Login\LoginResponse;
 use PHPUnit\Framework\TestCase;
 
 final class LoginHandlerTest extends TestCase
@@ -238,7 +238,7 @@ final class CreateOrderHandlerTest extends TestCase
 }
 ```
 
-## 3. UI Tests (Controller Layer)
+## 3. EndToEnd Tests (Controller Layer)
 
 **Purpose:** Test HTTP endpoints
 
@@ -249,11 +249,11 @@ final class CreateOrderHandlerTest extends TestCase
 ```php
 declare(strict_types=1);
 
-namespace App\Tests\UI\Http;
+namespace App\Tests\EndToEnd\Http;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class CreateUserActionTest extends WebTestCase
+final class CreateUserControllerTest extends WebTestCase
 {
     public function test_creates_user_and_returns_201(): void
     {
