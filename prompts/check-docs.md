@@ -27,6 +27,8 @@ Read every file found:
 - `.config/agents/agents.local.md` (if exists)
 - `AGENTS.md`, `README.md`
 - `.github/CONTRIBUTING.md`
+- `.cursorrules`, `.windsurfrules`
+- `.cursor/rules/*.rule`
 
 ## Step 2: Checklist for Each File
 
@@ -57,6 +59,11 @@ Check for naming conflicts:
 #### 4. Language
 - [ ] Code comments in English
 - [ ] Documentation in English
+
+#### 5. IDE Rules Consistency
+- [ ] `.cursorrules` and `.windsurfrules` match AGENTS.md rules
+- [ ] `.cursor/rules/*.rule` consistent with ADR documentation
+- [ ] No contradictions between IDE rules and AGENTS.md
 
 ## Step 3: Output Format
 
