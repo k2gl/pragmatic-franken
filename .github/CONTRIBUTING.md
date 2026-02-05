@@ -1,6 +1,15 @@
 # Contributing to Pragmatic Franken
 
-Thank you for your interest in contributing! This guide will help you get started.
+First of all, thank you for wanting to make the PHP world better! 🚀
+
+## How to Help
+
+1. **Follow the ADRs**: If you want to change something architectural, please open a Discussion first. We follow the decisions in `docs/adr/`.
+2. **AI-Ready Code**: If you add new features, ensure they are "understandable" for AI (proper types, attributes, and no hidden magic).
+3. **PR Style**:
+   - Keep it small.
+   - Mention which ADR it relates to.
+   - Add a "vibe" emoji to your PR title (e.g., `⚡️ feature: add redis healthcheck`).
 
 ## Quick Start
 
@@ -26,7 +35,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ## Code Standards
 
-- All code must follow DDD patterns (see `.config/agents/agents.md`)
+- All code must follow Vertical Slices architecture (see [AGENTS.md](AGENTS.md))
 - PHP 8.5+ with strict typing
 - All tests must pass
 - PHPStan level 8 compliance
@@ -55,7 +64,7 @@ pragmatic-franken/
 ├── src/
 │   ├── Kernel.php              # Symfony MicroKernel
 │   ├── User/                   # Module (Bounded Context)
-│   │   ├── UseCase/          # Feature Slices
+│   │   ├── Features/          # Feature Slices
 │   │   ├── Entity/
 │   │   └── Repository/
 │   └── Shared/                # Cross-module Shared Kernel
