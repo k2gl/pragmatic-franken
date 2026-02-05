@@ -1,9 +1,13 @@
+controllers:
+    resource: ../src/
+    type: attribute
+
 api_tasks:
     path: /api/tasks
-    controller: App\Task\Features\CreateTask\CreateTaskAction
+    controller: App\Task\UseCase\CreateTask\Action\CreateTaskAction
     methods: [POST]
 
 api_boards_id:
     path: /api/boards/{id}
-    controller: App\Board\Features\GetBoard\GetBoardAction
+    controller: App\Board\UseCase\GetBoard\Action\GetBoardAction
     methods: [GET]

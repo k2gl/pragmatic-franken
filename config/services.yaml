@@ -4,4 +4,18 @@ _defaults:
 
 App\:
     resource: '../src/'
-    exclude: '../src/{DependencyInjection,Entity,Kernel.php}'
+    exclude:
+        - '../src/Shared/{Exception,Services}/'
+        - '../src/*/{Entity,Enums}/'
+        - '../src/*/UseCase/*/Repository/'
+        - '../src/Kernel.php'
+
+App\Shared\:
+    resource: '../src/Shared/'
+    exclude: '../src/Shared/{Exception,Services}/*'
+
+App\**\*Controller:
+    tags: ['controller.service_arguments']
+
+App\**\*Handler:
+    tags: ['messenger.message_handler']

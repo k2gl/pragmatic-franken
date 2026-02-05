@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Task\Entity;
 
 use App\Board\Entity\Column;
 use App\User\Entity\User;
-use App\Task\Domain\ValueObject\TaskStatus;
+use App\Task\Enums\TaskStatus;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
