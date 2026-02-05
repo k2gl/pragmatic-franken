@@ -19,8 +19,13 @@ readonly class CreateTaskHandler
         private TaskRepository $taskRepository
     ) {}
 
-    public function handle(CreateTaskMessage $message, User $owner): TaskCreatedResponse
+    public function handle(CreateTaskMessage $message): TaskCreatedResponse
     {
+        $owner = $message->user;
+        if ($owner === null) {
+            throw new \RuntimeException('User not set on CreateTaskMessage');
+        }
+
         $column = $this->findColumn($message->columnId);
         $maxPosition = $this->taskRepository->getMaxPosition($message->columnId);
         $newPosition = $this->calculateNewPosition($maxPosition);

@@ -2,12 +2,15 @@
 
 namespace App\Board\Features\CreateBoard;
 
+use App\User\Entity\User;
 use Symfony\Component\Validator\Constraints as Assert;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(description: "Request to create a new Kanban board")]
-final readonly class CreateBoardMessage
+final class CreateBoardMessage
 {
+    public ?User $user = null;
+
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Length(min: 3, max: 255)]
@@ -24,6 +27,11 @@ final readonly class CreateBoardMessage
         )]
         public array $columns = []
     ) {}
+
+    public function setUser(User $user): void
+    {
+        $this->user = $user;
+    }
 }
 
 #[OA\Schema(description: "Column configuration for new board")]

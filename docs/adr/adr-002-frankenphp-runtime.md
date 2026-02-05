@@ -1,4 +1,4 @@
-# ADR 0005: FrankenPHP Application Server
+# ADR 002: FrankenPHP Runtime
 
 **Date:** 2026-02-04
 **Status:** Accepted
@@ -48,6 +48,54 @@ We needed a modern application server that provides:
 // FrankenPHP automatically sends 103 when:
 // 1. Route is preloading entities
 // 2. Preloading is configured in Caddyfile
+```
+
+## Stateless Design Required
+
+FrankenPHP worker mode requires stateless application design.
+
+### Requirements
+
+1. **No static state**: Do not use static properties to store request data
+2. **No session affinity**: Workers handle multiple requests, avoid in-memory caches
+3. **External caching**: Use Redis/Memcached for shared state
+4. **Clean shutdown**: Handle signals properly for graceful worker shutdown
+
+### Anti-Patterns to Avoid
+
+```php
+// ❌ WRONG - static property across requests
+static $cache = [];
+
+public function getData(): array
+{
+    return $this->cache[$this->id] ?? [];
+}
+
+// ✅ CORRECT - stateless
+public function getData(EntityManagerInterface $em, int $id): ?Entity
+{
+    return $em->find(Entity::class, $id);
+}
+```
+
+### Worker Configuration
+
+```caddy
+# Caddyfile
+{
+    frankenphp {
+        worker {
+            file ./public/index.php
+            num 4
+        }
+    }
+}
+
+localhost {
+    root * public
+    php_server
+}
 ```
 
 ## Alternatives Considered

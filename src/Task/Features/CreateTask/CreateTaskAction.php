@@ -6,6 +6,8 @@ use App\User\Entity\User;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[OA\Tag(name: 'Tasks')]
@@ -14,10 +16,12 @@ final class CreateTaskAction extends AbstractController
 {
     public function __invoke(
         #[MapRequestPayload] CreateTaskMessage $message,
-        CreateTaskHandler $handler
+        MessageBusInterface $bus
     ): TaskCreatedResponse {
         $user = $this->getUser();
         assert($user instanceof User);
-        return $handler->handle($message, $user);
+        $message->setUser($user);
+        $envelope = $bus->dispatch($message);
+        return $envelope->last(HandledStamp::class)->getResult();
     }
 }

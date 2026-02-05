@@ -6,7 +6,9 @@ use App\Task\Entity\Task;
 use App\Task\Entity\TaskStatus;
 use App\Task\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 readonly class MoveTaskHandler
 {
     public function __construct(

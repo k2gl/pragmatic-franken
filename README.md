@@ -29,7 +29,7 @@
 - Built-in Mercure for real-time updates
 - Prometheus metrics on port 2019
 
-See [ADR 0005: FrankenPHP Application Server](docs/adr/0005-frankenphp-server.md) for details.
+See [ADR 002: FrankenPHP Runtime](docs/adr/adr-002-frankenphp-runtime.md) for details.
 
 ## 🚀 Quick Start
 
@@ -172,11 +172,12 @@ Tasks are executed via Symfony Scheduler inside the main FrankenPHP container. P
 
 All major architectural decisions are documented as ADRs in [`docs/adr/`](docs/adr/):
 
-- [ADR 0001: Pragmatic Symfony Architecture](docs/adr/0001-pragmatic-symfony-architecture.md) — Core principles and compliance checklist
-- [ADR 0002: Symfony Messenger as Main Bus](docs/adr/0002-messenger-as-main-bus.md) — Command/Query separation
-- [ADR 0003: Transactional Outbox Pattern](docs/adr/0003-transactional-outbox-pattern.md) — Guaranteed event delivery
-- [ADR 0004: Modular Monolith Architecture](docs/adr/0004-modular-monolith-architecture.md) — Module boundaries
-- [ADR 0005: FrankenPHP Application Server](docs/adr/0005-frankenphp-server.md) — Server selection
+- [ADR 001: Pragmatic Symfony Architecture](docs/adr/adr-001-pragmatic-symfony-architecture.md) — Core principles, Message Bus Rule, Modular Architecture
+- [ADR 002: FrankenPHP Runtime](docs/adr/adr-002-frankenphp-runtime.md) — Server selection, Stateless Design
+- [ADR 003: AssetMapper](docs/adr/adr-003-asset-mapper.md) — Frontend asset management
+- [ADR 004: Messenger Transport](docs/adr/adr-004-messenger-transport.md) — Command/Query separation, AI use cases
+- [ADR 005: Health Checks](docs/adr/adr-005-health-checks.md) — Docker/K8s probes, PHP endpoints
+- [ADR 006: Memory Management](docs/adr/adr-006-memory-management.md) — PHP/Docker/Worker configuration for AI
 
 See [Architecture Overview](docs/ARCHITECTURE.md) for implementation details.
 

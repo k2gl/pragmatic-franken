@@ -4,10 +4,10 @@ namespace App\Board\Features\CreateBoard;
 
 use App\Board\Entity\Board;
 use App\Board\Entity\Column;
-use App\User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 readonly class CreateBoardHandler
 {
     private const FRACTIONAL_STEP = 1000;
@@ -16,8 +16,13 @@ readonly class CreateBoardHandler
         private EntityManagerInterface $entityManager
     ) {}
 
-    public function handle(CreateBoardMessage $message, User $owner): BoardCreatedResponse
+    public function handle(CreateBoardMessage $message): BoardCreatedResponse
     {
+        $owner = $message->user;
+        if ($owner === null) {
+            throw new \RuntimeException('User not set on CreateBoardMessage');
+        }
+
         $board = new Board($message->title, $owner);
 
         foreach ($message->columns as $index => $columnInput) {

@@ -4,7 +4,9 @@ namespace App\Task\Features\ReorderTasks;
 
 use App\Task\Entity\Task;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+#[AsMessageHandler]
 readonly class ReorderTasksHandler
 {
     public const INSERT_BETWEEN = 'between';

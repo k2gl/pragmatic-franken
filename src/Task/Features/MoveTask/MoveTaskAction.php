@@ -4,6 +4,8 @@ namespace App\Task\Features\MoveTask;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
 
@@ -14,8 +16,9 @@ final class MoveTaskAction extends AbstractController
     public function __invoke(
         int $id,
         #[MapRequestPayload] MoveTaskMessage $message,
-        MoveTaskHandler $handler
+        MessageBusInterface $bus
     ): MoveTaskResult {
-        return $handler->handle($message->withTaskId($id));
+        $envelope = $bus->dispatch($message->withTaskId($id));
+        return $envelope->last(HandledStamp::class)->getResult();
     }
 }
