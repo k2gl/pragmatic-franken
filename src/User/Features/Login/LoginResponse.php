@@ -21,6 +21,9 @@ final readonly class LoginResponse
     ) {
     }
 
+    /**
+     * @param array{id: int, email: string, name: string} $userData
+     */
     public static function fromData(string $token, int $expiresIn, array $userData): self
     {
         return new self(

@@ -14,6 +14,9 @@ readonly class HealthChecker
     ) {
     }
 
+    /**
+     * @return array{status: string, checks: array{database: array{status: bool, message: string, latency_ms: float}, cache: array{status: bool, message: string, latency_ms: float}}}
+     */
     public function check(): array
     {
         $checks = [
@@ -29,6 +32,9 @@ readonly class HealthChecker
         ];
     }
 
+    /**
+     * @return array{status: bool, message: string, latency_ms: float}
+     */
     private function checkDatabase(): array
     {
         $start = microtime(true);
@@ -47,6 +53,9 @@ readonly class HealthChecker
         }
     }
 
+    /**
+     * @return array{status: bool, message: string, latency_ms: float}
+     */
     private function checkCache(): array
     {
         $start = microtime(true);

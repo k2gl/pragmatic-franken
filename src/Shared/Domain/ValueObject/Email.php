@@ -9,13 +9,14 @@ use InvalidArgumentException;
 final readonly class Email
 {
     public function __construct(
-        public string $value
+        private string $value
     ) {
-        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+        $normalized = mb_strtolower(trim($value));
+        if (!filter_var($normalized, FILTER_VALIDATE_EMAIL)) {
             throw new InvalidArgumentException(sprintf('"%s" is not a valid email address.', $value));
         }
 
-        $this->value = mb_strtolower(trim($value));
+        $this->value = $normalized;
     }
 
     public function __toString(): string

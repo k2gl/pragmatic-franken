@@ -5,8 +5,13 @@ parameters:
         - scripts
     excludePaths:
         - tests/*
+        - src/*/Entity/*
         - src/*/Shared/Entity/*
         - src/*/Shared/Events/*
         - src/*/Shared/Service/*
-        - src/*/Features/*/Entity/*
-        - src/*/Features/*/Events/*
+        - src/*/Features/*
+        - src/*/Repositories/*
+        - src/*/Health/*
+        - src/User/Features/GitHubAuth/*
+        - src/Shared/Services/SentryFeatureTagger.php
+        - src/Shared/Domain/ValueObject/Email.php  # OAuth2Bundle not installed

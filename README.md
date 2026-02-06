@@ -1,5 +1,4 @@
-# 🧑‍💻 Pragmatic Franken
-> **"Stop refactoring. Start delivering. Here the PHP Cheat Code for 2026"**
+# 🧑‍💻 Pragmatic Franken 🧟
 
 [![License MIT](https://img.shields.io/badge/License-MIT-yellowgreen)](https://opensource.org/licenses/MIT)
 [![PHP 8.5](https://img.shields.io/badge/PHP-8.4-777bb4?logo=php&logoColor=white)](https://www.php.net/releases/8.5/)
@@ -24,9 +23,10 @@ Build robust, high-performance Modular Monoliths while your AI Agent does the he
 
 ---
 
-## 🚀 Quick Start
-
+## 🥰 Quick Start
 ```bash
+# Here the PHP Cheat Code for 2026
+
 # 1. Clone and ignite
 git clone https://github.com/k2gl/pragmatic-franken.git && cd pragmatic-franken
 
@@ -40,7 +40,7 @@ make install
 
 ## 🦸 AI-First DX (Killer Feature!)
 
-This repo is **Agent-Native**. Cursor, Windsurf, and Copilot understand your architecture better than you do.
+This repo is **Agent-Native**. OpenCode, Cursor, Windsurf, and Copilot understand your architecture better than you do.
 
 ```bash
 @AGENTS.md Implement a new 'Subscription' module following our architecture.
@@ -52,7 +52,7 @@ The AI Agent will:
 3. **Verify** — Runs `make check` to ensure nothing is broken
 4. **Deliver** — Prepares a PR, ready for your review
 
-**First Feature:** Try implementing real business logic (Telegram auth, Stripe integration) using `@AGENTS.md`. You'll be amazed how simple it became.
+**First Feature:** Try implementing real business logic (**Telegram auth**, **Stripe integration**) using `@AGENTS.md`. **You'll be amazed how simple it became.**
 
 ---
 
@@ -64,6 +64,18 @@ The AI Agent will:
 | Static Analysis | **PHPStan Level 9** | `make analyze` |
 | Tests | **PHPUnit** | `make test` |
 | All Checks | **CI Pipeline** | `make check` |
+
+---
+
+## 🛣️ The Pragmatic Way
+
+How we write code:
+
+1. Create a Feature Slice
+2. Define a Command or Query
+3. Handle it
+
+**No over-engineering.**
 
 ---
 
@@ -88,18 +100,6 @@ The AI Agent will:
 | Graceful Shutdown | Manual config | **Out of the box** |
 
 **4 configs = 4 failure points. 1 Caddyfile = 1 source of truth.**
-
----
-
-## 🍨 The Pragmatic Way
-
-How we write code:
-
-1. Create a Feature Slice
-2. Define a Command or Query
-3. Handle it
-
-**No over-engineering.**
 
 ---
 
@@ -179,7 +179,7 @@ src/
 
 > **See [ADR-0009](docs/adr/0009-shared-architecture.md) for Shared architecture rules.**
 
-Why this kicks ass:
+### 🍑 Why this kicks ass:
 1. **Locality of Change:** Want to change "User Registration"? Everything is in one folder. No jumping around 10 directories.
 2. **Zero Side Effects:** Delete a folder — the entire feature is gone. No ghost code left behind.
 3. **AI-Friendly:** Your AI Agent finds context instantly. It doesn't have to scan the whole src/Controllers folder to find one specific action.
@@ -231,7 +231,7 @@ flowchart TD
 
 ---
 
-## 🚀 Roadmap 2026
+## 🗓️ Roadmap 2026
 
 | Quarter | Focus | What's Coming |
 |---------|-------|---------------|
@@ -250,4 +250,5 @@ See [Contributing Guidelines](.github/CONTRIBUTING.md) for details.
 
 ---
 
-**Build for 2026, not 2015. FrankenPHP is the engine, Symfony is the brain, AI is the hands.**
+**Build for 2026, not 2015. FrankenPHP is the engine, Symfony is the brain, AI is the hands. **
+> **Stop refactoring. Start delivering.**
