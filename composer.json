@@ -19,7 +19,7 @@
         "symfony/form": "^8.0",
         "symfony/framework-bundle": "^7.2",
         "symfony/http-kernel": "^7.2",
-        "symfony/messenger": "^7.2",
+        "symfony/messenger": "^8.0",
         "symfony/monolog-bridge": "^8.0",
         "symfony/routing": "^7.2",
         "symfony/runtime": "^7.2",
