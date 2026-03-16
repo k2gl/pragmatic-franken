@@ -71,7 +71,7 @@ jobs:
 
       # 3. Build Test Image
       - name: Build Dev Image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/frankenphp/Dockerfile
@@ -156,7 +156,7 @@ jobs:
 
       - name: Build and Push Production Image
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/frankenphp/Dockerfile
