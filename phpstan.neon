@@ -13,5 +13,5 @@ parameters:
         - src/*/Repositories/*
         - src/*/Health/*
         - src/User/Features/GitHubAuth/*
-        - src/Shared/Services/SentryFeatureTagger.php
-        - src/Shared/Domain/ValueObject/Email.php  # OAuth2Bundle not installed
+        - src/Shared/Services/SentryFeatureTagger.php (?)
+        - src/Shared/Domain/ValueObject/Email.php (?) # OAuth2Bundle not installed
