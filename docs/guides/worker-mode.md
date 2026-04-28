@@ -1,3 +1,10 @@
+---
+audience: both
+tier: 2
+last_reviewed: 2026-04-28
+summary: "FrankenPHP worker-mode operational guide. The kernel stays in memory; static state must be reset or avoided. Pairs with ADR-0004 (decision) and ADR-0006 (memory)."
+---
+
 # Worker Mode Best Practices
 
 FrankenPHP's Worker Mode allows your PHP application to boot once and handle thousands of requests without restarting. This is powerful but requires specific coding patterns.

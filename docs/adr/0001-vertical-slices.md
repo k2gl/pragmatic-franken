@@ -1,219 +1,112 @@
-# ADR 1: Vertical Slices Architecture
+---
+id: ADR-0001
+title: Vertical Slices
+status: Accepted
+date: 2026-02-06
+supersedes: []
+superseded_by: []
+audience: both
+summary: "Group code by business value, not technical type. Each feature is a self-contained directory at src/{Module}/Features/{Feature}/ with internal Domain/Application/Infrastructure/EntryPoint sub-folders."
+---
 
-## Status
+# ADR-0001: Vertical Slices
 
-**Accepted**
+**TL;DR:** Every business action is one folder under `src/{Module}/Features/{Feature}/`. Inside the slice, code is organised by DDD-style layer (`Domain/`, `Application/`, `Infrastructure/`, `EntryPoint/`). Cross-feature reuse is handled by ADR-0009 (Shared Architecture). Architecture is optimised for **deletion**, not reusability.
 
 ## Context
 
-Traditional layered architecture (Controllers → Services → Entities) leads to **"Shotgun Surgery"** — where a single business change requires touching files in multiple decoupled directories. This increases cognitive load, complicates AI context, and makes feature deletion nearly impossible.
+Traditional layered architecture (Controllers → Services → Entities) leads to **shotgun surgery**: a single business change touches files in 5+ unrelated directories. This raises cognitive load, fragments AI context, and makes feature deletion nearly impossible.
 
-### The Problem
-
-| Scenario | Layered Architecture | Vertical Slices |
-|----------|----------------------|-----------------|
-| Add new field | Edit Entity, DTO, Request, Response, Repository, Service | Edit one folder |
-| Find related code | Search 5+ directories | One folder |
-| Remove feature | Delete files in 5+ places | Delete one folder |
-| Onboarding time | 2-4 weeks | 1-2 days |
+| Scenario | Layered | Vertical Slices |
+|---|---|---|
+| Add a field | edit Entity, DTO, Request, Response, Repository, Service | edit one folder |
+| Find related code | search 5+ directories | one folder |
+| Remove feature | delete files in 5+ places | delete one folder |
+| Onboarding | 2–4 weeks | 1–2 days |
 
 ## Decision
 
-We adopt **Vertical Slices** as the primary organizational principle. We group code by **Business Value**, not by technical type.
-
-### 1. The Feature Folder
+### 1. Slice location
 
 Each business action is a self-contained directory:
 
 ```
-src/[Module]/Features/[FeatureName]/
+src/{Module}/Features/{Feature}/
 ```
 
-### 2. Flat Structure & Entry Points
-
-A feature folder contains everything it needs to function. We allow **multiple entry points** for the same business logic:
+### 2. Canonical slice layout
 
 ```
-src/User/Features/RegisterUser/
-├── RegisterUserAction.php    # HTTP entry point (Controller)
-├── RegisterUserCommand.php   # CLI entry point (Symfony Console)
-├── RegisterUserHandler.php   # Core business logic
-├── RegisterUserDto.php       # Input/Output data contracts
-└── RegisterUserHandlerTest.php # Feature-specific tests
+src/User/Features/Register/
+├── Domain/                          # value objects, domain events, entities (optional)
+├── Application/
+│   ├── RegisterCommand.php          # CQRS command (verb + noun)
+│   ├── RegisterHandler.php          # #[AsMessageHandler]
+│   └── RegisterResult.php           # output DTO
+├── Infrastructure/                  # adapters: Doctrine repos, HTTP clients, ...
+└── EntryPoint/
+    ├── Http/RegisterController.php  # POST /user/register
+    └── Cli/RegisterUserCliCommand.php   # bin/console user:register (optional)
 ```
 
-**Note:** No sub-folders like `Input/`, `Output/`, `Handler/` are allowed inside a Feature folder. Keep it flat.
+Rules:
 
-### 3. Rule of Deletion
+- `Domain/` is **optional**. Only create it when the feature actually owns a value object, domain event, or entity that is not shared with another feature.
+- `Infrastructure/` is **optional**. Only create it when the feature owns adapters (repository implementation, third-party client). Pure Application slices may omit it.
+- Each EntryPoint has its own subdirectory (`Http/`, `Cli/`, `Queue/`). One feature can have multiple entry points.
+- A feature folder must be deletable in one `rm -rf` without leaving dangling references anywhere else.
 
-The architecture is optimized for **deletion**, not for reusability.
+### 3. Naming
 
-To remove a feature, simply delete its folder. If deletion leaves "broken" code elsewhere, the isolation was violated.
+- CQRS commands: `Create{Feature}Command`, `Update{Feature}Command`, `Delete{Feature}Command` — verb + noun.
+- CQRS queries: `Get{Feature}Query`, `List{Feature}Query`, `Find{Feature}Query`.
+- Handlers: `{Feature}Handler` with `#[AsMessageHandler]`.
+- HTTP entry: `{Feature}Controller` in `EntryPoint/Http/`.
+- CLI entry: `{Verb}{Feature}CliCommand` extends `Symfony\Component\Console\Command\Command` in `EntryPoint/Cli/`. The `CliCommand` suffix exists to avoid collision with CQRS `*Command` classes; namespace separation handles the rest.
 
-```bash
-# Complete feature removal
-rm -rf src/User/Features/Login/
+### 4. Cross-feature communication
 
-# No tails left behind
-# - No LoginController in controllers/
-# - No LoginService in services/
-# - No LoginRepository in repositories/
-# - No LoginTest in tests/
-```
+- Features in the same module **must not** depend on each other directly. If they need to coordinate, dispatch an event.
+- Truly common code goes in `src/{Module}/Shared/` (Rule of Three — see ADR-0009).
+- Inter-module events live in `src/{Module}/Shared/Events/` (e.g., `src/User/Shared/Events/UserRegisteredEvent.php`).
 
-### 4. Cross-Feature Communication
+### 5. Cron jobs
 
-- **Features within the same module:** Should NOT depend on each other directly.
-- **Truly common code:** Use `Shared/` within the module or global `src/Shared/`.
-- **Inter-module events:** Place in `src/[Module]/Shared/Events/`.
-
-> **See [ADR-0009](0009-shared-architecture.md) for detailed Shared architecture rules.**
-
-### 5. Events
-
-**Intra-feature events:** If an event is used only by this feature, keep it inside the feature folder.
-
-**Inter-module events:** If `User` registration triggers `Notifier`, the event lives in `src/User/Shared/Events/`:
-
-```php
-// src/User/Shared/Events/UserRegisteredEvent.php
-final readonly class UserRegisteredEvent
-{
-    public function __construct(
-        public int $userId,
-        public string $email,
-    ) {}
-}
-```
-
-### 6. Cron Jobs
-
-A cron job is just a trigger. If it performs module-specific action, create a Feature for it:
+A cron job is a trigger, not a feature. The work it performs is a feature; place it under `Features/`:
 
 ```
 src/User/Features/CleanInactiveAccounts/
-├── CleanInactiveAccountsCommand.php
-└── CleanInactiveAccountsHandler.php
+├── Application/CleanInactiveAccountsCommand.php
+├── Application/CleanInactiveAccountsHandler.php
+└── EntryPoint/Cli/CleanInactiveAccountsCliCommand.php
 ```
 
 ## Consequences
 
 ### Positive
 
-| Benefit | Description |
-|---------|-------------|
-| **High Cohesion** | Related code stays together |
-| **AI-Native** | Agents (Cursor/Windsurf) find all context in one directory |
-| **Zero-Side-Effect Refactoring** | Changes are isolated to the slice |
-| **Onboarding** | New developers understand a feature by reading one folder |
-| **Deletion-Friendly** | Removing features is safe and complete |
+- **High cohesion** — related code is colocated.
+- **AI-native** — agents read one folder, not five.
+- **Deletion-safe** — `rm -rf` is the safe refactor.
+- **Onboarding** — a new dev understands one feature by reading one folder.
 
-### Negative
+### Negative & mitigations
 
 | Risk | Mitigation |
-|------|------------|
-| **Code Duplication** | Accepted: *Duplication is far cheaper than the wrong abstraction* |
-| **No Global Overview** | Use grep/search to find all features |
-| **Multiple Entry Points Confusion** | Consistent naming convention (`*Action.php`, `*Command.php`) |
-
-## Shared Architecture
-
-> **TL;DR:** Shared is for glue, not for domain. See [ADR-0009](0009-shared-architecture.md) for complete rules.
-
-### Two-Level Shared System
-
-| Level | Location | Purpose |
-|-------|----------|---------|
-| **Global Shared** | `src/Shared/` | Infrastructure glue (Messenger, Sentry, base exceptions) |
-| **Module Shared** | `src/{Module}/` | Module entities, enums, services |
-
-### Rule of Three
-
-Don't extract code to Shared until it's needed in **3+ places**:
-
-| Duplication | Action |
-|-------------|--------|
-| 1-2 places | Keep in feature (duplication is OK) |
-| 3+ places | Extract to Shared |
-
-### What Goes Where
-
-| Type | Global Shared | Module Shared | Feature |
-|------|---------------|---------------|---------|
-| Messenger Bus | ✅ | ❌ | ❌ |
-| Sentry Wrapper | ✅ | ❌ | ❌ |
-| User Entity | ❌ | ✅ | ❌ |
-| UserRole Enum | ❌ | ✅ | ❌ |
-| PasswordHasher | ❌ | ✅ | ❌ |
-| Domain Logic | ❌ | ❌ | ✅ |
+|---|---|
+| Code duplication across slices | Acceptable until Rule of Three (ADR-0009). |
+| No global overview | Use grep / IDE structure view. |
+| Multiple entry points confusion | Subfolders under `EntryPoint/` (`Http/`, `Cli/`, `Queue/`). |
 
 ## Compliance
 
-1. **Generate with `make slice`**: All new features MUST use the scaffold script.
-2. **Reject nesting in PRs**: Any Pull Request introducing sub-folders (`Input/`, `Output/`, `Handler/`) inside a Feature folder must be rejected.
-3. **Rule of One Folder**: Deleting a feature folder must not leave broken references.
+1. New features must be scaffolded with `make slice module=Foo feature=Bar`.
+2. PRs introducing global directories (`Controllers/`, `Services/`, `Repositories/`) at module root are rejected.
+3. PRs introducing top-level layout drift (renamed `Features/`, `EntryPoint/`) are rejected.
 
-## Directory Structure
+## Relationship to other ADRs
 
-```
-src/
-├── Kernel.php              # System core (Symfony MicroKernel)
-├── Shared/                 # Global Shared (infrastructure only)
-│   ├── Infrastructure/
-│   │   ├── Bus/           # Messenger configuration
-│   │   ├── Persistence/   # Doctrine extensions
-│   │   └── Logging/       # Sentry, monitoring
-│   └── Domain/
-│       ├── ValueObject/    # Global value objects
-│       └── Exception/      # Base exceptions
-├── User/                   # Module
-│   ├── Entity/             # User.php
-│   ├── Enum/               # UserRole.php
-│   ├── Service/            # PasswordHasher.php
-│   ├── Events/             # UserRegisteredEvent.php
-│   ├── Repositories/
-│   └── Features/           # Vertical Slices
-│       └── {FeatureName}/
-│           ├── {FeatureName}Action.php
-│           ├── {FeatureName}Handler.php
-│           ├── {FeatureName}Dto.php
-│           └── {FeatureName}HandlerTest.php
-├── Task/                   # Module (same pattern)
-├── Board/                  # Module (same pattern)
-└── Health/                 # Technical feature (same pattern)
-```
-
-> **Note:** Module Shared folders (`Entity/`, `Enum/`, `Service/`, `Events/`) are optional. Create only when code is used across 3+ features within the module.
-
----
-src/
-├── Kernel.php              # System core (Symfony MicroKernel)
-├── Shared/                 # Truly shared (infrastructure only)
-│   ├── Exception/
-│   └── Services/
-├── User/                   # Module
-│   ├── Entity/
-│   ├── Enums/
-│   ├── ValueObject/
-│   ├── Event/
-│   ├── Services/
-│   ├── Clients/
-│   ├── Repositories/
-│   ├── Exception/
-│   └── Features/           # Vertical Slices
-│       └── {FeatureName}/
-│           ├── {FeatureName}Action.php
-│           ├── {FeatureName}Command.php
-│           ├── {FeatureName}Handler.php
-│           ├── {FeatureName}Dto.php
-│           └── {FeatureName}HandlerTest.php
-├── Task/                   # Module (same pattern)
-├── Board/                  # Module (same pattern)
-└── Health/                 # Technical feature (same pattern)
-```
-
----
-
-**Pragmatism over Dogma.** We build products, not folder structures.
-
-*We optimize for Deletion, not for Reusability. A feature remains a feature regardless of how it's invoked — whether via HTTP, CLI, or Message Bus. That's the essence of Vertical Slices.*
+- **ADR-0002** — Messenger Transport: defines the bus that Application handlers dispatch to.
+- **ADR-0008** — Testing Strategy: tests mirror this layout at `tests/{Module}/Features/{Feature}/`.
+- **ADR-0009** — Shared Architecture: defines what lives at `src/Shared/` and `src/{Module}/Shared/`.
+- **ADR-0003** — Pragmatic Symfony Architecture: superseded by this ADR + ADR-0002 + ADR-0004.

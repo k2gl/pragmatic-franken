@@ -1,7 +1,17 @@
-# ADR 4: FrankenPHP Runtime
+---
+id: ADR-0004
+title: FrankenPHP Runtime
+status: Accepted
+date: 2026-02-04
+supersedes: []
+superseded_by: []
+audience: both
+summary: "FrankenPHP (Caddy + PHP) is the primary application server with worker mode. Single binary, HTTP/3, no separate consumer processes for Messenger workers."
+---
 
-**Date:** 2026-02-04
-**Status:** Accepted
+# ADR-0004: FrankenPHP Runtime
+
+**TL;DR:** FrankenPHP runs the app in worker mode (kernel kept in memory between requests). Throughput is 2–3× PHP-FPM. Trade-off: handlers must be stateless. See `docs/guides/worker-mode.md` for operational guidance.
 
 ## Decision
 

@@ -1,7 +1,17 @@
-# ADR 6: Memory Management
+---
+id: ADR-0006
+title: Memory Management
+status: Accepted
+date: 2026-02-05
+supersedes: []
+superseded_by: []
+audience: both
+summary: "PHP memory_limit 512M, OPcache + JIT tuned for worker mode, FRANKENPHP_MAX_JOBS and PHP_MAX_REQUESTS bound worker recycling to bound memory growth."
+---
 
-**Date:** 2026-02-05
-**Status:** Accepted
+# ADR-0006: Memory Management
+
+**TL;DR:** Worker processes recycle every `PHP_MAX_REQUESTS` requests; OPcache + JIT enabled in production; `memory_limit` 512M for AI workloads. Without recycling, slow leaks accumulate across the worker's lifetime.
 
 ## Decision
 

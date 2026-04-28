@@ -33,5 +33,5 @@ node_modules/
 .php-cs-fixer.cache
 
 # AI Agents
-.config/agents/*.local.md
+AGENTS.local.md
 

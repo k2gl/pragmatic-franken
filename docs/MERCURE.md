@@ -1,3 +1,10 @@
+---
+audience: both
+tier: 2
+last_reviewed: 2026-04-28
+summary: "Mercure hub configuration for real-time server-sent events. Optional — enable only when a feature needs push semantics."
+---
+
 # Mercure Integration
 
 Real-time updates for the Kanban board using Mercure.

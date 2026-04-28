@@ -1,10 +1,10 @@
-.PHONY: help shell install start up down build rebuild ps logs \
-         db-migrate db-rollback db-seed db-console db-fresh db-reset \
-         test test-coverage coverage-html \
-         lint phpstan cs-fix cs-check format check ci \
-         clean metrics docker-stats stats \
-         env-create \
-         open-api xdebug-on xdebug-off slice
+.PHONY: help shell e d install env-create \
+        up run down build rebuild ps logs composer-chown \
+        db-migrate db-rollback db-seed db-console db-fresh db-reset \
+        test test-unit test-integration test-e2e test-coverage coverage-html \
+        lint lint-check analyze check ci smoke docs-check \
+        clean metrics docker-stats stats \
+        open-api xdebug-on xdebug-off slice adr deploy
 
 # Variables (local)
 USER_ID := $(shell id -u)
@@ -13,16 +13,20 @@ GROUP_ID := $(shell id -g)
 # Executables (local)
 DC = UID=$(USER_ID) GID=$(GROUP_ID) docker compose
 
-# Docker container name
-DC_APP = pfranken-app
+# Docker container name (matches docker-compose service "app")
+DC_APP = app
+
+# Postgres credentials (must match docker-compose.yml)
+DB_USER = user
+DB_NAME = app_db
 
 # Colors
 RED    := $(shell tput setaf 1)
 GREEN  := $(shell tput setaf 2)
-YELLOW  := $(shell tput setaf 3)
-BLUE    := $(shell tput setaf 4)
-CYAN    := $(shell tput setaf 6)
-RESET   := $(shell tput sgr0)
+YELLOW := $(shell tput setaf 3)
+BLUE   := $(shell tput setaf 4)
+CYAN   := $(shell tput setaf 6)
+RESET  := $(shell tput sgr0)
 
 ##—————— Pragmatic Franken ——————
 help: ## Show this help message
@@ -37,24 +41,17 @@ help: ## Show this help message
 		} \
 	}'
 
-env-create:
+env-create: ## Create .env from .env.dist
 	@if [ ! -f .env.dist ]; then echo "$(RED)Error: .env.dist not found!$(RESET)"; exit 1; fi
 	cp -n .env.dist .env
-	@echo "" >> .env
-	@echo "# Replace auto-generated IDs"
-	sed -i "s|UID=.*|UID=${USER_ID}|g" .env
-	sed -i "s|GID=.*|GID=${GROUP_ID}|g" .env
+	@sed -i "s|^UID=.*|UID=$(USER_ID)|g" .env
+	@sed -i "s|^GID=.*|GID=$(GROUP_ID)|g" .env
 	@echo "$(GREEN).env created with UID:$(USER_ID) and GID:$(GROUP_ID)$(RESET)"
 
-install: env-create build up db-migrate ## 🚀 Full setup: Container, Dependencies, Database
+install: env-create build up db-migrate ## 🚀 Full setup: containers, dependencies, database
 	@echo ""
 	@echo "🐘 $(BLUE)Pragmatic Franken is igniting...$(RESET)"
-	@echo ""
-	@echo "📦 Installing dependencies..."
-	@echo ""
-	@echo "💾 Running migrations..."
-	@echo ""
-	@echo "🔥 $(GREEN)Done! Application live at https://localhost$(RESET)"
+	@echo "🔥 $(GREEN)Done! Open https://pragmatic-franken.localhost:$${HTTPS_PORT:-4750} (set in .env).$(RESET)"
 
 ##—————— 🐳 Docker ——————
 build: ## Build Docker images
@@ -73,7 +70,7 @@ up: ## Start containers in detached mode
 	@echo "$(YELLOW)Starting containers...$(RESET)"
 	$(DC) up --detach
 
-run: ## Starting containers with logs
+run: ## Start containers with logs (foreground)
 	@echo "$(YELLOW)Starting containers with logs...$(RESET)"
 	$(DC) up
 
@@ -95,10 +92,9 @@ composer-chown: ## Fix composer cache permissions
 
 ##—————— FrankenPHP ——————
 shell: ## Connect to FrankenPHP container shell
-	@if [ -z "$$(docker ps -q -f name=$(DC_APP))" ]; then \
+	@if [ -z "$$($(DC) ps -q $(DC_APP))" ]; then \
 		echo "$(YELLOW)Container $(DC_APP) not running. Starting...$(RESET)"; \
 		$(DC) up -d $(DC_APP); \
-		echo "$(GREEN)Container started.$(RESET)"; \
 	fi
 	$(DC) exec $(DC_APP) bash
 
@@ -118,8 +114,8 @@ db-seed: ## Load fixtures
 	$(DC) exec $(DC_APP) bin/console doctrine:fixtures:load --no-interaction
 
 db-console: ## Connect to PostgreSQL console
-	@echo "$(CYAN)Connecting to PostgreSQL...$(RESET)"
-	$(DC) exec postgres psql -U postgres -d app
+	@echo "$(CYAN)Connecting to PostgreSQL ($(DB_USER)@$(DB_NAME))...$(RESET)"
+	$(DC) exec db psql -U $(DB_USER) -d $(DB_NAME)
 
 db-fresh: db-rollback db-migrate db-seed ## Full reset: rollback, migrate, seed
 	@echo "$(GREEN)Database freshened!$(RESET)"
@@ -130,12 +126,24 @@ db-reset: down ## Destroy and rebuild database
 	$(DC) up -d $(DC_APP)
 	$(MAKE) db-migrate db-seed
 
-##—————— Tests ——————
-test: ## Run PHPUnit tests
-	@echo "$(GREEN)Running PHPUnit tests...$(RESET)"
+##—————— ✅ Tests ——————
+test: ## Run all PHPUnit tests (fail-fast)
+	@echo "$(GREEN)Running all tests...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --fail-fast
 
-test-coverage: ## Run tests with coverage report
+test-unit: ## Run unit tests only (#[Group('unit')])
+	@echo "$(GREEN)Running unit tests...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=unit --fail-fast
+
+test-integration: ## Run integration tests only (#[Group('integration')])
+	@echo "$(GREEN)Running integration tests...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=integration --fail-fast
+
+test-e2e: ## Run API/E2E tests only (#[Group('e2e')])
+	@echo "$(GREEN)Running E2E tests...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=e2e --fail-fast
+
+test-coverage: ## Run tests with text coverage report
 	@echo "$(GREEN)Running tests with coverage...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --coverage-text
 
@@ -143,83 +151,37 @@ coverage-html: ## Generate HTML coverage report
 	@echo "$(GREEN)Generating HTML coverage report...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --coverage-html=coverage
 
-##—————— Code Quality ——————
-
-# Quick commands for developers
+##—————— 🛡 Code Quality ——————
 lint: ## 🚀 Auto-fix code style (Laravel Pint)
 	@echo "$(GREEN)Fixing code style with Pint...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/pint
+
+lint-check: ## Check code style without fixing
+	@echo "$(YELLOW)Checking code style with Pint...$(RESET)"
+	$(DC) exec $(DC_APP) ./vendor/bin/pint --test
 
 analyze: ## 🔍 Run PHPStan static analysis (Level 9)
 	@echo "$(YELLOW)Running PHPStan (Level 9)...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --memory-limit=1G
 
-check: lint analyze ## ✅ Run all checks before commit
-	@echo "$(GREEN)✨ All checks passed! Code is bulletproof.$(RESET)"
+check: lint analyze ## ✅ Run all checks before commit (lint + analyze)
+	@echo "$(GREEN)✨ All checks passed!$(RESET)"
 
-# Advanced commands
-lint-check: ## Check code style without fixing
-	@echo "$(YELLOW)Checking code style...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/pint --test
-
-phpstan: ## Run PHPStan (level 5 - medium strictness)
-	@echo "$(YELLOW)Running PHPStan (level 5)...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --level=5
-
-phpstan-level-8: ## Run PHPStan (level 8 - maximum strictness)
-	@echo "$(YELLOW)Running PHPStan (level 8)...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --level=8
-
-phpstan-level-9: ## Run PHPStan (level 9 - bleeding edge)
-	@echo "$(YELLOW)Running PHPStan (Level 9 - maximum)...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --memory-limit=1G
-
-phpstan-baseline: ## Generate PHPStan baseline
-	@echo "$(YELLOW)Generating PHPStan baseline...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --level=9 --generate-baseline
-
-cs-fix: ## Fix code style with PHP-CS-Fixer (legacy)
-	@echo "$(YELLOW)Fixing code style with PHP-CS-Fixer...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/php-cs-fixer fix
-
-cs-check: ## Check code style with PHP-CS-Fixer (legacy)
-	@echo "$(YELLOW)Checking code style...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/php-cs-fixer check --dry-run --diff
-
-pint: ## Fix code style with Laravel Pint (modern PSR-12)
-	@echo "$(GREEN)Fixing code style with Pint...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/pint
-
-pint-check: ## Check code style with Laravel Pint
-	@echo "$(YELLOW)Checking code style with Pint...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/pint --test
-
-format: lint ## Auto-format code (alias)
-	@echo "$(GREEN)Code formatted!$(RESET)"
-
-ci: lint-check phpstan-level-9 test-coverage ## Simulate CI pipeline
-	@echo "$(GREEN)CI pipeline complete!$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/pint --test
-
-format: cs-fix ## Auto-format code (alias)
-	@echo "$(GREEN)Code formatted!$(RESET)"
-
-check: phpstan-level-8 cs-check ## Run all checks before commit
-	@echo "$(GREEN)All checks passed!$(RESET)"
-
-ci: cs-check phpstan-level-8 test-coverage ## Simulate CI pipeline
+ci: lint-check analyze test ## Simulate CI pipeline (no auto-fix)
 	@echo "$(GREEN)CI pipeline complete!$(RESET)"
 
-##—————— Static Analysis ——————
-sa: phpstan ## Static analysis (alias)
-	@echo "$(GREEN)Static analysis complete!$(RESET)"
+smoke: ## End-to-end smoke check (console boots, /healthz responds)
+	@echo "$(YELLOW)Running smoke check...$(RESET)"
+	$(DC) exec $(DC_APP) bin/console list >/dev/null
+	@curl -fsS http://localhost:$${HTTP_PORT:-8750}/healthz | tee /dev/stderr | grep -q '"ok":true'
+	@echo "$(GREEN)Smoke check passed!$(RESET)"
 
-sa-full: phpstan-level-8 cs-check ## Full static analysis
-	@echo "$(GREEN)Full static analysis complete!$(RESET)"
+docs-check: ## Lint ADR front-matter and AGENTS.md token budget
+	@./dev/check-docs.sh
 
-##—————— Maintenance ——————
+##—————— 🧹 Maintenance ——————
 clean: ## Clean cache and temporary files
-	@echo "Cleaning cache and temporary files..."
+	@echo "$(YELLOW)Cleaning cache and temporary files...$(RESET)"
 	rm -rf build/ .phpunit.result.cache coverage/ var/cache/*
 	@echo "$(GREEN)Clean complete!$(RESET)"
 
@@ -231,31 +193,33 @@ metrics: ## Show project metrics
 
 docker-stats: ## Show container resource usage
 	@echo "$(GREEN)Container stats:$(RESET)"
-	@docker stats --no-color $$(docker compose ps -q)
+	@docker stats --no-stream $$($(DC) ps -q)
 
-##—————— Dev Utilities ——————
+stats: ## 📊 Check FrankenPHP metrics
+	@echo "$(GREEN)Fetching FrankenPHP metrics (port 2019)...$(RESET)"
+	@curl -s http://localhost:2019/metrics | head -20
+
+##—————— 🛠 Dev Utilities ——————
 open-api: ## Generate OpenAPI spec
 	@echo "$(GREEN)Generating OpenAPI documentation...$(RESET)"
 	$(DC) exec $(DC_APP) bin/console nelmio:api-doc:dump > docs/openapi.yaml
 	@echo "$(GREEN)OpenAPI spec written to docs/openapi.yaml$(RESET)"
 
-xdebug-on: ## Enable Xdebug
-	@echo "$(YELLOW)Enabling Xdebug...$(RESET)"
-	$(DC) exec $(DC_APP) bash -c 'echo "xdebug.mode=debug" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini'
+xdebug-on: ## Enable Xdebug at runtime
+	@$(DC) exec $(DC_APP) bash -c 'echo "xdebug.mode=debug" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini'
 	@echo "$(GREEN)Xdebug enabled. Restart container to apply.$(RESET)"
 
-xdebug-off: ## Disable Xdebug
-	@echo "$(YELLOW)Disabling Xdebug...$(RESET)"
+xdebug-off: ## Disable Xdebug at runtime
 	@$(DC) exec $(DC_APP) rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 	@echo "$(GREEN)Xdebug disabled. Restart container to apply.$(RESET)"
 
-##—————— 📊 Metrics ——————
-stats: ## 📊 Check FrankenPHP metrics
-	@echo "$(GREEN)Fetching FrankenPHP metrics...$(RESET)"
-	@curl -s http://localhost:2019/metrics | head -20
-
-##—————— 🤖 AI & Development ——————
-slice: ## 🚀 Generate a new feature slice
+##—————— 🤖 Scaffolding & Docs ——————
+slice: ## 🚀 Generate a new feature slice (module=Foo feature=Bar)
 	@echo "$(GREEN)Creating slice...$(RESET)"
-	@chmod +x scripts/create-slice.sh
-	@./scripts/create-slice.sh $(module) $(feature)
+	@./dev/create-slice.sh $(module) $(feature)
+
+adr: ## 📝 Create a new ADR (title="My Decision")
+	@./dev/new-adr.sh "$(title)"
+
+deploy: ## 🚢 Run deployment script (ops/deploy.sh)
+	@./ops/deploy.sh

@@ -1,400 +1,153 @@
+---
+audience: both
+tier: 2
+last_reviewed: 2026-04-28
+summary: "Day-to-day development guide: setup, daily commands, slice scaffolding, common patterns. Architectural rules live in ADRs; this is the operational complement."
+---
+
 # Development Guide
-
-## Overview
-
-This guide covers setting up your development environment and following project conventions.
 
 ## Prerequisites
 
 - Docker & Docker Compose
 - Make
-- PHP 8.5+ (for local tooling only)
+- (Optional) PHP 8.5 locally for IDE / tooling integration
 
-## Quick Start
+## Quick start
 
 ```bash
-# 1. Clone and enter directory
-git clone git@github.com:your-org/pragmatic-franken.git
+git clone https://github.com/k2gl/pragmatic-franken.git
 cd pragmatic-franken
-
-# 2. Create environment file
-make env-create
-
-# 3. Build and start containers
-make up
-
-# 4. Install dependencies
-make install
-
-# 5. Run database migrations
-make db-migrate
-
-# 6. (Optional) Load fixtures
-make db-seed
-
-# 7. Verify installation
-make test
+make install        # env-create + build + up + db-migrate
+make smoke          # confirms bin/console boots and /healthz responds
 ```
 
-## Daily Development Commands
+`make install` is idempotent: it creates `.env` from `.env.dist` (substituting your UID/GID), builds containers, brings them up, and runs Doctrine migrations.
 
-### Shell Access
+## Daily commands
 
-```bash
-make shell  # Enter PHP container shell
-```
+| Command | Effect |
+|---|---|
+| `make up` / `make down` | start / stop containers |
+| `make shell` (alias `make e`) | shell inside the FrankenPHP container |
+| `make logs` | follow container logs |
+| `make test` | PHPUnit, fail-fast |
+| `make test-unit` / `make test-integration` / `make test-e2e` | filtered by `#[Group]` |
+| `make test-coverage` / `make coverage-html` | coverage reports |
+| `make lint` / `make lint-check` | Pint (auto-fix / read-only) |
+| `make analyze` | PHPStan level 9 |
+| `make check` | lint + analyze (pre-commit) |
+| `make ci` | lint-check + analyze + test (CI parity) |
+| `make smoke` | end-to-end smoke check |
+| `make db-migrate` / `make db-rollback` / `make db-fresh` | Doctrine migrations |
+| `make slice module=Foo feature=Bar` | scaffold a new slice |
+| `make adr title="My Decision"` | scaffold a new ADR |
+| `make docs-check` | lint ADR front-matter and AGENTS.md budget |
 
-### Running Tests
+## Project structure
 
-```bash
-make test              # Run all tests (fail-fast)
-make test-coverage     # Run with coverage report
-make coverage-html     # Generate HTML coverage
-```
-
-### Code Quality
-
-```bash
-make lint              # Run all linters (PHPStan + CS Check)
-make phpstan           # Static analysis only
-make cs-check          # Code style check only
-make cs-fix            # Auto-fix code style
-```
-
-### Database Operations
-
-```bash
-make db-migrate        # Run migrations
-make db-rollback       # Rollback last migration
-make db-seed           # Load fixtures
-make db-console        # Connect to PostgreSQL
-```
-
-### Docker Management
-
-```bash
-make up                # Start containers (detached)
-make down              # Stop containers
-make logs              # Follow logs
-make build             # Rebuild images
-make rebuild           # Rebuild without cache
-```
-
-## Project Structure
+See [ADR-0001](../adr/0001-vertical-slices.md) for the canonical layout. At a glance:
 
 ```
 pragmatic-franken/
 ├── src/
-│   ├── {Module}/
-│   │   ├── Entity/             # Doctrine Entities
-│   │   ├── Enums/
-│   │   └── Features/{FeatureName}/   # Feature Slice
-│   │       ├── {FeatureName}Command.php
-│   │       ├── {FeatureName}Handler.php
-│   │       ├── EntryPoint/Http/{FeatureName}Controller.php
-│   │       ├── Request/
-│   │       └── Response/
-│   └── Shared/                 # Cross-cutting concerns
-│       ├── Exception/
-│       └── Services/
-├── config/              # Symfony configuration
-├── docs/
-│   ├── adr/             # Architectural Decision Records
-│   └── guides/         # How-to guides
-├── tests/
-│   ├── Unit/           # Handler tests
-│   ├── Integration/    # Persistence tests
-│   └── EndToEnd/       # Controller tests
-├── docker/
-├── Makefile
-└── composer.json
-```
-pragmatic-franken/
-├── src/
-│   ├── {Module}/
-│   │   ├── Domain/       # Entities, Value Objects, Events
-│   │   ├── Application/  # Commands, Queries, Handlers
-│   │   ├── Infrastructure/ # Doctrine, External Services
-│   │   └── UI/           # Controllers, Commands
-│   └── Shared/           # Cross-cutting concerns
-├── config/              # Symfony configuration
-├── docs/
-│   ├── architecture/    # ADR and architecture docs
-│   └── guides/          # How-to guides
-├── tests/
-│   ├── Unit/            # Domain logic tests
-│   ├── Integration/    # Handler integration tests
-│   └── UI/              # Controller/E2E tests
-├── docker/
-│   ├── frankenphp/      # FrankenPHP config
-│   ├── php/            # PHP extensions config
-│   └── ...
-├── Makefile
-├── docker-compose.yml
-└── composer.json
+│   ├── Kernel.php
+│   ├── Shared/                 # global infra glue (Bus, Persistence, Logging)
+│   └── {Module}/Features/{Feature}/
+│       ├── Domain/             # value objects, domain events (optional)
+│       ├── Application/        # *Command / *Query / *Handler / *Result
+│       ├── Infrastructure/     # adapters: Doctrine repos, HTTP clients
+│       └── EntryPoint/Http/    # *Controller.php with #[Route]
+├── tests/{Module}/Features/{Feature}/  # mirrors src/, type via base class + #[Group]
+├── config/  bin/  public/  assets/
+├── dev/                        # codegen helpers (create-slice, new-adr, check-docs)
+├── ops/                        # deploy
+├── docs/{adr,guides}/
+└── docker/
 ```
 
-## Creating a New Feature
+`Domain/` and `Infrastructure/` are optional inside a slice — create them only when the feature actually needs them.
 
-### Step 1: Create Features Structure
+## Creating a new slice
 
 ```bash
-# Create Features directories
-mkdir -p src/Task/Features/CreateTask/{EntryPoint/Http,Request,Response}
+make slice module=Billing feature=Subscribe
 ```
 
-### Step 2: Define Command
+This generates `src/Billing/Features/Subscribe/` with `Application/SubscribeCommand.php`, `Application/SubscribeHandler.php`, `Application/SubscribeResult.php`, `EntryPoint/Http/SubscribeController.php`, plus a matching `tests/Billing/Features/Subscribe/SubscribeHandlerTest.php`. Open the files and replace the placeholders.
+
+The reference slice for JSON endpoints is [`src/Health/Features/Healthz/`](../../src/Health/Features/Healthz/). The reference for Twig + AssetMapper is [`src/Home/Features/Index/`](../../src/Home/Features/Index/) (non-normative — drop it for API-only projects).
+
+## Common patterns
+
+### Validating input with attributes
+
+Place validation on the request DTO so it's deserialized and validated by `#[MapRequestPayload]`:
 
 ```php
-// src/Task/Features/CreateTask/CreateTaskCommand.php
-declare(strict_types=1);
+namespace App\Task\Features\CreateTask\Application;
 
-namespace App\Task\Features\CreateTask;
+use Symfony\Component\Validator\Constraints as Assert;
 
 final readonly class CreateTaskCommand
 {
     public function __construct(
-        public string $title,
-        public int $columnId,
-        public ?string $description = null,
-    ) {}
-}
-```
-
-### Step 3: Create Handler
-
-```php
-// src/Task/Features/CreateTask/CreateTaskHandler.php
-declare(strict_types=1);
-
-namespace App\Task\Features\CreateTask;
-
-use App\Task\Entity\Task;
-use App\Task\Features\CreateTask\Request\CreateTaskRequest;
-use App\Task\Features\CreateTask\Response\CreateTaskResponse;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-
-#[AsMessageHandler]
-final readonly class CreateTaskHandler
-{
-    public function __construct(
-        private EntityManagerInterface $em,
-    ) {}
-
-    public function handle(CreateTaskCommand $command): CreateTaskResponse
-    {
-        $task = new Task($command->title, $command->columnId);
-        $this->em->persist($task);
-        $this->em->flush();
-
-        return CreateTaskResponse::fromEntity($task);
-    }
-}
-```
-
-### Step 4: Create Request DTO with Validation
-
-```php
-// src/Task/Features/CreateTask/Request/CreateTaskRequest.php
-declare(strict_types=1);
-
-namespace App\Task\Features\CreateTask\Request;
-
-use Symfony\Component\Validator\Constraints as Assert;
-use OpenApi\Attributes as OA;
-
-#[OA\Schema(description: "Create task request")]
-final readonly class CreateTaskRequest
-{
-    public function __construct(
         #[Assert\NotBlank]
         #[Assert\Length(min: 3, max: 255)]
-        #[OA\Property(example: "Fix login bug")]
         public string $title,
-
         #[Assert\Positive]
-        #[OA\Property(example: 1)]
         public int $columnId,
-
-        #[Assert\Length(max: 5000)]
-        #[OA\Property(nullable: true)]
-        public ?string $description = null,
     ) {}
 }
 ```
 
-### Step 5: Create Controller
+### Dispatching a command from a controller
 
 ```php
-// src/Task/Features/CreateTask/EntryPoint/Http/CreateTaskController.php
-declare(strict_types=1);
-
-namespace App\Task\Features\CreateTask\EntryPoint\Http;
-
-use App\Task\Features\CreateTask\CreateTaskCommand;
-use App\Task\Features\CreateTask\Request\CreateTaskRequest;
-use App\Task\Features\CreateTask\Response\CreateTaskResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class CreateTaskController
 {
-    #[Route('/api/tasks', methods: ['POST'])]
-    public function __invoke(
-        #[MapRequestPayload] CreateTaskRequest $request,
-        MessageBusInterface $bus,
-    ): CreateTaskResponse {
-        $command = new CreateTaskCommand(
-            $request->title,
-            $request->columnId,
-            $request->description,
-        );
-        return $bus->dispatch($command);
-    }
-}
-```
+    public function __construct(private MessageBusInterface $bus) {}
 
-### Step 6: Write Tests
-
-```php
-// tests/Unit/Task/Features/CreateTask/CreateTaskHandlerTest.php
-declare(strict_types=1);
-
-namespace App\Tests\Unit\Task\Features\CreateTask;
-
-use App\Task\Features\CreateTask\CreateTaskHandler;
-use App\Task\Features\CreateTask\CreateTaskCommand;
-use PHPUnit\Framework\TestCase;
-
-final class CreateTaskHandlerTest extends TestCase
-{
-    public function test_creates_task(): void
+    #[Route('/task', methods: ['POST'])]
+    public function __invoke(#[MapRequestPayload] CreateTaskCommand $cmd): JsonResponse
     {
-        $handler = new CreateTaskHandler($this->em);
-        $command = new CreateTaskCommand('Test Task', 1);
-
-        $response = $handler->handle($command);
-
-        self::assertNotNull($response->id);
+        $envelope = $this->bus->dispatch($cmd);
+        // ... return JSON
     }
 }
 ```
 
-## Common Patterns
+For sync handlers that return a value, use `HandleTrait::handle()` (see `HealthzController` for an example).
 
-### Validation with Attributes
-
-```php
-declare(strict_types=1);
-
-namespace App\Task\Application\Command;
-
-use Symfony\Component\Validator\Constraints as Assert;
-
-final readonly class CreateTaskCommand
-{
-    public function __construct(
-        #[Assert\NotBlank]
-        #[Assert\Length(min: 3, max: 255)]
-        public string $title,
-        
-        #[Assert\Positive]
-        public ?int $projectId = null
-    ) {}
-}
-```
-
-### Using Enums for Status
+### Enums for status
 
 ```php
-// src/Task/Domain/TaskStatus.php
-declare(strict_types=1);
-
-namespace App\Task\Domain;
-
 enum TaskStatus: string
 {
     case TODO = 'todo';
     case IN_PROGRESS = 'in_progress';
     case DONE = 'done';
-    
-    public function canTransitionTo(TaskStatus $target): bool
-    {
-        return match ($this) {
-            self::TODO => $target === self::IN_PROGRESS,
-            self::IN_PROGRESS => $target === self::DONE,
-            self::DONE => false,
-        };
-    }
 }
 ```
 
-### Fetching Related Data with Queries
+### Returning DTOs, never entities
 
-```php
-// For reading, use Query Bus - never expose entities directly
-final readonly class GetTaskDetailsHandler
-{
-    public function handle(GetTaskDetailsQuery $query): TaskDetailsDto
-    {
-        $task = $this->repository->findById($query->taskId);
-        $assignee = $this->userRepository->findById($task->assigneeId);
-        $comments = $this->commentRepository->findByTaskId($task->id);
-        
-        return new TaskDetailsDto(
-            id: $task->id,
-            title: $task->title,
-            status: $task->status,
-            assignee: $assignee->name,
-            comments: array_map(fn($c) => $c->text, $comments)
-        );
-    }
-}
-```
+Query handlers return `*Result` DTOs. Don't expose Doctrine entities through HTTP — implicit lazy loading during JSON serialization causes hidden N+1.
 
-## Debugging Tips
+## Code style & static analysis
 
-### View Logs
+- **Laravel Pint** (PSR-12 preset, `pint.json`). `make lint` auto-fixes; `make lint-check` is read-only.
+- **PHPStan level 9** (`phpstan.neon`). `make analyze`.
+- **Conventional Commits** for commit message headers.
 
-```bash
-make logs
-```
+`make check` runs lint + analyze before every commit; `make ci` adds tests and matches the CI workflow exactly.
 
-### Xdebug
+## Debugging
 
-Configure your IDE:
-- Port: `9003`
-- Host: `host.docker.internal` (or `docker.for.mac.localhost` on Mac)
-- Start listening for debug connections
-
-### Messenger Inspector
-
-```bash
-# View failed messages
-php bin/console messenger:failed
-
-# Retry failed messages
-php bin/console messenger:retry
-```
-
-## Performance Tips
-
-1. **Use Redis for sessions and cache**
-2. **Enable OPcache in development** (`make composer-chown`)
-3. **Use PHP 8.5 optimizations**
-4. **Configure Caddy for HTTP/3**
-5. **Use connection pooling in production**
-
-## Code Style Enforcement
-
-This project uses:
-- **PHP-CS-Fixer** with PSR-12 rules
-- **PHPStan** at level 8 (strict)
-- **Rector** for automated upgrades (optional)
-
-Run checks before committing:
-
-```bash
-make cs-fix && make phpstan && make test
-```
+- **Logs:** `make logs`.
+- **Xdebug:** port 9003, `make xdebug-on` / `make xdebug-off`. Host: `host.docker.internal` (or `docker.for.mac.localhost` on macOS).
+- **Messenger:** `php bin/console messenger:failed` to inspect the dead-letter queue, `php bin/console messenger:retry` to retry.
+- **Worker mode quirks:** see [`worker-mode.md`](worker-mode.md).

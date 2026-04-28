@@ -1,8 +1,17 @@
-# ADR 2: Messenger Transport
+---
+id: ADR-0002
+title: Messenger Transport
+status: Accepted
+date: 2026-02-04
+supersedes: []
+superseded_by: []
+audience: both
+summary: "Symfony Messenger as the primary bus. CQRS: Commands and Queries are synchronous; Events are asynchronous (Redis transport) for cross-module communication."
+---
 
-**Date:** 2026-02-04
-**Status:** Accepted
-**Owner:** Architecture Team
+# ADR-0002: Messenger Transport
+
+**TL;DR:** All write operations dispatch a `*Command` synchronously through Messenger. Reads dispatch a `*Query`. Cross-module side effects use asynchronous `*Event`s on a Redis-backed transport. This is the contract; ADR-0003 is superseded by this plus ADR-0001 and ADR-0004.
 
 ## Context
 

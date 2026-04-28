@@ -1,11 +1,21 @@
-# ADR 7: AssetMapper
+---
+id: ADR-0007
+title: AssetMapper
+status: Accepted
+date: 2026-02-05
+supersedes: []
+superseded_by: []
+audience: both
+summary: "Symfony AssetMapper is the default for HTML-first apps (no Webpack/Vite). The boilerplate ships an Index slice as a non-normative reference; SPA projects may swap AssetMapper for Vite without violating any ADR."
+---
 
-**Date:** 2026-02-05
-**Status:** Accepted
+# ADR-0007: AssetMapper
+
+**TL;DR:** Default frontend tooling is AssetMapper. The shipped `src/Home/Features/Index/` slice is a reference example, **not** an architectural commitment. Projects building an SPA can replace it with a `frontend/` workspace driven by Vite without violating any other ADR.
 
 ## Decision
 
-Use Symfony AssetMapper for managing frontend assets.
+Use Symfony AssetMapper as the default for managing frontend assets in HTML-first slices.
 
 ## Context
 
@@ -27,6 +37,7 @@ We needed a simple asset management solution that:
 
 - **Limited Transpilation**: Not suitable for complex JS frameworks
 - **Browser Support**: Requires modern browsers with Import Maps
+- **SPA escape hatch:** Projects shipping an SPA should replace the AssetMapper integration with a `frontend/` workspace driven by Vite/Bun/etc. The example `Home/Index` slice can be deleted without architectural impact.
 
 ## Usage
 
@@ -40,7 +51,7 @@ We needed a simple asset management solution that:
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
 </head>
 <body>
-    {{ include('@App/scripts/app.js') }}
+    <script type="module" src="{{ asset('app.js') }}"></script>
 </body>
 </html>
 ```

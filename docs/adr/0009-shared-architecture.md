@@ -1,8 +1,17 @@
-# ADR 9: Shared Architecture
+---
+id: ADR-0009
+title: Shared Architecture
+status: Accepted
+date: 2026-02-06
+supersedes: []
+superseded_by: []
+audience: both
+summary: "Two-level Shared: src/Shared/ for cross-module infra glue, src/{Module}/Shared/ for module-internal reuse. Rule of Three (extract only at the third occurrence). Relationship to ADR-0001."
+---
 
-## Status
+# ADR-0009: Shared Architecture
 
-**Accepted**
+**TL;DR:** `src/Shared/` is for infrastructure glue only (Bus, Persistence, base exceptions). Module-internal reuse goes in `src/{Module}/Shared/`. Don't extract before three occurrences. ADR-0001 defines slice layout; this ADR defines what lives *outside* slices.
 
 ## Context
 

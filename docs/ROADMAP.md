@@ -1,3 +1,10 @@
+---
+audience: human
+tier: 3
+last_reviewed: 2026-04-28
+summary: "Quarterly product roadmap. Human-only — load on demand for planning context, not for code generation."
+---
+
 # Pragmatic Franken Roadmap 2026
 
 > **"Stop refactoring. Start delivering."**
@@ -38,7 +45,7 @@ make integrate-mercure
 **Goal:** Auto-generate TypeScript clients from Features/Dto.php
 
 **Deliverables:**
-- Script: `scripts/generate-sdk.sh`
+- Script: `dev/generate-sdk.sh`
 - Output: `packages/client-sdk/`
 - Documentation: `docs/guides/sdk-generation.md`
 
@@ -60,7 +67,7 @@ make integrate-mercure
 **Goal:** `make slice` becomes interactive — AI asks for parameters and drafts logic.
 
 **Deliverables:**
-- Enhanced script: `scripts/create-slice.sh`
+- Enhanced script: `dev/create-slice.sh`
 - AI prompts for feature description
 - Auto-generate first draft of Handler logic
 
@@ -69,7 +76,7 @@ make integrate-mercure
 **Goal:** Automatic project context gathering for LLMs.
 
 **Deliverables:**
-- Script: `scripts/generate-context.sh`
+- Script: `dev/generate-context.sh`
 - Output: `context.json` for Claude/GPT-4
 - Integration with AGENTS.md
 
@@ -83,7 +90,7 @@ make integrate-mercure
 
 **Deliverables:**
 - Documentation: `docs/guides/static-build.md`
-- Script: `scripts/build-static.sh`
+- Script: `dev/build-static.sh`
 - Deployment guide: Fly.io, Cloudflare
 
 ### 3.2 Memory Management
@@ -93,7 +100,7 @@ make integrate-mercure
 **Deliverables:**
 - ADR: `docs/adr/0011-memory-management.md`
 - Profiling tools integration
-- Example: `scripts/memory-profile.sh`
+- Example: `dev/memory-profile.sh`
 
 ### 3.3 Native SQLite Support
 

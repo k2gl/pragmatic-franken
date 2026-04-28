@@ -1,3 +1,10 @@
+---
+audience: human
+tier: 3
+last_reviewed: 2026-04-28
+summary: "FrankenPHP vs PHP-FPM benchmarks and methodology. Marketing/comparison content; not loaded by AI agents by default."
+---
+
 # Performance Benchmarks
 
 This document contains detailed performance benchmarks for Pragmatic Franken.

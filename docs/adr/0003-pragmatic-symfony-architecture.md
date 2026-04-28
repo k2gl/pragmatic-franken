@@ -1,8 +1,20 @@
-# ADR 3: Pragmatic Symfony Architecture
+---
+id: ADR-0003
+title: Pragmatic Symfony Architecture
+status: Superseded
+date: 2026-02-04
+supersedes: []
+superseded_by: [ADR-0001, ADR-0002, ADR-0004]
+audience: human
+summary: "SUPERSEDED. Original meta-decision to favor Symfony idioms over hexagonal/DDD-pure architecture. Concrete rules now live in ADR-0001 (Vertical Slices), ADR-0002 (Messenger), and ADR-0004 (FrankenPHP Runtime)."
+---
 
-## Status
+# ADR-0003: Pragmatic Symfony Architecture *(superseded)*
 
-**Accepted**
+> **Status: Superseded.** Kept for historical context. The decisions in this ADR have been replaced by:
+> - ADR-0001 — Vertical Slices (folder layout & naming)
+> - ADR-0002 — Messenger Transport (CQRS rules)
+> - ADR-0004 — FrankenPHP Runtime (worker-mode constraints)
 
 ## Context
 

@@ -1,23 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
          colors="true"
          cacheDirectory=".phpunit.cache"
          executionOrder="depends,defects"
          failOnRisky="true"
          failOnWarning="true"
          stopOnFailure="false">
+
     <testsuites>
-        <testsuite name="Task">
-            <directory>tests/Task</directory>
+        <testsuite name="All">
+            <directory suffix="Test.php">tests</directory>
+            <exclude>tests/Support</exclude>
+            <exclude>tests/bootstrap.php</exclude>
         </testsuite>
     </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <file>src/Kernel.php</file>
+        </exclude>
+    </source>
+
+    <coverage>
+        <report>
+            <text outputFile="php://stdout"/>
+        </report>
+    </coverage>
+
     <php>
         <env name="APP_ENV" value="test"/>
-        <env name="KERNEL_CLASS" value="App\FrankenKernel"/>
-        <env name="DATABASE_URL" value="sqlite:////home/l0gic/www/k2gl/pragmatic-franken/var/test.db"/>
-        <env name="REDIS_URL" value="redis://redis:6379"/>
-        <env name="MESSENGER_TRANSPORT_DSN" value="redis://redis:6379/messages"/>
+        <env name="KERNEL_CLASS" value="App\Kernel"/>
+        <!--
+            DATABASE_URL — from .env.test (sqlite by default for fast unit tests).
+                           Override per-run with: DATABASE_URL=postgres://... vendor/bin/phpunit
+            REDIS_URL, MESSENGER_TRANSPORT_DSN — from system env (container / CI).
+        -->
     </php>
 </phpunit>

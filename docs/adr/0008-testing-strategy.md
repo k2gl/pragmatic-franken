@@ -1,363 +1,74 @@
-# ADR 8: Testing Strategy
+---
+id: ADR-0008
+title: Testing Strategy
+status: Accepted
+date: 2026-04-27
+supersedes: []
+superseded_by: []
+audience: both
+summary: "PHPUnit 11 with mirror-of-src test layout; pyramid 60/30/10 (unit/integration/e2e); coverage thresholds Domain 90 / Application 80 / Infrastructure 60 / UI 40."
+---
 
-**Date:** 2026-02-06
-**Status:** Proposed
-**Owner:** QA Team
+# ADR-0008: Testing Strategy
+
+**TL;DR:** PHPUnit 11 is the test framework. Tests mirror `src/` one-to-one. Test type is encoded by the base class plus a `#[Group]` attribute, not by a top-level directory. Coverage gates are enforced per layer (Domain 90 / Application 80 / Infrastructure 60 / UI 40).
 
 ## Context
 
-Choosing a testing framework for a PHP/Symfony project affects:
-- Developer productivity
-- Code quality gates
-- AI agent compatibility
-- CI/CD pipeline complexity
-
-Options:
-1. **PHPUnit** — Industry standard, mature, extensive ecosystem
-2. **Pest** — Modern, expressive, PHP 8+ native, growing adoption
+Choosing a testing strategy for a PHP/Symfony/FrankenPHP project affects developer productivity, the predictability of AI-generated code, CI cost, and how easy it is to delete a feature. We considered PHPUnit and Pest; we considered three layouts (separated `Unit/Integration/EndToEnd` directories, mirror-of-`src/` with grouping, and feature-local tests next to handlers).
 
 ## Decision
 
-We use **PHPUnit** as the primary testing framework.
+1. **Framework: PHPUnit 11.** Mature, deeply integrated with Symfony Test framework, abundant AI training data, full PHPStan compatibility. Pest is rejected for this boilerplate (less AI training data, extra plugin layer with Symfony).
+2. **Layout: mirror of `src/`** at `tests/{Module}/Features/{Feature}/`. Test *type* is communicated via the base class (`UnitTestCase` / `IntegrationTestCase` / `ApiTestCase`) and PHPUnit `#[Group]` attribute (`unit` / `integration` / `e2e`).
+3. **Pyramid: 60 / 30 / 10** (unit / integration / e2e). Most logic is exercised in cheap unit tests; integration covers persistence, Messenger, and external adapters; e2e validates HTTP contracts.
+4. **Coverage thresholds** (enforced in CI):
 
-## Rationale
+| Layer | Path glob | Minimum line coverage |
+|---|---|---|
+| Domain | `src/*/Features/*/Domain/`, `src/*/Domain/` | **90 %** |
+| Application | `src/*/Features/*/Application/` | **80 %** |
+| Infrastructure | `src/*/Features/*/Infrastructure/`, `src/*/Infrastructure/` | **60 %** |
+| UI / EntryPoint | `src/*/Features/*/EntryPoint/` | **40 %** |
 
-### PHPUnit Advantages
+5. **Async support:** `zenstruck/messenger-test` for in-memory bus assertions; `zenstruck/foundry` + `dama/doctrine-test-bundle` for database isolation.
 
-| Factor | PHPUnit | Pest |
-|--------|---------|------|
-| **Symfony Integration** | Native support via Symfony Test framework | Requires Pest plugin |
-| **AI Agent Compatibility** | Well-documented patterns, predictable structure | Less training data for AI |
-| **Team Familiarity** | 95% of PHP developers know PHPUnit | Learning curve for newcomers |
-| **CI/CD** | Universal support | Growing but not universal |
-| **Static Analysis** | Full PHPStan compatibility | PHPStan requires configuration |
-
-### Symfony Test Framework Integration
-
-PHPUnit integrates seamlessly with Symfony:
-
-```php
-// KernelTestCase for container testing
-abstract class KernelTestCase extends AbstractKernelTestCase
-{
-    protected function setUp(): void
-    {
-        self::bootKernel();
-    }
-}
-
-// WebTestCase for HTTP testing
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-final class CreateTaskControllerTest extends WebTestCase
-{
-    public function test_creates_task_successfully(): void
-    {
-        $client = self::createClient();
-        $client->request('POST', '/api/tasks', [], [], [], json_encode([
-            'title' => 'Test Task',
-            'columnId' => 1,
-        ]));
-
-        self::assertResponseStatusCodeSame(201);
-    }
-}
-```
-
-### Messenger Testing
-
-Zenstruck\Messenger\Test provides async testing for Messenger:
-
-```php
-use Zenstruck\Messenger\Test\InteractsWithMessenger;
-use App\Task\Features\CreateTask\CreateTaskCommand;
-
-final class CreateTaskHandlerTest extends TestCase
-{
-    use InteractsWithMessenger;
-
-    public function test_creates_task_and_dispatches_event(): void
-    {
-        // Given
-        $this->bus()->dispatch(new CreateTaskCommand(
-            title: 'New Task',
-            columnId: 1,
-        ));
-
-        // Then
-        $this->bus()->dispatched()->assertContains(CreateTaskCommand::class);
-    }
-}
-```
-
-### Pest Consideration
-
-Pest is excellent for simple projects but has drawbacks for enterprise:
-
-```
-Pros:              Cons:
-- Clean syntax     - Symfony plugin required
-- Fast writing     - Less AI training data
-- Modern           - Smaller community for edge cases
-```
-
-For an AI-Native project, PHPUnit's predictability outweighs Pest's syntax benefits.
-
-## Testing Pyramid
-
-```
-        /\
-       /E2E\        ← 10% — Full HTTP flow, WebTestCase
-      /-----\ 
-     /Integ.\      ← 30% — Database integration, Messenger
-    /-------\ 
-   / Unit   \     ← 60% — Handlers, Services, pure logic
-  /_________\
-```
-
-### Test Types
-
-| Type | Purpose | Framework | Isolation |
-|------|---------|-----------|-----------|
-| **Unit** | Business logic | PHPUnit | Full (mocks) |
-| **Integration** | Persistence, Messenger | PHPUnit + Foundry | Database per test |
-| **E2E** | HTTP endpoints | WebTestCase | Full kernel |
-
-## Project Structure
+## Test layout
 
 ```
 tests/
-├── Unit/
-│   └── {Module}/
-│       └── Features/
-│           └── {FeatureName}/
-│               └── {FeatureName}HandlerTest.php
-├── Integration/
-│   └── {Module}/
-│       └── Features/
-│           └── {FeatureName}/
-│               └── {FeatureName}HandlerTest.php
-└── EndToEnd/
-    └── {Module}/
-        └── Features/
-            └── {FeatureName}/
-                └── {FeatureName}ControllerTest.php
+├── bootstrap.php
+├── Support/                                  # framework helpers, not tests
+│   ├── TestCase/{UnitTestCase, IntegrationTestCase, ApiTestCase}.php
+│   ├── Factory/                              # Foundry factories
+│   └── Helper/
+└── {Module}/Features/{Feature}/{Feature}HandlerTest.php
 ```
 
-## Testing Standards
+| Test type | Base class | `#[Group]` | Make target |
+|---|---|---|---|
+| Unit | `UnitTestCase` | `unit` | `make test-unit` |
+| Integration | `IntegrationTestCase` | `integration` | `make test-integration` |
+| API / E2E | `ApiTestCase` | `e2e` | `make test-e2e` |
 
-### Unit Test Pattern
-
-```php
-declare(strict_types=1);
-
-namespace App\Tests\Unit\User\Features\Login;
-
-use App\User\Features\Login\LoginHandler;
-use App\User\Features\Login\LoginCommand;
-use App\User\Features\Login\LoginResponse;
-use PHPUnit\Framework\TestCase;
-
-final class LoginHandlerTest extends TestCase
-{
-    public function test_returns_token_on_valid_credentials(): void
-    {
-        // Arrange
-        $userRepository = $this->createMock(UserRepository::class);
-        $handler = new LoginHandler($userRepository);
-        $command = new LoginCommand('user@example.com', 'password123');
-
-        // Act
-        $response = $handler->handle($command);
-
-        // Assert
-        self::assertInstanceOf(LoginResponse::class, $response);
-        self::assertNotEmpty($response->token);
-    }
-}
-```
-
-### Integration Test Pattern
-
-```php
-declare(strict_types=1);
-
-namespace App\Tests\Integration\User\Features\Login;
-
-use App\User\Entity\User;
-use App\User\Features\Login\LoginCommand;
-use App\User\Features\Login\LoginHandler;
-use App\User\Features\Login\LoginResponse;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
-
-final class LoginHandlerIntegrationTest extends KernelTestCase
-{
-    use ResetDatabase;
-    use Factories;
-
-    public function test_returns_token_for_existing_user(): void
-    {
-        // Given
-        $user = User::create(email: 'user@example.com', password: 'hashed');
-        $this->getContainer()->get(UserRepository::class)->save($user);
-
-        $handler = $this->getContainer()->get(LoginHandler::class);
-        $command = new LoginCommand('user@example.com', 'password123');
-
-        // Act
-        $response = $handler->handle($command);
-
-        // Assert
-        self::assertInstanceOf(LoginResponse::class, $response);
-        self::assertNotEmpty($response->token);
-    }
-}
-```
-
-### E2E Test Pattern
-
-```php
-declare(strict_types=1);
-
-namespace App\Tests\EndToEnd\User\Features\Login;
-
-use App\User\Features\Login\LoginRequest;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-final class LoginControllerTest extends WebTestCase
-{
-    public function test_login_endpoint_returns_token(): void
-    {
-        // Given
-        $client = self::createClient();
-
-        // When
-        $client->request('POST', '/api/login', [], [], [], json_encode([
-            'email' => 'user@example.com',
-            'password' => 'password123',
-        ]));
-
-        // Then
-        self::assertResponseStatusCodeSame(200);
-        $content = json_decode($client->getResponse()->getContent(), true);
-        self::assertArrayHasKey('token', $content);
-    }
-}
-```
-
-## Test Configuration
-
-### phpunit.xml
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         colors="true"
-         cacheDirectory=".phpunit.cache"
-         executionOrder="depends,defects"
-         beStrictAboutChangesToGlobalState="true"
-         beStrictAboutOutputDuringTests="true"
-         failOnRisky="true"
-         failOnWarning="true">
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Integration">
-            <directory suffix="Test.php">tests/Integration</directory>
-        </testsuite>
-        <testsuite name="EndToEnd">
-            <directory suffix="Test.php">tests/EndToEnd</directory>
-        </testsuite>
-    </testsuites>
-    <source>
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
-    </source>
-    <php>
-        <env name="APP_ENV" value="test"/>
-    </php>
-</phpunit>
-```
-
-### CI Configuration
-
-```yaml
-# .github/workflows/test.yml
-name: Tests
-
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: test
-        ports: [5432:5432]
-        options: >-
-          --health-cmd pg_isready
-          --health-cmd="psql -U test -d test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: PHP Setup
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-          tools: composer, phpunit
-
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction
-
-      - name: Run PHPUnit
-        run: ./vendor/bin/phpunit --testdox
-
-      - name: Run PHPStan
-        run: ./vendor/bin/phpstan analyse --level=8 src/
-```
-
-## Tools & Libraries
-
-| Tool | Purpose |
-|------|---------|
-| **phpunit/phpunit** | Core testing framework |
-| **symfony/test-pack** | Symfony integration (WebTestCase, KernelTestCase) |
-| **zenstruck/foundry** | Database fixtures, factories |
-| **zenstruck/messenger-test** | Messenger/async testing |
-| **phpstan/phpstan** | Static analysis |
-| **php-cs-fixer** | Code style |
+Concrete examples live in `docs/guides/testing.md` (this ADR is the source of truth for the *decision*; the guide is the source of truth for *patterns*).
 
 ## Consequences
 
 ### Positive
 
-1. **Predictable**: Standard PHPUnit patterns, well-documented
-2. **AI-Friendly**: AI agents trained on PHPUnit examples
-3. **Symfony Native**: Deep integration with Symfony ecosystem
-4. **Mature**: 15+ years of bug fixes and optimizations
+- One folder per feature for both production and test code → deletion is one `rm -rf`.
+- Test type is searchable (`grep -r '#[Group(\'integration\')]'`).
+- Coverage gates pin domain rigor where it matters and avoid overspending on UI tests.
+- AI agents reliably scaffold mirror paths.
 
 ### Negative
 
-1. **Boilerplate**: More verbose than Pest
-2. **Learning Curve**: SetUp/tearDown patterns require understanding
+- Test runners that filter only by directory cannot select "all unit tests" in one shot — must use `--group=unit`. Mitigated by Make targets.
+- Coverage thresholds require collector configuration in `phpunit.xml`. Initial setup cost.
 
 ## References
 
-- [PHPUnit Documentation](https://phpunit.de/documentation.html)
-- [Symfony Testing Guide](https://symfony.com/doc/current/testing.html)
-- [Zenstruck Foundry](https://github.com/zenstruck/foundry)
-- [Zenstruck Messenger Test](https://github.com/zenstruck/messenger-test)
+- ADR-0001 (Vertical Slices) — defines the slice layout that tests mirror.
+- `docs/guides/testing.md` — example tests and Foundry/Messenger-Test usage.
+- [PHPUnit](https://phpunit.de) · [Symfony Testing](https://symfony.com/doc/current/testing.html) · [Zenstruck Foundry](https://github.com/zenstruck/foundry) · [Zenstruck Messenger-Test](https://github.com/zenstruck/messenger-test).

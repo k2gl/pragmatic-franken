@@ -1,330 +1,125 @@
-# Pragmatic Franken - AI Developer Companion
+---
+audience: agent,human
+tier: 1
+budget_tokens: 2000
+last_reviewed: 2026-04-28
+---
 
-This project uses structured instructions for AI assistants.
+# AGENTS.md — Pragmatic Franken
 
-## Quick Commands
+PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Architecture: Vertical Slices + CQRS over Symfony Messenger, FrankenPHP worker mode. This file is the **only** AI-default context — everything else loads on demand from `docs/`.
 
-| Command | Description |
-|---------|-------------|
-| `make up` | Start development environment |
-| `make install` | Install PHP dependencies |
-| `make test` | Run PHPUnit tests |
-| `make check` | Run all checks (lint + test) |
-| `make ci` | Simulate CI pipeline |
-| `make shell` | Access FrankenPHP container |
-| `make logs` | Follow container logs |
+## Quickstart
 
-## Architecture Style: Vertical Slices (VSA) + Pragmatic Symfony
+```bash
+make install     # env, containers, deps, migrations
+make up          # start containers
+make smoke       # bin/console list && curl /healthz
+make test        # PHPUnit
+make ci          # lint-check + analyze + test (matches CI)
+make slice module=Foo feature=Bar   # scaffold a new slice
+```
 
-### Folder Structure
+## Directory map
 
+```
 src/
-├── Kernel.php              # System core (Symfony MicroKernel)
-├── Shared/                 # Global Shared (infrastructure only)
-│   ├── Infrastructure/
-│   │   ├── Bus/           # Messenger configuration
-│   │   ├── Persistence/   # Doctrine extensions
-│   │   └── Logging/       # Sentry, monitoring
-│   └── Domain/
-│       ├── ValueObject/    # Global value objects
-│       └── Exception/      # Base exceptions
-│
-├── {Module}/
-│   ├── Entity/            # Module-wide entities
-│   ├── Enum/              # Module-wide enums
-│   ├── Service/           # Module-domain services
-│   ├── Events/            # Module events
-│   ├── Repositories/
-│   └── Features/           # Vertical Slices (flat structure)
-│       └── {FeatureName}/
-│           ├── {FeatureName}Command.php     # Command (Write)
-│           ├── {FeatureName}Query.php       # Query (Read, optional)
-│           ├── {FeatureName}Handler.php     # Handler
-│           ├── {FeatureName}Request.php     # Input validation (optional)
-│           └── {FeatureName}Response.php    # Response (optional)
-
-### Code Rules
-
-#### 1. No Extra Layers
-- НЕ создавай интерфейсы для сервисов, если только одна реализация
-- НЕ создавай DTO, если хватает валидации в сущности
-- Цепочка: EntryPoint → Command/Query → Handler → Entity
-
-#### 2. Message Bus Pattern (Preferred)
-```php
-// EntryPoint/Http/{FeatureName}Controller.php
-final class {FeatureName}Controller extends AbstractController
-{
-    public function __invoke(
-        #[MapRequestPayload] {FeatureName}Request $request,
-        MessageBusInterface $bus
-    ): {FeatureName}Response {
-        $command = new {FeatureName}Command(...);
-        return $bus->dispatch($command);
-    }
-}
+  Kernel.php                            # App\Kernel
+  Shared/                               # global infra (Bus, Persistence, base exceptions) — empty until needed
+  {Module}/
+    Features/{Feature}/
+      Domain/                           # entities, value objects, domain events (optional)
+      Application/                      # *Command / *Query / *Handler / *Result
+      Infrastructure/                   # adapters: Doctrine repos, HTTP clients, etc.
+      EntryPoint/Http/{Feature}Controller.php
+      EntryPoint/Cli/{Verb}{Feature}CliCommand.php   # if a CLI entry exists
+config/  bin/  public/  assets/         # standard Symfony layout
+docs/    dev/  ops/                     # ADRs, codegen, deploy
+tests/   {Module}/Features/{Feature}/   # mirror of src/
 ```
 
-#### 3. Slim Controller / EntryPoint
-EntryPoint только:
-- Транслирует входные данные в Command/Query
-- Вызывает `$bus->dispatch()`
-- Возвращает Response
+## Hard rules (DO / DO-NOT)
 
-НИКАКОЙ бизнес-логики в EntryPoint.
+- **DO** put feature code in `src/{Module}/Features/{Feature}/`. See ADR-0001.
+- **DO** name CQRS commands `Create{Feature}Command`, `Update{Feature}Command`, etc. — verb + noun.
+- **DO** use `#[AsMessageHandler]` on handlers and dispatch via `MessageBusInterface`.
+- **DO** name Symfony Console classes `*CliCommand extends Command` in `EntryPoint/Cli/`.
+- **DO** use attributes for routing, validation, Doctrine mapping. No XML/YAML for those.
+- **DO** keep controllers slim: parse input → dispatch command/query → return result.
+- **DO-NOT** create global `Controllers/`, `Services/`, `Repositories/` directories.
+- **DO-NOT** create an interface unless ≥ 2 implementations or test substitution is unavoidable.
+- **DO-NOT** hold mutable static state — FrankenPHP worker mode reuses the kernel between requests. See ADR-0004.
+- **DO-NOT** return Doctrine entities from query handlers or controllers — return DTOs.
+- **DO-NOT** add files anywhere outside the slice for slice-scoped logic. Deletion of the slice folder must leave nothing dangling.
 
-#### 4. Attributes in DTOs (Validation + OpenAPI)
-```php
-// Request/{FeatureName}Request.php
-final readonly class {FeatureName}Request
-{
-    public function __construct(
-        #[OA\Property(description: "User email", example: "user@example.com")]
-        #[Assert\Email]
-        #[Assert\NotBlank]
-        public string $email,
+## Slice anatomy (canonical, ADR-0001)
 
-        #[Assert\Length(min: 8)]
-        public string $password
-    ) {}
-}
+```
+src/User/Features/Register/
+  Application/RegisterCommand.php
+  Application/RegisterHandler.php
+  Application/RegisterResult.php
+  Infrastructure/PasswordHasher.php
+  EntryPoint/Http/RegisterController.php   # POST /user/register
+  EntryPoint/Cli/RegisterUserCliCommand.php  # bin/console user:register (optional)
 ```
 
-#### 5. CQRS Separation
+`Domain/` is added only when the feature has its own value objects, entities, or domain events. Cross-feature shared code lives at the next level up (`src/{Module}/Shared/`) only after the Rule of Three (used in 3+ slices). See ADR-0009.
 
-**Command (Write):**
-- Возвращает: `id`, `void`, или Domain Event
-- Использует: Doctrine Entity
-- Логика: бизнес-правила, валидация, persistence
+## Naming cheat-sheet
 
-**Query (Read):**
-- Возвращает: DTO/Response
-- Использует: DBAL, raw SQL, или non-tracked ORM
-- Логика: projection, оптимизация чтения
+| What | Class name | Location |
+|---|---|---|
+| CQRS command (write) | `Create{Feature}Command` | `Application/` |
+| CQRS query (read) | `Get{Feature}Query` | `Application/` |
+| Handler | `{Feature}Handler` | `Application/` |
+| Result DTO | `{Feature}Result` | `Application/` |
+| HTTP controller | `{Feature}Controller` | `EntryPoint/Http/` |
+| Symfony Console | `{Verb}{Feature}CliCommand` extends `Command` | `EntryPoint/Cli/` |
+| Domain event | `{Feature}{PastTenseVerb}` | `Domain/` (intra-feature) or `src/{Module}/Shared/Events/` (inter-module) |
 
-#### 6. Event Communication
-Модули общаются ТОЛЬКО через EventBus:
-```php
-// В Handler
-$this->eventBus->dispatch(new {FeatureName}Event($data));
-```
+## Runtime mode
 
-### Naming Conventions
+FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless handlers only. Configure via `.env` (`FRANKENPHP_MAX_JOBS`, `PHP_MAX_REQUESTS`, `PHP_MEMORY_LIMIT`). Health probes at `/healthz` (liveness) and `/ready` (readiness). See ADR-0004, ADR-0005, `docs/guides/worker-mode.md`.
 
-| Тип | Пример |
-|-----|--------|
-| Command | `{FeatureName}Command.php` |
-| Query | `{FeatureName}Query.php` |
-| Handler | `{FeatureName}Handler.php` |
-| EntryPoint HTTP | `{FeatureName}Controller.php` |
-| EntryPoint CLI | `{FeatureName}Console.php` |
+## Testing
 
-### Shared Architecture
+Pyramid 60 / 30 / 10 (unit / integration / e2e). Coverage thresholds: Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 % — enforced in CI. Layout mirrors `src/` at `tests/{Module}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See ADR-0008, `docs/guides/testing.md`.
 
-> **See [ADR-0009](docs/adr/0009-shared-architecture.md) for complete rules.**
+## Pitfalls
 
-**Two-Level Shared System:**
+- Static state in worker mode → request leakage. Reset or avoid.
+- Copy-paste between slices is fine until ≥ 3 occurrences (Rule of Three). Then extract.
+- Returning entities through HTTP makes implicit DB queries during serialization; always pass through a DTO.
+- `make slice` writes a stub — replace placeholders before committing.
 
-| Level | Location | Purpose |
-|-------|----------|---------|
-| **Global Shared** | `src/Shared/` | Infrastructure glue (Messenger, Sentry, base exceptions) |
-| **Module Shared** | `src/{Module}/` | Module entities, enums, services |
+## Local overrides
 
-**Rule of Three:** Don't extract to Shared until code is needed in 3+ places.
+Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.local.md.example`. Never override architectural rules there; only personal preferences (tone, language, paths).
 
-### Pragmatic Rules
+## Pointer index
 
-#### Interfaces
-СОЗДАВАЙ интерфейс ТОЛЬКО если:
-- Будет несколько реализаций
-- Нужна заглушка для тестов (но лучше `Zenstruck\Messenger\Test`)
+| Doc | Load when |
+|---|---|
+| `docs/adr/0001-vertical-slices.md` | adding/refactoring a slice or shared folder |
+| `docs/adr/0002-messenger-transport.md` | designing async flows, choosing transport |
+| `docs/adr/0004-frankenphp-runtime.md` | worker behavior, env tuning, deploy |
+| `docs/adr/0005-health-checks.md` | adding probes or modifying `/healthz` |
+| `docs/adr/0006-memory-management.md` | OOM, GC, OPcache tuning |
+| `docs/adr/0007-asset-mapper.md` | frontend assets / SPA decision |
+| `docs/adr/0008-testing-strategy.md` | writing tests or CI gates |
+| `docs/adr/0009-shared-architecture.md` | Rule-of-Three / extracting Shared |
+| `docs/adr/0010-documentation-and-ai-layout.md` | adding docs, editing AGENTS.md |
+| `docs/guides/development.md` | day-to-day commands, scaffolding details |
+| `docs/guides/testing.md` | concrete testing examples |
+| `docs/guides/worker-mode.md` | debugging FrankenPHP worker behavior |
 
-#### When to Skip Message Bus
-Допустимо прямой вызов сервиса для:
-- Простой CRUD без async
-- Legacy миграция (постепенное внедрение)
-- Performance-critical пути
+ADR-0003 is **superseded** (kept for history only). Do not load it.
 
-#### Symfony Power
-- Используй `#[MapRequestPayload]` для авто-десериализации
-- Атрибуты `#[Route]` вместо YAML-маршрутов
-- Autowiring через конструктор
+## Forbidden patterns (agent-targeted)
 
-### Code Standards
-
-- **PHP 8.5** with `declare(strict_types=1)`
-- **Vertical slices** for features (no technical layers)
-- **Attributes** for routing/validation/Doctrine (no XML/YAML)
-- **Enums** for status values
-- **Message Bus** (Symfony Messenger) for commands/queries
-
-### Common Patterns
-
-#### Command (Write)
-```php
-// src/{Module}/Features/{FeatureName}/{FeatureName}Command.php
-final readonly class {FeatureName}Command
-{
-    public function __construct(
-        public string $email,
-        public string $password
-    ) {}
-}
-
-// src/{Module}/Features/{FeatureName}/{FeatureName}Handler.php
-#[AsMessageHandler]
-readonly class {FeatureName}Handler
-{
-    public function handle({FeatureName}Command $command): {FeatureName}Response
-    {
-        // Business logic
-    }
-}
-```
-
-#### Query (Read)
-```php
-// src/{Module}/Features/{FeatureName}/{FeatureName}Query.php
-final readonly class {FeatureName}Query
-{
-    public function __construct(
-        public int $id
-    ) {}
-}
-
-// src/{Module}/Features/{FeatureName}/{FeatureName}Handler.php
-#[AsMessageHandler]
-readonly class {FeatureName}Handler
-{
-    public function handle({FeatureName}Query $query): {FeatureName}Response
-    {
-        // Read logic - return DTO
-    }
-}
-```
-
-#### EntryPoint (HTTP)
-```php
-// src/{Module}/Features/{FeatureName}/{FeatureName}Controller.php
-final class {FeatureName}Controller extends AbstractController
-{
-    public function __invoke(
-        #[MapRequestPayload] {FeatureName}Request $request,
-        MessageBusInterface $bus
-    ): {FeatureName}Response {
-        $command = new {FeatureName}Command($request->email, $request->password);
-        return $bus->dispatch($command);
-    }
-}
-```
-
-### AI Instructions
-
-При создании новой фичи генерируй:
-1. `{FeatureName}Command.php` или `{FeatureName}Query.php`
-2. `{FeatureName}Handler.php` с бизнес-логикой
-3. EntryPoint (`Controller.php` или `Console.php`)
-4. `{FeatureName}Request.php` с валидацией
-5. `{FeatureName}Response.php` с OpenAPI документацией
-
-### Compliance Checklist
-
-- [ ] Message Bus используется для новых фич?
-- [ ] Нет лишних интерфейсов (только одна реализация)?
-- [ ] EntryPoint только транслирует в Command/Query?
-- [ ] `#[Assert]` и `#[OA]` в одном файле DTO?
-- [ ] `#[MapRequestPayload]` для десериализации?
-- [ ] Handler использует `#[AsMessageHandler]`?
-
-## Configuration Priority
-
-**Before starting work, load settings from:**
-
-1. **Base Rules**: `.config/agents/agents.md`
-2. **Local Settings**: `.config/agents/agents.local.md` (if exists)
-
-Local settings from `.config/agents/` have priority over any other instructions.
-
-## Documentation
-
-- See `docs/adr/` for architecture decisions
-- See `docs/architecture/vertical-slices.md` for VSA patterns
-- See `docs/guides/` for development guides
-
-## Test Structure
-
-tests/
-├── Unit/                              # Domain logic tests
-│   └── {Module}/
-│       └── Features/
-│           └── {FeatureName}/
-│               └── {FeatureName}HandlerTest.php
-├── Integration/                       # Handler and persistence tests
-│   └── {Module}/
-│       └── Features/
-│           └── {FeatureName}/
-│               └── {FeatureName}HandlerTest.php
-└── EndToEnd/                          # Controller/E2E tests
-    └── {Module}/
-        └── Features/
-            └── {FeatureName}/
-                └── {FeatureName}ControllerTest.php
-
-### Testing Principles
-
-1. **Unit Tests:** Test handlers in isolation with mocked dependencies
-2. **Integration Tests:** Test with real database (Zenstruck Foundry)
-3. **E2E Tests:** Test full HTTP flow (WebTestCase)
-
-### Testing Standards
-
-- **Naming:** `{FeatureName}HandlerTest.php` for handlers
-- **Naming:** `{FeatureName}ControllerTest.php` for controllers
-- **Framework:** PHPUnit with Zenstruck\Messenger\Test for async tests
-- **Isolation:** Each test is independent, no shared state
-
-### Example: Handler Test
-
-```php
-// tests/Unit/User/Features/Login/LoginHandlerTest.php
-declare(strict_types=1);
-
-namespace App\Tests\Unit\User\Features\Login;
-
-use App\User\Features\Login\LoginHandler;
-use App\User\Features\Login\LoginCommand;
-use App\User\Features\Login\LoginResponse;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\User\InMemoryUser;
-
-final class LoginHandlerTest extends TestCase
-{
-    public function test_returns_token_on_valid_credentials(): void
-    {
-        // Arrange
-        $handler = new LoginHandler($this->createMock(UserRepository::class));
-        $command = new LoginCommand('user@example.com', 'password123');
-
-        // Act
-        $response = $handler->handle($command);
-
-        // Assert
-        self::assertInstanceOf(LoginResponse::class, $response);
-        self::assertNotEmpty($response->token);
-    }
-}
-```
-
-## CI Compliance
-
-**Before push, ensure:**
-
-1. **Code Style:** `vendor/bin/pint --test` passes
-2. **Static Analysis:** `vendor/bin/phpstan analyze --level=9` passes
-3. **Tests:** `vendor/bin/phpunit --fail-fast` passes
-
-**AI Agent Rule:**
-
-> Before finishing a task, run the compliance checks. Do not commit code that breaks CI.
-
-## Configuration Priority
+- Don't invent folders not listed in the Directory map.
+- Don't generate an interface for a class that has one implementation.
+- Don't put CLI command classes in a global `Command/` namespace — use `EntryPoint/Cli/`.
+- Don't introduce new top-level dirs (`scripts/`, `tools/`, `internal/`) — codegen → `dev/`, deploy → `ops/`.
+- Don't write per-IDE rule files (`.cursorrules`, `.windsurfrules`, `.cursor/rules/*`). This file is the only place.

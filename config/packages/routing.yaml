@@ -1,3 +1,4 @@
 framework:
     router:
-        # Routes are configured in FrankenKernel using attribute-based routing
+        # Routes are configured in App\Kernel::configureRoutes() — attribute-based,
+        # discovered from src/{Module}/Features/{Feature}/EntryPoint/Http/.

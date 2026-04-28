@@ -1,7 +1,17 @@
-# ADR 5: Health Checks
+---
+id: ADR-0005
+title: Health Checks
+status: Accepted
+date: 2026-02-05
+supersedes: []
+superseded_by: []
+audience: both
+summary: "Standardized HTTP probes: /healthz (liveness), /ready (readiness with DB+Redis pings), /metrics (Prometheus). Reference implementation lives in src/Health/Features/Healthz/."
+---
 
-**Date:** 2026-02-05
-**Status:** Accepted
+# ADR-0005: Health Checks
+
+**TL;DR:** Three endpoints — `/healthz` (process is alive), `/ready` (dependencies reachable), `/metrics` (Prometheus). The reference slice in `src/Health/Features/Healthz/` is the canonical implementation pattern.
 
 ## Decision
 

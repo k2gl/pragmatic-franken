@@ -1,23 +1,23 @@
 #!/usr/bin/env php
 <?php
 
-use App\FrankenKernel;
+use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 if (!is_file(dirname(__DIR__).'/vendor/autoload.php')) {
     throw new LogicException('Install dependencies first.');
 }
 
-if (PHP_VERSION_ID < 80300) {
+if (PHP_VERSION_ID < 80500) {
     if (!headers_sent()) {
         header('HTTP/1.1 500 Internal Server Error');
     }
-    echo 'You need at least PHP 8.3.0 to run this application.'.PHP_EOL;
+    echo 'You need at least PHP 8.5.0 to run this application.'.PHP_EOL;
     exit(1);
 }
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
-$kernel = new FrankenKernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
+$kernel = new Kernel($_SERVER['APP_ENV'], (bool) $_SERVER['APP_DEBUG']);
 $application = new Application($kernel);
 $application->run();

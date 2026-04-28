@@ -39,6 +39,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DATABASE_URL: postgresql://user:password@127.0.0.1:5432/app_db?serverVersion=16&charset=utf8
+      REDIS_URL: redis://127.0.0.1:6379
+      MESSENGER_TRANSPORT_DSN: redis://127.0.0.1:6379/messages
+      APP_ENV: test
+      APP_SECRET: ci-secret
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -53,22 +60,22 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --no-scripts --prefer-dist --optimize-autoloader
 
-      - name: Check Code Style (Pint)
+      - name: Smoke check (bin/console boots)
+        run: php bin/console list >/dev/null
+
+      - name: Docs lint (ADR front-matter, AGENTS.md budget)
+        run: ./dev/check-docs.sh
+
+      - name: Code style (Pint)
         run: vendor/bin/pint --test
 
-      - name: Static Analysis (PHPStan Level 9)
+      - name: Static analysis (PHPStan level 9)
         run: vendor/bin/phpstan analyze --level=9
 
-      - name: Prepare Database
-        env:
-          DATABASE_URL: postgres://user:password@127.0.0.1:5432/app_db
+      - name: Prepare test database
         run: |
-          bin/console doctrine:database:create --env=test || true
-          bin/console doctrine:migrations:migrate --no-interaction --env=test || true
+          php bin/console doctrine:database:create --env=test --if-not-exists || true
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test || true
 
-      - name: Run Tests
-        env:
-          DATABASE_URL: postgres://user:password@127.0.0.1:5432/app_db
-          REDIS_URL: redis://127.0.0.1:6379
-          MESSENGER_TRANSPORT_DSN: redis://127.0.0.1:6379/messages
+      - name: Tests
         run: vendor/bin/phpunit --stop-on-failure

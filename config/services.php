@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Predis\Client as PredisClient;
+use Predis\ClientInterface as PredisClientInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $container): void {
@@ -9,18 +11,13 @@ return function (ContainerConfigurator $container): void {
         ->defaults()
             ->autowire()
             ->autoconfigure()
-        ->load('../src/', '../src/')
+        ->load('App\\', '../src/')
             ->exclude([
-                '../src/Shared/{Exception,Services}/',
-                '../src/*/{Entity,Enums}/',
-                '../src/*/UseCase/*/Repository/',
                 '../src/Kernel.php',
-                '../src/FrankenKernel.php',
-            ])
-        ->load('../src/Shared/', '../src/Shared/')
-            ->exclude('../src/Shared/{Exception,Services}/*')
-        ->autowire()
-        ->autoconfigure();
+                '../src/*/Entity/',
+                '../src/*/Enum/',
+                '../src/*/Features/*/Domain/',
+            ]);
 
     $container->services()
         ->instanceof('App\\**\\*Controller')
@@ -29,4 +26,10 @@ return function (ContainerConfigurator $container): void {
     $container->services()
         ->instanceof('App\\**\\*Handler')
             ->tag('messenger.message_handler');
+
+    // Redis client (Predis) bound to REDIS_URL.
+    $container->services()
+        ->set(PredisClient::class)
+            ->args(['%env(REDIS_URL)%'])
+        ->alias(PredisClientInterface::class, PredisClient::class);
 };

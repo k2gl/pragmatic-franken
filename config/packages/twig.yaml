@@ -1,0 +1,5 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    paths:
+        # Slice-local templates (vertical slices keep their own templates).
+        '%kernel.project_dir%/src/Home/Features/Index/EntryPoint/Http/templates': Home

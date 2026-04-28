@@ -1,0 +1,31 @@
+# AGENTS.local.md (per-developer overrides)
+
+Copy this file to `AGENTS.local.md` (gitignored) and adjust per machine. Settings here take precedence over `AGENTS.md` for the local environment, but **never** override architectural rules from ADRs.
+
+## Environment
+
+- **OS**: Linux | macOS | Windows (WSL2)
+- **Shell**: bash | zsh | fish
+- **Project root**: `/absolute/path/to/pragmatic-franken`
+
+## Documentation language
+
+- **Docs**: English
+- **Code comments**: English
+- **Commit messages**: English (Conventional Commits)
+- **Personal communication with the agent**: any
+
+## Tone
+
+- Concise, factual, no marketing language ("ultimate", "blazing fast", etc.).
+- Use emojis only when explicitly asked.
+
+## Safety
+
+- Never run destructive git operations (`reset --hard`, `push --force`, `branch -D`) without explicit confirmation.
+- Protected branches: `main`.
+
+## Tooling overrides (optional)
+
+- Preferred HTTP port if 8750 is taken: `8751`
+- Xdebug mode default: `off | develop | debug`

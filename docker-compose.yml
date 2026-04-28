@@ -25,9 +25,9 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     environment:
-      SERVER_NAME: "localhost"
+      SERVER_NAME: "${SERVER_NAME:-localhost}"
       APP_SECRET: "${APP_SECRET:-change-me-in-production}"
-      DATABASE_URL: "postgres://user:password@db:5432/app_db?serverVersion=16&charset=utf8"
+      DATABASE_URL: "postgres://user:password@db:5432/app_db?serverVersion=17&charset=utf8"
       REDIS_URL: "redis://redis:6379"
       MESSENGER_TRANSPORT_DSN: "redis://redis:6379/messages"
       PHP_INI_SCAN_DIR: ":/usr/local/etc/php/conf.d"
@@ -57,7 +57,7 @@ services:
       - app-network
 
   db:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: app_db
