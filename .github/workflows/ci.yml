@@ -16,7 +16,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:17-alpine
         env:
           POSTGRES_DB: app_db
           POSTGRES_USER: user
@@ -40,10 +40,11 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://user:password@127.0.0.1:5432/app_db?serverVersion=16&charset=utf8
+      DATABASE_URL: postgresql://user:password@127.0.0.1:5432/app_db?serverVersion=17&charset=utf8
       REDIS_URL: redis://127.0.0.1:6379
       MESSENGER_TRANSPORT_DSN: redis://127.0.0.1:6379/messages
       APP_ENV: test
+      APP_DEBUG: '0'
       APP_SECRET: ci-secret
 
     steps:

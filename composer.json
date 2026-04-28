@@ -15,6 +15,7 @@
         "nelmio/cors-bundle": "^2.6",
         "predis/predis": "^3.3",
         "symfony/asset": "^8.0",
+        "symfony/asset-mapper": "^8.0",
         "symfony/doctrine-bridge": "^8.0",
         "symfony/framework-bundle": "^8.0",
         "symfony/http-kernel": "^8.0",
