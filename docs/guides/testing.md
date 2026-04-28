@@ -18,7 +18,7 @@ tests/
 ├── bootstrap.php
 ├── Support/                                   # framework helpers (not tests)
 │   └── TestCase/{UnitTestCase,IntegrationTestCase,ApiTestCase}.php
-└── {Module}/Features/{Feature}/{Feature}*Test.php
+└── {Context}/Features/{Feature}/{Feature}*Test.php
 ```
 
 Test type is encoded by the base class plus a `#[Group]` attribute:

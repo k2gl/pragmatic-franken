@@ -17,16 +17,18 @@ make up          # start containers
 make smoke       # bin/console list && curl /healthz
 make test        # PHPUnit
 make ci          # lint-check + analyze + test (matches CI)
-make slice module=Foo feature=Bar   # scaffold a new slice
+make slice context=Foo feature=Bar  # scaffold a new slice
 ```
 
 ## Directory map
+
+`{Context}` = a DDD Bounded Context (`User`, `Billing`, `Health`…). Each has its own ubiquitous language and consistency boundary, not just a code module. See ADR-0001.
 
 ```
 src/
   Kernel.php                            # App\Kernel
   Shared/                               # global infra (Bus, Persistence, base exceptions) — empty until needed
-  {Module}/
+  {Context}/
     Features/{Feature}/
       Domain/                           # entities, value objects, domain events (optional)
       Application/                      # *Command / *Query / *Handler / *Result
@@ -35,12 +37,12 @@ src/
       EntryPoint/Cli/{Verb}{Feature}CliCommand.php   # if a CLI entry exists
 config/  bin/  public/  assets/         # standard Symfony layout
 docs/    dev/  ops/                     # ADRs, codegen, deploy
-tests/   {Module}/Features/{Feature}/   # mirror of src/
+tests/   {Context}/Features/{Feature}/   # mirror of src/
 ```
 
 ## Hard rules (DO / DO-NOT)
 
-- **DO** put feature code in `src/{Module}/Features/{Feature}/`. See ADR-0001.
+- **DO** put feature code in `src/{Context}/Features/{Feature}/`. See ADR-0001.
 - **DO** name CQRS commands `Create{Feature}Command`, `Update{Feature}Command`, etc. — verb + noun.
 - **DO** use `#[AsMessageHandler]` on handlers and dispatch via `MessageBusInterface`.
 - **DO** name Symfony Console classes `*CliCommand extends Command` in `EntryPoint/Cli/`.
@@ -64,7 +66,7 @@ src/User/Features/Register/
   EntryPoint/Cli/RegisterUserCliCommand.php  # bin/console user:register (optional)
 ```
 
-`Domain/` is added only when the feature has its own value objects, entities, or domain events. Cross-feature shared code lives at the next level up (`src/{Module}/Shared/`) only after the Rule of Three (used in 3+ slices). See ADR-0009.
+`Domain/` is added only when the feature has its own value objects, entities, or domain events. Cross-feature shared code lives at the next level up (`src/{Context}/Shared/`) only after the Rule of Three (used in 3+ slices). See ADR-0009.
 
 ## Naming cheat-sheet
 
@@ -76,7 +78,7 @@ src/User/Features/Register/
 | Result DTO | `{Feature}Result` | `Application/` |
 | HTTP controller | `{Feature}Controller` | `EntryPoint/Http/` |
 | Symfony Console | `{Verb}{Feature}CliCommand` extends `Command` | `EntryPoint/Cli/` |
-| Domain event | `{Feature}{PastTenseVerb}` | `Domain/` (intra-feature) or `src/{Module}/Shared/Events/` (inter-module) |
+| Domain event | `{Feature}{PastTenseVerb}` | `Domain/` (intra-feature) or `src/{Context}/Shared/Events/` (cross-context) |
 
 ## Runtime mode
 
@@ -84,7 +86,7 @@ FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless 
 
 ## Testing
 
-Pyramid 60 / 30 / 10 (unit / integration / e2e). Coverage thresholds: Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 % — enforced in CI. Layout mirrors `src/` at `tests/{Module}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See ADR-0008, `docs/guides/testing.md`.
+Pyramid 60 / 30 / 10 (unit / integration / e2e). Coverage thresholds: Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 % — enforced in CI. Layout mirrors `src/` at `tests/{Context}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See ADR-0008, `docs/guides/testing.md`.
 
 ## Pitfalls
 
@@ -103,6 +105,7 @@ Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.l
 |---|---|
 | `docs/adr/0001-vertical-slices.md` | adding/refactoring a slice or shared folder |
 | `docs/adr/0002-messenger-transport.md` | designing async flows, choosing transport |
+| `docs/adr/0003-pragmatic-symfony-architecture.md` | weighing extra abstraction; deciding when to skip the Message Bus |
 | `docs/adr/0004-frankenphp-runtime.md` | worker behavior, env tuning, deploy |
 | `docs/adr/0005-health-checks.md` | adding probes or modifying `/healthz` |
 | `docs/adr/0006-memory-management.md` | OOM, GC, OPcache tuning |
@@ -114,7 +117,7 @@ Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.l
 | `docs/guides/testing.md` | concrete testing examples |
 | `docs/guides/worker-mode.md` | debugging FrankenPHP worker behavior |
 
-ADR-0003 is **superseded** (kept for history only). Do not load it.
+ADR-0003 is the umbrella *Pragmatism Charter* — load it whenever you're tempted to add an extra layer or interface, or when deciding whether the Message Bus is overkill for a CRUD case.
 
 ## Forbidden patterns (agent-targeted)
 

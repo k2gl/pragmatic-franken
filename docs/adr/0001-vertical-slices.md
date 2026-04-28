@@ -6,12 +6,12 @@ date: 2026-02-06
 supersedes: []
 superseded_by: []
 audience: both
-summary: "Group code by business value, not technical type. Each feature is a self-contained directory at src/{Module}/Features/{Feature}/ with internal Domain/Application/Infrastructure/EntryPoint sub-folders."
+summary: "Group code by business value, not technical type. Each feature is a self-contained directory at src/{Context}/Features/{Feature}/ with internal Domain/Application/Infrastructure/EntryPoint sub-folders. {Context} is a DDD Bounded Context."
 ---
 
 # ADR-0001: Vertical Slices
 
-**TL;DR:** Every business action is one folder under `src/{Module}/Features/{Feature}/`. Inside the slice, code is organised by DDD-style layer (`Domain/`, `Application/`, `Infrastructure/`, `EntryPoint/`). Cross-feature reuse is handled by ADR-0009 (Shared Architecture). Architecture is optimised for **deletion**, not reusability.
+**TL;DR:** Every business action is one folder under `src/{Context}/Features/{Feature}/`. Inside the slice, code is organised by DDD-style layer (`Domain/`, `Application/`, `Infrastructure/`, `EntryPoint/`). Cross-feature reuse is handled by ADR-0009 (Shared Architecture). Architecture is optimised for **deletion**, not reusability.
 
 ## Context
 
@@ -28,11 +28,13 @@ Traditional layered architecture (Controllers → Services → Entities) leads t
 
 ### 1. Slice location
 
-Each business action is a self-contained directory:
+Each business action is a self-contained directory inside a Bounded Context:
 
 ```
-src/{Module}/Features/{Feature}/
+src/{Context}/Features/{Feature}/
 ```
+
+`{Context}` here is a **DDD Bounded Context** (Eric Evans, Vaughn Vernon) — a part of the system with its own ubiquitous language, model, and consistency boundary. `User`, `Billing`, `Inventory`, `Health` are bounded contexts; `User.Login` and `User.Register` are slices within the `User` context. The term `{Context}` is preferred over `{Module}` because the top-level dir is a strategic boundary, not just a code-organisation namespace.
 
 ### 2. Canonical slice layout
 
@@ -66,9 +68,9 @@ Rules:
 
 ### 4. Cross-feature communication
 
-- Features in the same module **must not** depend on each other directly. If they need to coordinate, dispatch an event.
-- Truly common code goes in `src/{Module}/Shared/` (Rule of Three — see ADR-0009).
-- Inter-module events live in `src/{Module}/Shared/Events/` (e.g., `src/User/Shared/Events/UserRegisteredEvent.php`).
+- Features in the same context **must not** depend on each other directly. If they need to coordinate, dispatch an event.
+- Truly common code goes in `src/{Context}/Shared/` (Rule of Three — see ADR-0009).
+- Cross-context events live in `src/{Context}/Shared/Events/` (e.g., `src/User/Shared/Events/UserRegisteredEvent.php`).
 
 ### 5. Cron jobs
 
@@ -100,13 +102,13 @@ src/User/Features/CleanInactiveAccounts/
 
 ## Compliance
 
-1. New features must be scaffolded with `make slice module=Foo feature=Bar`.
+1. New features must be scaffolded with `make slice context=Foo feature=Bar`.
 2. PRs introducing global directories (`Controllers/`, `Services/`, `Repositories/`) at module root are rejected.
 3. PRs introducing top-level layout drift (renamed `Features/`, `EntryPoint/`) are rejected.
 
 ## Relationship to other ADRs
 
 - **ADR-0002** — Messenger Transport: defines the bus that Application handlers dispatch to.
-- **ADR-0008** — Testing Strategy: tests mirror this layout at `tests/{Module}/Features/{Feature}/`.
-- **ADR-0009** — Shared Architecture: defines what lives at `src/Shared/` and `src/{Module}/Shared/`.
-- **ADR-0003** — Pragmatic Symfony Architecture: superseded by this ADR + ADR-0002 + ADR-0004.
+- **ADR-0008** — Testing Strategy: tests mirror this layout at `tests/{Context}/Features/{Feature}/`.
+- **ADR-0009** — Shared Architecture: defines what lives at `src/Shared/` and `src/{Context}/Shared/`.
+- **ADR-0003** — Pragmatism Charter: the umbrella philosophy under which this ADR (and 0002, 0004) operate.

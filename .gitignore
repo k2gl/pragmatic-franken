@@ -23,7 +23,8 @@ node_modules/
 !var/.gitkeep
 
 
-# Testing
+# Testing (PHPUnit caches now live under var/)
+.phpunit.cache/
 .phpunit.result.cache
 
 # PHPStan

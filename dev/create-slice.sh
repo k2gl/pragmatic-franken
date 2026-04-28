@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
-# Generates a vertical slice scaffold for src/{Module}/Features/{Feature}/.
+# Generates a vertical slice scaffold for src/{Context}/Features/{Feature}/.
+# {Context} is a DDD Bounded Context (Eric Evans / Vaughn Vernon) — top-level
+# directories like User/, Billing/, Health/ each have their own ubiquitous
+# language and consistency boundary.
+#
 # Layout follows ADR-0001 (DDD-layered slice).
 #
-# Usage: make slice module=User feature=Register
+# Usage: make slice context=User feature=Register
 #    or: ./dev/create-slice.sh User Register
 
 set -euo pipefail
 
-MODULE="${1:-}"
+CONTEXT="${1:-}"
 FEATURE="${2:-}"
 
-if [[ -z "$MODULE" || -z "$FEATURE" ]]; then
-    echo "Usage: make slice module=ModuleName feature=FeatureName" >&2
+if [[ -z "$CONTEXT" || -z "$FEATURE" ]]; then
+    echo "Usage: make slice context=ContextName feature=FeatureName" >&2
     exit 1
 fi
 
-DIR="src/$MODULE/Features/$FEATURE"
-TEST_DIR="tests/$MODULE/Features/$FEATURE"
+DIR="src/$CONTEXT/Features/$FEATURE"
+TEST_DIR="tests/$CONTEXT/Features/$FEATURE"
 
 if [[ -e "$DIR" ]]; then
     echo "Refusing to overwrite existing $DIR" >&2
@@ -25,7 +29,7 @@ fi
 
 mkdir -p "$DIR/Application" "$DIR/Infrastructure" "$DIR/EntryPoint/Http" "$TEST_DIR"
 
-LCM=$(echo "$MODULE" | tr '[:upper:]' '[:lower:]')
+LCC=$(echo "$CONTEXT" | tr '[:upper:]' '[:lower:]')
 LCF=$(echo "$FEATURE" | tr '[:upper:]' '[:lower:]')
 
 cat > "$DIR/Application/${FEATURE}Command.php" <<EOF
@@ -33,7 +37,7 @@ cat > "$DIR/Application/${FEATURE}Command.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\${MODULE}\\Features\\${FEATURE}\\Application;
+namespace App\\${CONTEXT}\\Features\\${FEATURE}\\Application;
 
 final readonly class ${FEATURE}Command
 {
@@ -48,7 +52,7 @@ cat > "$DIR/Application/${FEATURE}Handler.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\${MODULE}\\Features\\${FEATURE}\\Application;
+namespace App\\${CONTEXT}\\Features\\${FEATURE}\\Application;
 
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 
@@ -68,7 +72,7 @@ cat > "$DIR/Application/${FEATURE}Result.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\${MODULE}\\Features\\${FEATURE}\\Application;
+namespace App\\${CONTEXT}\\Features\\${FEATURE}\\Application;
 
 final readonly class ${FEATURE}Result
 {
@@ -83,9 +87,9 @@ cat > "$DIR/EntryPoint/Http/${FEATURE}Controller.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\${MODULE}\\Features\\${FEATURE}\\EntryPoint\\Http;
+namespace App\\${CONTEXT}\\Features\\${FEATURE}\\EntryPoint\\Http;
 
-use App\\${MODULE}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
+use App\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
 use Symfony\\Component\\HttpFoundation\\JsonResponse;
 use Symfony\\Component\\Messenger\\HandleTrait;
 use Symfony\\Component\\Messenger\\MessageBusInterface;
@@ -100,7 +104,7 @@ final class ${FEATURE}Controller
         \$this->messageBus = \$messageBus;
     }
 
-    #[Route('/${LCM}/${LCF}', methods: ['POST'])]
+    #[Route('/${LCC}/${LCF}', methods: ['POST'])]
     public function __invoke(): JsonResponse
     {
         \$result = \$this->handle(new ${FEATURE}Command());
@@ -115,14 +119,16 @@ cat > "$TEST_DIR/${FEATURE}HandlerTest.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\Tests\\${MODULE}\\Features\\${FEATURE};
+namespace App\\Tests\\${CONTEXT}\\Features\\${FEATURE};
 
-use App\\${MODULE}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
-use App\\${MODULE}\\Features\\${FEATURE}\\Application\\${FEATURE}Handler;
-use App\\${MODULE}\\Features\\${FEATURE}\\Application\\${FEATURE}Result;
-use PHPUnit\\Framework\\TestCase;
+use App\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
+use App\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Handler;
+use App\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Result;
+use App\\Tests\\Support\\TestCase\\UnitTestCase;
+use PHPUnit\\Framework\\Attributes\\Group;
 
-final class ${FEATURE}HandlerTest extends TestCase
+#[Group('unit')]
+final class ${FEATURE}HandlerTest extends UnitTestCase
 {
     public function test_handler_returns_result(): void
     {

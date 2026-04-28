@@ -46,7 +46,7 @@ The app comes up at `https://pragmatic-franken.localhost:${HTTPS_PORT:-4750}`. C
 | `make check` | Pint + PHPStan (pre-commit gate) |
 | `make ci` | lint-check + analyze + test (CI parity) |
 | `make smoke` | end-to-end smoke check |
-| `make slice module=Foo feature=Bar` | scaffold a vertical slice |
+| `make slice context=Foo feature=Bar` | scaffold a vertical slice |
 | `make adr title="My Decision"` | scaffold a new ADR |
 | `make docs-check` | lint ADR front-matter & AGENTS.md budget |
 
@@ -63,7 +63,7 @@ docs/                             # ADRs and guides (Tier 2)
   guides/{development,testing,worker-mode}.md
 dev/                              # codegen helpers (create-slice, new-adr, check-docs)
 ops/                              # deployment scripts
-tests/                            # mirrors src/ — tests/{Module}/Features/{Feature}/
+tests/                            # mirrors src/ — tests/{Context}/Features/{Feature}/
 docker/                           # Dockerfile, Caddyfile, php.ini
 AGENTS.md                         # Tier-1 agent context, ≤ 2 000 tokens
 AGENTS.local.md.example           # per-developer overrides template (gitignored target)
@@ -79,7 +79,7 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 |---|---|---|
 | [0001](docs/adr/0001-vertical-slices.md) | Vertical Slices | Accepted |
 | [0002](docs/adr/0002-messenger-transport.md) | Messenger Transport | Accepted |
-| [0003](docs/adr/0003-pragmatic-symfony-architecture.md) | Pragmatic Symfony | Superseded |
+| [0003](docs/adr/0003-pragmatic-symfony-architecture.md) | Pragmatism Charter | Accepted |
 | [0004](docs/adr/0004-frankenphp-runtime.md) | FrankenPHP Runtime | Accepted |
 | [0005](docs/adr/0005-health-checks.md) | Health Checks | Accepted |
 | [0006](docs/adr/0006-memory-management.md) | Memory Management | Accepted |

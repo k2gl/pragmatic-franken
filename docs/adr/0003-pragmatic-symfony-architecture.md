@@ -1,291 +1,113 @@
 ---
 id: ADR-0003
-title: Pragmatic Symfony Architecture
-status: Superseded
+title: Pragmatism Charter
+status: Accepted
 date: 2026-02-04
 supersedes: []
-superseded_by: [ADR-0001, ADR-0002, ADR-0004]
-audience: human
-summary: "SUPERSEDED. Original meta-decision to favor Symfony idioms over hexagonal/DDD-pure architecture. Concrete rules now live in ADR-0001 (Vertical Slices), ADR-0002 (Messenger), and ADR-0004 (FrankenPHP Runtime)."
+superseded_by: []
+audience: both
+summary: "Umbrella philosophy under which the other ADRs operate: framework coupling is acceptable, no extra layers without justification, Message Bus is preferred but legal escape hatches exist for CRUD/legacy/perf-critical paths."
 ---
 
-# ADR-0003: Pragmatic Symfony Architecture *(superseded)*
+# ADR-0003: Pragmatism Charter
 
-> **Status: Superseded.** Kept for historical context. The decisions in this ADR have been replaced by:
-> - ADR-0001 — Vertical Slices (folder layout & naming)
-> - ADR-0002 — Messenger Transport (CQRS rules)
-> - ADR-0004 — FrankenPHP Runtime (worker-mode constraints)
+**TL;DR:** This boilerplate explicitly chooses *pragmatic Symfony* over *hexagonal-pure / DDD-pure*. We accept framework coupling as a trade-off for development speed and onboarding ergonomics. Concrete rules (slice layout, CQRS, runtime, testing) live in ADR-0001/0002/0004/0008; this ADR is the philosophy they all assume.
 
 ## Context
 
-When developing with Symfony, teams often face a dilemma between following strict enterprise standards (Hexagonal Architecture, DDD) and delivering features quickly. Excessive abstraction in medium-sized projects often leads to:
+When building with Symfony, teams oscillate between two failure modes:
 
-- **Over-engineering**: Unnecessary complexity without clear business value
-- **Boilerplate code**: Excessive file count slowing down development
-- **Slow time-to-market**: High cost per feature
-- **Onboarding friction**: New developers struggle to understand complex abstractions
+1. **Over-engineering** — hexagonal layers, ports, adapters, mappers for every CRUD endpoint. High file count, high onboarding cost, low velocity.
+2. **Spaghetti** — controllers full of business logic, no separation of write/read, framework leaks everywhere.
 
-We needed an approach that leverages Symfony's power without becoming "hostage" to the framework, while also avoiding "code purity" that ignores practical benefits.
+Vertical Slices (ADR-0001) and Symfony Messenger CQRS (ADR-0002) handle the second failure mode. This ADR is the explicit defence against the first — the written record of "we considered hexagonal, we declined, here is why".
+
+Eric Evans warns against fighting your framework. We don't. We use Symfony idioms directly and pay the framework-coupling cost knowingly.
 
 ## Decision
 
-We adopt a **Pragmatic Symfony Architecture** based on these principles:
+The following principles are **binding** and override any ADR-0001/0002/0004 detail in case of conflict:
 
-### 1. Follow Symfony Best Practices
+### 1. Framework coupling is acceptable
 
-Instead of introducing custom structures or complex patterns (e.g., Hexagonal Architecture in small services), we use official Symfony recommendations and standard directory structure.
+We use Symfony attributes (`#[Route]`, `#[Assert]`, `#[OA]`, `#[AsMessageHandler]`, `#[MapRequestPayload]`) directly in business code. We do not extract framework-independent domain layers prophylactically. We pay the framework-migration cost (which is rare) for compounding development-speed gains (which are constant).
 
-### 2. No Extra Layers
+### 2. No extra layers without justification
 
-- **Don't create interfaces** for services unless multiple implementations are expected
-- **Don't use DTOs** where form validation or entities are sufficient
-- Standard chain: Controller → Message Bus → Handler → Entity
+- **No interface for a single implementation.** Add an interface only when there are ≥ 2 implementations or when test substitution genuinely cannot be done with a mocked concrete class.
+- **No DTO for a value that already has structural validation.** A `*Command` with `#[Assert]` attributes IS the input DTO; don't wrap it in another layer.
+- **No repository abstraction for trivial Doctrine queries.** Use `EntityManagerInterface` directly when the call is one-line.
+- **The default chain is** Controller → Message Bus → Handler → Entity. Anything else needs a sentence of justification in the PR description.
 
-### 3. Symfony Flex & Autowiring
+### 3. Attributes are the source of truth for contracts
 
-Maximum trust in automatic dependency injection. Avoid manual service registration in YAML/XML where possible.
+Validation, OpenAPI, routing, security all live as attributes on the class they describe. We do not maintain parallel YAML/XML/JSON config files for the same facts.
 
-### 4. Modularity "On Demand"
+### 4. Native Symfony tooling first
 
-Use only necessary Symfony components (HttpFoundation, Routing) for microservices instead of full stack bundle when justified by performance requirements.
+- `#[MapRequestPayload]` for JSON-to-DTO conversion.
+- Symfony Messenger for CQRS.
+- Symfony Validator for input validation.
+- Symfony Serializer (or AssetMapper for HTML-first) for output.
 
-### 5. Framework Coupling Is Acceptable
+If a problem looks solvable with a Symfony component, try the component before introducing a third-party library.
 
-We permit using Symfony capabilities (Attributes, Doctrine) directly in business logic to accelerate development.
+### 5. Message Bus preferred — but with explicit escape hatches
 
-### 6. Attributes in DTOs (Validation & OpenAPI)
+Symfony Messenger is the default for write operations (commands), reads (queries), and cross-feature notification (events) — see ADR-0002.
 
-For maximum development speed and clarity, we abandon separate validation and API schema configurations:
+**Direct service calls are explicitly legal** for these cases:
 
-- **Validation (Assert)**: Validation rules are defined using Symfony Validator attributes (`#[Assert\...]`) directly in DTO properties
-- **API Specification (OpenAPI)**: Swagger/OAS specifications are described using PHP 8 attributes (`#[OA\Property]`, `#[OA\Schema]`) within the same DTOs
-- **Single Source of Truth**: DTO becomes the only place defining structure, validation rules, and frontend/client documentation
+| Case | Why direct call is acceptable |
+|---|---|
+| Single-writer CRUD with no async, no events, no cross-feature consumers | The bus indirection adds zero value over `$service->doIt($input)`. |
+| Legacy / migration | While migrating from a non-CQRS module, direct calls coexist with newly-written bus dispatches. |
+| Performance-critical hot path | When microsecond latency matters and the dispatch envelope is measurable overhead. |
 
-### 7. Native Symfony Mapping
+**When the bus is mandatory**: multiple handlers possible, async transport needed, audit-trail needed, cross-feature event consumers, or any future intent to extract to a separate service.
 
-We use built-in Symfony tools (Serializers or `#[MapRequestPayload]`) for automatic JSON-to-DTO conversion with validation.
+If unsure: dispatch a command. The cost of the bus is small; the cost of refactoring later is large.
 
-### 8. Message Bus Pattern (Preferred)
+## Comparison
 
-**Symfony Messenger** is the preferred way to dispatch commands and queries. This provides:
-- Loose coupling between UI and business logic
-- Easy async processing via transports
-- Audit trail via messages
-- Testability of handlers in isolation
-
-**Preferred Pattern:**
-```php
-use Symfony\Component\Messenger\MessageBusInterface;
-
-final readonly class CreateTaskController
-{
-    public function __invoke(
-        #[MapRequestPayload] CreateTaskCommand $command,
-        MessageBusInterface $bus,
-    ): TaskResponse {
-        return $bus->dispatch($command);
-    }
-}
-```
-
-See [ADR 2: Messenger Transport](0002-messenger-transport.md) for implementation details.
-
-**Acceptable Alternative:** Direct service calls are still allowed for simple CRUD (see Appendix B).
+| Axis | Pure / Hexagonal (DDD-strict) | Pragmatism Charter |
+|---|---|---|
+| **Domain code framework-aware?** | Forbidden. Ports + adapters mediate. | Encouraged. `#[AsMessageHandler]` lives on the handler. |
+| **Class count per feature** | 8–15 (entity, VO, repo iface, repo impl, port, adapter, mapper, command, handler, dto…) | 3–6 (command, handler, result, controller; optional: domain VO, infra adapter) |
+| **Time-to-first-feature** | Days | Hours |
+| **Tests** | Pure unit on domain | Unit on handler + e2e via WebTestCase |
+| **Validation lives in** | Domain Value Objects | `#[Assert]` on the command |
+| **API spec lives in** | Separate YAML | `#[OA]` on the same command/result |
+| **Cost of framework migration** | Low (domain is portable) | High (rewrite). **Accepted trade-off.** |
 
 ## Consequences
 
 ### Positive
 
-| Benefit | Description |
-|---------|-------------|
-| **Time-to-Market** | Significant reduction in feature delivery time |
-| **Onboarding** | Lower entry barrier for new developers (standard Symfony code is more understandable than custom abstractions) |
-| **Code Reduction** | Simpler maintenance with less code volume |
-| **Developer Experience** | Familiar patterns reduce cognitive load |
-| **Self-Documenting** | Attributes serve as live documentation |
+- Faster delivery, lower file count, lower cognitive load on review.
+- One source of truth per fact (validation = attribute, not duplicated YAML).
+- Junior PHP devs are productive without learning hexagonal vocabulary.
+- AI agents generate idiomatic Symfony, not bespoke abstractions.
 
-### Negative / Risks
+### Negative & explicit acceptances
 
-| Risk | Mitigation |
-|------|-------------|
-| **Framework Coupling** | Higher effort required if migrating to another framework | Accept as trade-off for development speed |
-| **Testing Complexity** | Pure business logic testing without DB is harder | Use WebTestCase for functional tests |
-| **DTO "Noise"** | Many attributes can make classes visually cluttered | Keep DTOs focused on single responsibility |
+| Trade-off | Acceptance |
+|---|---|
+| Framework migration is expensive | Accepted. Symfony is a long-term commitment. |
+| Domain logic is harder to test in isolation when it touches `EntityManagerInterface` directly | Accepted. Use integration tests for those handlers (see ADR-0008). |
+| `#[Assert]` + `#[OA]` attributes can clutter a class | Accepted. Single Responsibility means one DTO per case — clutter doesn't compound. |
+| Some DDD purists will dislike this | Accepted. They are not the audience. |
 
-## Comparison
+## Relationship to other ADRs
 
-| Characteristic | Pure / Hexagonal (DDD) | Pragmatic Symfony |
-|----------------|--------------------------|-------------------|
-| **Code** | Framework-independent business logic | Uses Symfony capabilities directly |
-| **Complexity** | Many classes: ports, adapters, mappers | Minimal class count |
-| **Speed** | Slow start, high feature cost | Maximum speed (Flex, autowiring) |
-| **Testing Focus** | Unit tests without environment | Functional tests (WebTestCase) |
-| **Validation** | Extracted to Domain/Value Objects | `#[Assert]` attributes in DTOs |
-| **API Docs** | Separate YAML/JSON specification files | `#[OA]` attributes in DTOs |
+- **ADR-0001** (Vertical Slices) — *implements* this charter for code organisation.
+- **ADR-0002** (Messenger Transport) — *implements* the bus rule from §5; this ADR's escape hatches override defaults if the case fits.
+- **ADR-0004** (FrankenPHP Runtime) — *implements* the "native Symfony tooling first" principle for the runtime layer.
+- **ADR-0008** (Testing Strategy) — *operationalises* the testing trade-off in §Negative.
 
-## Code Examples
+This ADR is the umbrella; all others assume it.
 
-### Example: Pragmatic Request DTO
+## References
 
-```php
-declare(strict_types=1);
-
-namespace App\User\Application\Dto;
-
-use Symfony\Component\Validator\Constraints as Assert;
-use OpenApi\Attributes as OA;
-
-#[OA\Schema(description: "Request data for user registration")]
-final readonly class CreateUserRequest
-{
-    public function __construct(
-        #[OA\Property(description: "Username", example: "john_doe")]
-        #[Assert\NotBlank(message: "Username is required")]
-        #[Assert\Length(min: 3, max: 50)]
-        public readonly string $username,
-
-        #[OA\Property(description: "Email address", example: "john@example.com")]
-        #[Assert\NotBlank]
-        #[Assert\Email(message: "Invalid email format")]
-        public readonly string $email,
-
-        #[OA\Property(description: "User role", example: "ROLE_USER")]
-        #[Assert\Choice(choices: ['ROLE_USER', 'ROLE_ADMIN'], message: "Invalid role")]
-        public readonly string $role = 'ROLE_USER',
-    ) {}
-}
-```
-
-### Example: Slim Controller (Message Bus)
-
-```php
-declare(strict_types=1);
-
-namespace App\User\UI\Http;
-
-use App\User\Application\Command\CreateUserCommand;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Attribute\Route;
-
-final readonly class CreateUserController
-{
-    public function __construct(
-        private MessageBusInterface $bus
-    ) {}
-
-    #[Route('/api/users', methods: ['POST'])]
-    public function __invoke(
-        #[MapRequestPayload] CreateUserCommand $command
-    ): JsonResponse {
-        $response = $this->bus->dispatch($command);
-        return $this->json(['id' => $response->id], 201);
-    }
-}
-```
-
-### Example: Handler
-
-```php
-declare(strict_types=1);
-
-namespace App\User\Application\Handler;
-
-use App\User\Application\Command\CreateUserCommand;
-use App\User\Application\Response\UserResponse;
-use App\User\Infrastructure\UserRepository;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-
-#[AsMessageHandler]
-final readonly class CreateUserHandler
-{
-    public function __construct(
-        private UserRepository $repository
-    ) {}
-
-    public function handle(CreateUserCommand $command): UserResponse
-    {
-        $user = User::register($command->email, $command->username);
-        $this->repository->save($user);
-        return UserResponse::fromEntity($user);
-    }
-}
-```
-
----
-
-## Appendix A: ADR 003 Compliance Checklist
-
-### 1. Structure and Layers
-
-- [ ] **Message Bus Preferred**: Does the action use `MessageBusInterface` for new features?
-- [ ] **No unnecessary interfaces**: Does the service have an interface? If only one implementation exists, remove the interface.
-- [ ] **Call chain consistency**: Does the logic follow Controller → Message Bus → Handler → Entity?
-- [ ] **Slim Controller**: Does the controller only dispatch messages and return responses?
-
-### 2. DTOs and Data Handling
-
-- [ ] **Attributes over configs**: Are validation (`#[Assert]`) and API docs (`#[OA]`) inside DTOs? No duplicate YAML/XML configs?
-- [ ] **Native Symfony mapping**: Is `#[MapRequestPayload]` or `MapQueryString` used? If manual mapping exists (foreach, etc.), refactor.
-- [ ] **Readonly properties**: Are `public readonly` properties used in DTOs?
-
-### 3. Symfony Power
-
-- [ ] **Autowiring**: Are services injected via constructor automatically?
-- [ ] **Attributes over annotations**: Are modern PHP 8 attributes (`#[Route]`) used?
-
-### 4. Testing
-
-- [ ] **Test balance**: For CRUD features, is there at least one functional test (WebTestCase)?
-
-### Quick Reference
-
-| Check | Question |
-|-------|-----------|
-| Message Bus | Does action use `MessageBusInterface`? |
-| Interface needed? | Does this service have multiple implementations? |
-| DTO correct? | Are `#[Assert]` and `#[OA]` in the same file? |
-| Controller slim? | Does it only call `$bus->dispatch()`? |
-| Tests exist? | At least one WebTestCase per feature? |
-
----
-
-## Appendix B: Direct Service Calls (Acceptable but Not Preferred)
-
-While **Message Bus is preferred** for new features, direct service calls are still acceptable for simple CRUD operations where async processing and loose coupling are not needed.
-
-```php
-// Acceptable for simple CRUD
-declare(strict_types=1);
-
-namespace App\User\UI\Http;
-
-use App\User\Application\Dto\CreateUserRequest;
-use App\User\Application\Service\UserService;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Attribute\Route;
-
-final readonly class CreateUserController
-{
-    public function __construct(private UserService $userService) {}
-
-    #[Route('/api/users', methods: ['POST'])]
-    public function __invoke(
-        #[MapRequestPayload] CreateUserRequest $dto
-    ): JsonResponse {
-        $user = $this->userService->create($dto);
-        return $this->json(['id' => $user->getId()], 201);
-    }
-}
-```
-
-**When to use direct service calls:**
-- Simple CRUD with no async requirements
-- Legacy code migration (gradual Messenger adoption)
-- Performance-critical paths with minimal logic
-
-**When to prefer Message Bus:**
-- Multiple handlers needed
-- Async processing required
-- Cross-module communication
-- Audit trail important
+- Evans, *Domain-Driven Design*, on framework integration: "Don't fight your framework."
+- Symfony [Best Practices](https://symfony.com/doc/current/best_practices.html).

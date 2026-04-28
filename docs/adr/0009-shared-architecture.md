@@ -6,16 +6,16 @@ date: 2026-02-06
 supersedes: []
 superseded_by: []
 audience: both
-summary: "Two-level Shared: src/Shared/ for cross-module infra glue, src/{Module}/Shared/ for module-internal reuse. Rule of Three (extract only at the third occurrence). Relationship to ADR-0001."
+summary: "Two-level Shared: src/Shared/ for cross-context infra glue, src/{Context}/Shared/ for context-internal reuse. Rule of Three (extract only at the third occurrence). Relationship to ADR-0001."
 ---
 
 # ADR-0009: Shared Architecture
 
-**TL;DR:** `src/Shared/` is for infrastructure glue only (Bus, Persistence, base exceptions). Module-internal reuse goes in `src/{Module}/Shared/`. Don't extract before three occurrences. ADR-0001 defines slice layout; this ADR defines what lives *outside* slices.
+**TL;DR:** `src/Shared/` is for infrastructure glue only (Bus, Persistence, base exceptions). Context-internal reuse goes in `src/{Context}/Shared/`. Don't extract before three occurrences. ADR-0001 defines slice layout; this ADR defines what lives *outside* slices. ("Context" here is a DDD Bounded Context — see ADR-0001.)
 
 ## Context
 
-The `Shared/` directory is the most dangerous place in any architecture. Without strict rules, it becomes a "trash bin" within 6 months, containing everything from string helpers to business logic that was afraid to be placed in a module.
+The `Shared/` directory is the most dangerous place in any architecture. Without strict rules, it becomes a "trash bin" within 6 months, containing everything from string helpers to business logic that was afraid to be placed in a context.
 
 ### The Problem
 
@@ -23,15 +23,15 @@ The `Shared/` directory is the most dangerous place in any architecture. Without
 |--------------|---------|
 | CommonUtils.php | God class with 500+ unrelated methods |
 | Helper.php | Place for code nobody wants to own |
-| Shared Services | Business logic scattered across modules |
-| Cross-module dependencies | Tight coupling, impossible to extract microservices |
+| Shared Services | Business logic scattered across contexts |
+| Cross-context dependencies | Tight coupling, impossible to extract microservices |
 
 ### The Solution: Two-Level Shared System
 
 We establish two levels of Shared to prevent contamination:
 
-1. **Global Shared** (`src/Shared/`) — Cross-module infrastructure glue
-2. **Module Shared** (`src/{Module}/`) — Module-level shared code
+1. **Global Shared** (`src/Shared/`) — Cross-context infrastructure glue
+2. **Context Shared** (`src/{Context}/Shared/`) — Context-level shared code
 
 ## Decision
 
@@ -57,19 +57,19 @@ src/Shared/
         └── InvalidArgumentException.php
 ```
 
-### 2. Module Shared Structure
+### 2. Context Shared Structure
 
-`src/{Module}/Shared/` contains module-level shared code:
+`src/{Context}/Shared/` contains context-level shared code:
 
 ```
-src/User/
-├── Entity/                    # Module-wide entities
+src/User/Shared/
+├── Entity/                    # Context-wide entities
 │   └── User.php
-├── Enum/                      # Module-wide enums
+├── Enum/                      # Context-wide enums
 │   └── UserRole.php
-├── Service/                   # Module-domain services
+├── Service/                   # Context-domain services
 │   └── PasswordHasher.php
-└── Events/                    # Module events for cross-module communication
+└── Events/                    # Cross-context events (others subscribe to these)
     └── UserRegisteredEvent.php
 ```
 
@@ -100,20 +100,20 @@ src/User/
 | **Base Exceptions** | DomainException, NotFoundException | Standard error handling across modules |
 | **Global Value Objects** | Uuid, PaginationDto | Objects used everywhere |
 
-### 5. What Belongs in Module Shared
+### 5. What Belongs in Context Shared
 
 | Category | Examples | Why |
 |----------|----------|-----|
-| **Entities** | User, Task, Board | Used across multiple features in the module |
+| **Entities** | User, Task, Board | Used across multiple features in the context |
 | **Enums** | UserRole, TaskStatus | Status values used in multiple features |
-| **Domain Services** | PasswordHasher, TokenGenerator | Module-specific infrastructure |
-| **Events** | UserRegisteredEvent | Cross-module communication |
+| **Domain Services** | PasswordHasher, TokenGenerator | Context-specific infrastructure |
+| **Events** | UserRegisteredEvent | Cross-context communication |
 
 ### 6. What is PROHIBITED in Shared
 
 | Anti-Pattern | Solution |
 |--------------|----------|
-| **Handlers** | Business logic belongs in Features. If two features need the same handler, extract to Module Shared/Service/ |
+| **Handlers** | Business logic belongs in Features. If two features need the same handler, extract to Context Shared/Service/ |
 | **God Classes** (CommonUtils.php, Helper.php) | Use dedicated libraries or create specific classes |
 | **Feature-Specific Code** | Keep in the feature folder |
 | **Business Logic** | Never. Features own their business logic. |
@@ -143,15 +143,15 @@ final readonly class EventBus
 }
 ```
 
-#### ✅ ALLOWED: Module Entity in Module Shared
+#### ✅ ALLOWED: Context Entity in Context Shared
 
 ```php
-// src/User/Entity/User.php
+// src/User/Shared/Entity/User.php
 declare(strict_types=1);
 
-namespace App\User\Entity;
+namespace App\User\Shared\Entity;
 
-use App\User\Enum\UserRole;
+use App\User\Shared\Enum\UserRole;
 
 final class User
 {
@@ -163,13 +163,13 @@ final class User
 }
 ```
 
-#### ✅ ALLOWED: Module Event in Module Shared
+#### ✅ ALLOWED: Cross-Context Event in Context Shared
 
 ```php
-// src/User/Events/UserRegisteredEvent.php
+// src/User/Shared/Events/UserRegisteredEvent.php
 declare(strict_types=1);
 
-namespace App\User\Events;
+namespace App\User\Shared\Events;
 
 final readonly class UserRegisteredEvent
 {
@@ -273,7 +273,7 @@ final class SendWelcomeEmailHandler
 - [ ] No God Classes (CommonUtils.php, Helper.php)
 - [ ] No feature-specific code in Shared
 - [ ] Code extracted only after 3+ usages (Rule of Three)
-- [ ] Infrastructure in Global Shared, Domain in Module Shared
+- [ ] Infrastructure in Global Shared, Domain in Context Shared
 
 ### 2. Automated Checks
 
@@ -294,7 +294,7 @@ ruleset:
 
 ```bash
 # Generate feature with proper structure
-make slice module=User feature=RegisterUser
+make slice context=User feature=Register
 
 # Run compliance checks
 make check
@@ -318,14 +318,14 @@ grep -r "FeatureName" src/Shared/ --include="*.php"
 # Create Global Shared subdirectories
 mkdir -p src/Shared/{Infrastructure/{Bus,Persistence,Logging},Domain/{ValueObject,Exception}}
 
-# Create Module Shared directories (if needed by module)
+# Create Context Shared directories (only when 3+ features within a context need them)
 mkdir -p src/{User,Task,Board}/Shared/{Entity,Enum,Service,Events}
 ```
 
 ### Phase 3: Gradual Migration
 
 1. When adding new feature, check if Shared needs organization
-2. When finding code in Shared, classify it as Global/Module/Feature
+2. When finding code in Shared, classify it as Global/Context/Feature
 3. Move feature-specific code back to feature folder
 4. Consolidate similar infrastructure code
 

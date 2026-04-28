@@ -20,7 +20,7 @@ Choosing a testing strategy for a PHP/Symfony/FrankenPHP project affects develop
 ## Decision
 
 1. **Framework: PHPUnit 11.** Mature, deeply integrated with Symfony Test framework, abundant AI training data, full PHPStan compatibility. Pest is rejected for this boilerplate (less AI training data, extra plugin layer with Symfony).
-2. **Layout: mirror of `src/`** at `tests/{Module}/Features/{Feature}/`. Test *type* is communicated via the base class (`UnitTestCase` / `IntegrationTestCase` / `ApiTestCase`) and PHPUnit `#[Group]` attribute (`unit` / `integration` / `e2e`).
+2. **Layout: mirror of `src/`** at `tests/{Context}/Features/{Feature}/`. Test *type* is communicated via the base class (`UnitTestCase` / `IntegrationTestCase` / `ApiTestCase`) and PHPUnit `#[Group]` attribute (`unit` / `integration` / `e2e`).
 3. **Pyramid: 60 / 30 / 10** (unit / integration / e2e). Most logic is exercised in cheap unit tests; integration covers persistence, Messenger, and external adapters; e2e validates HTTP contracts.
 4. **Coverage thresholds** (enforced in CI):
 
@@ -42,7 +42,7 @@ tests/
 │   ├── TestCase/{UnitTestCase, IntegrationTestCase, ApiTestCase}.php
 │   ├── Factory/                              # Foundry factories
 │   └── Helper/
-└── {Module}/Features/{Feature}/{Feature}HandlerTest.php
+└── {Context}/Features/{Feature}/{Feature}HandlerTest.php
 ```
 
 | Test type | Base class | `#[Group]` | Make target |

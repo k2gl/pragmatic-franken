@@ -1,4 +1,4 @@
 framework:
     router:
         # Routes are configured in App\Kernel::configureRoutes() — attribute-based,
-        # discovered from src/{Module}/Features/{Feature}/EntryPoint/Http/.
+        # discovered from src/{Context}/Features/{Feature}/EntryPoint/Http/.

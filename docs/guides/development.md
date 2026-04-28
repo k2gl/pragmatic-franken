@@ -40,7 +40,7 @@ make smoke          # confirms bin/console boots and /healthz responds
 | `make ci` | lint-check + analyze + test (CI parity) |
 | `make smoke` | end-to-end smoke check |
 | `make db-migrate` / `make db-rollback` / `make db-fresh` | Doctrine migrations |
-| `make slice module=Foo feature=Bar` | scaffold a new slice |
+| `make slice context=Foo feature=Bar` | scaffold a new slice |
 | `make adr title="My Decision"` | scaffold a new ADR |
 | `make docs-check` | lint ADR front-matter and AGENTS.md budget |
 
@@ -53,12 +53,12 @@ pragmatic-franken/
 ├── src/
 │   ├── Kernel.php
 │   ├── Shared/                 # global infra glue (Bus, Persistence, Logging)
-│   └── {Module}/Features/{Feature}/
+│   └── {Context}/Features/{Feature}/
 │       ├── Domain/             # value objects, domain events (optional)
 │       ├── Application/        # *Command / *Query / *Handler / *Result
 │       ├── Infrastructure/     # adapters: Doctrine repos, HTTP clients
 │       └── EntryPoint/Http/    # *Controller.php with #[Route]
-├── tests/{Module}/Features/{Feature}/  # mirrors src/, type via base class + #[Group]
+├── tests/{Context}/Features/{Feature}/  # mirrors src/, type via base class + #[Group]
 ├── config/  bin/  public/  assets/
 ├── dev/                        # codegen helpers (create-slice, new-adr, check-docs)
 ├── ops/                        # deploy
@@ -71,7 +71,7 @@ pragmatic-franken/
 ## Creating a new slice
 
 ```bash
-make slice module=Billing feature=Subscribe
+make slice context=Billing feature=Subscribe
 ```
 
 This generates `src/Billing/Features/Subscribe/` with `Application/SubscribeCommand.php`, `Application/SubscribeHandler.php`, `Application/SubscribeResult.php`, `EntryPoint/Http/SubscribeController.php`, plus a matching `tests/Billing/Features/Subscribe/SubscribeHandlerTest.php`. Open the files and replace the placeholders.

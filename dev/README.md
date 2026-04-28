@@ -4,6 +4,6 @@ Developer-facing helpers and codegen. **Not** Symfony binaries — those live in
 
 | Script | Purpose |
 |---|---|
-| `create-slice.sh` | Scaffolds `src/{Module}/Features/{Feature}/` per ADR-0001. Invoked via `make slice module=Foo feature=Bar`. |
+| `create-slice.sh` | Scaffolds `src/{Context}/Features/{Feature}/` per ADR-0001 (Context = DDD Bounded Context). Invoked via `make slice context=Foo feature=Bar`. |
 | `new-adr.sh` | Generates a new ADR file with required front-matter. Invoked via `make adr title="My Decision"`. |
 | `check-docs.sh` | Lints ADR front-matter, broken `ADR-XXXX` references, and the `AGENTS.md` token budget. Invoked via `make docs-check`. |

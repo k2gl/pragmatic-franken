@@ -214,9 +214,9 @@ xdebug-off: ## Disable Xdebug at runtime
 	@echo "$(GREEN)Xdebug disabled. Restart container to apply.$(RESET)"
 
 ##—————— 🤖 Scaffolding & Docs ——————
-slice: ## 🚀 Generate a new feature slice (module=Foo feature=Bar)
+slice: ## 🚀 Generate a new feature slice (context=Foo feature=Bar)
 	@echo "$(GREEN)Creating slice...$(RESET)"
-	@./dev/create-slice.sh $(module) $(feature)
+	@./dev/create-slice.sh $(context) $(feature)
 
 adr: ## 📝 Create a new ADR (title="My Decision")
 	@./dev/new-adr.sh "$(title)"
