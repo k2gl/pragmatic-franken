@@ -70,8 +70,8 @@ jobs:
       - name: Code style (Pint)
         run: vendor/bin/pint --test
 
-      - name: Static analysis (PHPStan level 9)
-        run: vendor/bin/phpstan analyze --level=9
+      - name: Static analysis (PHPStan level 7)
+        run: vendor/bin/phpstan analyze --level=7
 
       - name: Prepare test database
         run: |

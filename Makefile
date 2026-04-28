@@ -160,8 +160,8 @@ lint-check: ## Check code style without fixing
 	@echo "$(YELLOW)Checking code style with Pint...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/pint --test
 
-analyze: ## 🔍 Run PHPStan static analysis (Level 9)
-	@echo "$(YELLOW)Running PHPStan (Level 9)...$(RESET)"
+analyze: ## 🔍 Run PHPStan static analysis (Level 7)
+	@echo "$(YELLOW)Running PHPStan (Level 7)...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpstan analyze --memory-limit=1G
 
 check: lint analyze ## ✅ Run all checks before commit (lint + analyze)

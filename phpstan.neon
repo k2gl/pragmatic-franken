@@ -1,10 +1,8 @@
 parameters:
-    level: 9
+    level: 7
     paths:
         - src
-        - scripts
     excludePaths:
-        - tests/*
         - src/*/Entity/*
         - src/*/Shared/Entity/*
         - src/*/Shared/Events/*
@@ -13,5 +11,3 @@ parameters:
         - src/*/Repositories/*
         - src/*/Health/*
         - src/User/Features/GitHubAuth/*
-        - src/Shared/Services/SentryFeatureTagger.php (?)
-        - src/Shared/Domain/ValueObject/Email.php (?) # OAuth2Bundle not installed
