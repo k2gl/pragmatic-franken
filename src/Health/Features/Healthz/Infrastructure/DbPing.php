@@ -9,7 +9,9 @@ use Throwable;
 
 final readonly class DbPing
 {
-    public function __construct(private Connection $connection) {}
+    public function __construct(private Connection $connection)
+    {
+    }
 
     public function isAlive(): bool
     {

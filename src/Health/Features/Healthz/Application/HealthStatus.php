@@ -9,7 +9,8 @@ final readonly class HealthStatus
     public function __construct(
         public bool $db,
         public bool $redis,
-    ) {}
+    ) {
+    }
 
     public function ok(): bool
     {
