@@ -9,6 +9,10 @@
          failOnWarning="true"
          stopOnFailure="false">
 
+    <extensions>
+        <bootstrap class="Dama\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+    </extensions>
+
     <testsuites>
         <testsuite name="All">
             <directory suffix="Test.php">tests</directory>
