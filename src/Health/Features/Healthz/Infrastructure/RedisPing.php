@@ -16,7 +16,7 @@ final readonly class RedisPing implements RedisPingInterface
     public function isAlive(): bool
     {
         try {
-            return (string) $this->redis->ping() !== '';
+            return (bool) $this->redis->ping();
         } catch (Throwable) {
             return false;
         }

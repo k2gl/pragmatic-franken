@@ -35,7 +35,7 @@ make smoke          # confirms bin/console boots and /healthz responds
 | `make test-unit` / `make test-integration` / `make test-e2e` | filtered by `#[Group]` |
 | `make test-coverage` / `make coverage-html` | coverage reports |
 | `make lint` / `make lint-check` | Pint (auto-fix / read-only) |
-| `make analyze` | PHPStan level 9 |
+| `make analyze` | PHPStan level 10 |
 | `make check` | lint + analyze (pre-commit) |
 | `make ci` | lint-check + analyze + test (CI parity) |
 | `make smoke` | end-to-end smoke check |
@@ -140,7 +140,7 @@ Query handlers return `*Result` DTOs. Don't expose Doctrine entities through HTT
 ## Code style & static analysis
 
 - **Laravel Pint** (PSR-12 preset, `pint.json`). `make lint` auto-fixes; `make lint-check` is read-only.
-- **PHPStan level 9** (`phpstan.neon`). `make analyze`.
+- **PHPStan level 10** (`phpstan.neon`). `make analyze`.
 - **Conventional Commits** for commit message headers.
 
 `make check` runs lint + analyze before every commit; `make ci` adds tests and matches the CI workflow exactly.

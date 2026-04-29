@@ -67,7 +67,7 @@
         ],
         "lint": "pint --test",
         "fix": "pint",
-        "analyze": "phpstan analyze --level=7",
+        "analyze": "phpstan analyze --level=10",
         "check": [
             "@lint",
             "@analyze"

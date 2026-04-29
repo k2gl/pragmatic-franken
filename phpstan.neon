@@ -1,13 +1,4 @@
 parameters:
-    level: 7
+    level: 10
     paths:
         - src
-    excludePaths:
-        - src/*/Entity/*
-        - src/*/Shared/Entity/*
-        - src/*/Shared/Events/*
-        - src/*/Shared/Service/*
-        - src/*/Features/*
-        - src/*/Repositories/*
-        - src/*/Health/*
-        - src/User/Features/GitHubAuth/*

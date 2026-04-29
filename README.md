@@ -4,7 +4,7 @@
 [![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777bb4?logo=php&logoColor=white)](https://www.php.net/releases/8.5/)
 [![FrankenPHP 1.x](https://img.shields.io/badge/FrankenPHP-1.x-006b5b?logo=docker&logoColor=white)](https://frankenphp.dev/)
 [![Symfony 8.0](https://img.shields.io/badge/Symfony-8.0-000000?logo=symfony&logoColor=white)](https://symfony.com/)
-[![PHPStan Level 9](https://img.shields.io/badge/PHPStan-Level%209-cyan)](https://phpstan.org)
+[![PHPStan Level 10](https://img.shields.io/badge/PHPStan-Level%2010-cyan)](https://phpstan.org)
 [![CI](https://img.shields.io/github/actions/workflow/status/k2gl/pragmatic-franken/ci.yml?branch=main&label=CI)](https://github.com/k2gl/pragmatic-franken/actions)
 
 PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Vertical Slices + CQRS over Symfony Messenger. PostgreSQL 16, Redis 7. Designed to be readable by both humans and AI agents.
@@ -22,7 +22,7 @@ For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** â
 | Cache / Queue | Redis 7 | Predis + Messenger transport |
 | Frontend (default) | AssetMapper + Twig | no Webpack/Vite needed for HTML-first |
 | Code style | Laravel Pint (PSR-12) | one-flag autofix |
-| Static analysis | PHPStan level 9 | enforced in CI |
+| Static analysis | PHPStan level 10 | enforced in CI |
 | Tests | PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA | pyramid 60/30/10 |
 
 ## Quickstart
@@ -105,7 +105,7 @@ For per-developer overrides (tone, language, IDE quirks), copy `AGENTS.local.md.
 
 ## Contributing
 
-See [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md). Conventional Commits required for the message header. CI gates: Pint, PHPStan level 9, PHPUnit. `make ci` mirrors the pipeline locally.
+See [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md). Conventional Commits required for the message header. CI gates: Pint, PHPStan level 10, PHPUnit. `make ci` mirrors the pipeline locally.
 
 ## License
 
