@@ -9,11 +9,7 @@ summary: "Step-by-step guide for adding real-time server-sent events to a vertic
 
 FrankenPHP ships a Mercure hub as a built-in service — no separate process needed. Use it to push server-sent events (SSE) to browser clients without WebSocket complexity.
 
-## Prerequisites
-
-```bash
-composer require symfony/mercure-bundle
-```
+`symfony/mercure-bundle` is already included in this boilerplate (`composer.json`) and registered in `config/bundles.php`. The config file `config/packages/mercure.yaml` is also pre-configured. The only step you need is to set the env vars below.
 
 ## Configuration
 
@@ -30,16 +26,27 @@ mercure:
                 publish: ['*']
 ```
 
-### `.env`
+### `.env.local` (local development)
 
 ```dotenv
-# Internal URL reachable from the PHP worker (same container)
+# Internal URL reachable from the PHP worker (same container as FrankenPHP)
 MERCURE_URL=https://pragmatic-franken.localhost:4750/.well-known/mercure
 # Public URL sent to browser clients
 MERCURE_PUBLIC_URL=https://pragmatic-franken.localhost:4750/.well-known/mercure
 # Must match the `hubOptions.jwt_key` in your Caddyfile
 MERCURE_JWT_SECRET=changeme-in-production
 ```
+
+### `.env.test` (test / CI stubs)
+
+```dotenv
+# Stub values — no real hub needed for unit or smoke tests
+MERCURE_URL=http://localhost/.well-known/mercure
+MERCURE_PUBLIC_URL=http://localhost/.well-known/mercure
+MERCURE_JWT_SECRET=test-secret
+```
+
+These stubs are already committed to `.env.test`. MercureBundle resolves the hub URL eagerly at container compile time (via `EnvVarProcessor`), so stubs are required even when no real Mercure hub is present in CI.
 
 ## Publishing from a slice
 

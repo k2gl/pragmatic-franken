@@ -77,10 +77,27 @@ final readonly class ProcessPaymentHandler
 A subscriber in another context is just a `#[AsMessageHandler]` handler for the domain event class. Route it async in `config/packages/messenger.yaml` to decouple throughput:
 
 ```yaml
+# config/packages/messenger.yaml
 framework:
     messenger:
+        transports:
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    auto_setup: true
+
         routing:
             App\Billing\Features\ProcessPayment\Domain\PaymentProcessed: async
+```
+
+For tests, override the transport with an in-memory sink so domain events are captured without a real Redis consumer:
+
+```yaml
+# config/packages/test/messenger.yaml
+framework:
+    messenger:
+        transports:
+            async: 'in-memory://'
 ```
 
 ### 4. What "Lite" excludes
