@@ -25,13 +25,17 @@ final class LiveUpdatesController
     #[Route('/notification/live-update', name: 'app_notification_live_update', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
-        $body = json_decode((string) $request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $body = $request->toArray();
+
+        $topic = \is_string($body['topic'] ?? null) ? $body['topic'] : '';
+        $data = \is_array($body['data'] ?? null) ? $body['data'] : [];
+        $private = \is_bool($body['private'] ?? null) ? $body['private'] : false;
 
         /** @var LiveUpdateResult $result */
         $result = $this->handle(new PublishLiveUpdateCommand(
-            topic: (string) ($body['topic'] ?? ''),
-            data: (array) ($body['data'] ?? []),
-            private: (bool) ($body['private'] ?? false),
+            topic: $topic,
+            data: $data,
+            private: $private,
         ));
 
         return new JsonResponse(['messageId' => $result->messageId], Response::HTTP_CREATED);

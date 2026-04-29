@@ -25,12 +25,15 @@ final class ProcessPaymentController
     #[Route('/billing/payment', name: 'app_billing_process_payment', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
-        $body = json_decode((string) $request->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        $body = $request->toArray();
+
+        $amountCents = \is_int($body['amount_cents'] ?? null) ? $body['amount_cents'] : 0;
+        $currency = \is_string($body['currency'] ?? null) ? $body['currency'] : 'USD';
 
         /** @var ProcessPaymentResult $result */
         $result = $this->handle(new ProcessPaymentCommand(
-            amountCents: (int) ($body['amount_cents'] ?? 0),
-            currency: (string) ($body['currency'] ?? 'USD'),
+            amountCents: $amountCents,
+            currency: $currency,
         ));
 
         return new JsonResponse([
