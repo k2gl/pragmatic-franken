@@ -1,0 +1,12 @@
+framework:
+    messenger:
+        transports:
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    auto_setup: true
+
+        routing:
+            # Domain events are routed async — consumed by messenger:consume, not inline.
+            # Add new domain event classes here as new bounded contexts are introduced.
+            App\Billing\Features\ProcessPayment\Domain\PaymentProcessed: async
