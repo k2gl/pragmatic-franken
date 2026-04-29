@@ -7,7 +7,7 @@ namespace App\Health\Features\Healthz\Infrastructure;
 use Doctrine\DBAL\Connection;
 use Throwable;
 
-final readonly class DbPing
+final readonly class DbPing implements DbPingInterface
 {
     public function __construct(private Connection $connection)
     {

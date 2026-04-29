@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Health\Features\Healthz\Application;
 
-use App\Health\Features\Healthz\Infrastructure\DbPing;
-use App\Health\Features\Healthz\Infrastructure\RedisPing;
+use App\Health\Features\Healthz\Infrastructure\DbPingInterface;
+use App\Health\Features\Healthz\Infrastructure\RedisPingInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final readonly class CheckHealthHandler
 {
     public function __construct(
-        private DbPing $dbPing,
-        private RedisPing $redisPing,
+        private DbPingInterface $dbPing,
+        private RedisPingInterface $redisPing,
     ) {
     }
 

@@ -7,8 +7,8 @@ namespace App\Tests\Health\Features\Healthz;
 use App\Health\Features\Healthz\Application\CheckHealthHandler;
 use App\Health\Features\Healthz\Application\CheckHealthQuery;
 use App\Health\Features\Healthz\Application\HealthStatus;
-use App\Health\Features\Healthz\Infrastructure\DbPing;
-use App\Health\Features\Healthz\Infrastructure\RedisPing;
+use App\Health\Features\Healthz\Infrastructure\DbPingInterface;
+use App\Health\Features\Healthz\Infrastructure\RedisPingInterface;
 use App\Tests\Support\TestCase\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
@@ -17,10 +17,10 @@ final class CheckHealthHandlerTest extends UnitTestCase
 {
     public function test_returns_ok_when_both_pings_succeed(): void
     {
-        $db = $this->createMock(DbPing::class);
+        $db = $this->createMock(DbPingInterface::class);
         $db->method('isAlive')->willReturn(true);
 
-        $redis = $this->createMock(RedisPing::class);
+        $redis = $this->createMock(RedisPingInterface::class);
         $redis->method('isAlive')->willReturn(true);
 
         $handler = new CheckHealthHandler($db, $redis);
@@ -32,10 +32,10 @@ final class CheckHealthHandlerTest extends UnitTestCase
 
     public function test_returns_not_ok_when_db_is_down(): void
     {
-        $db = $this->createMock(DbPing::class);
+        $db = $this->createMock(DbPingInterface::class);
         $db->method('isAlive')->willReturn(false);
 
-        $redis = $this->createMock(RedisPing::class);
+        $redis = $this->createMock(RedisPingInterface::class);
         $redis->method('isAlive')->willReturn(true);
 
         $handler = new CheckHealthHandler($db, $redis);

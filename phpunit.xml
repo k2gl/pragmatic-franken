@@ -10,7 +10,7 @@
          stopOnFailure="false">
 
     <extensions>
-        <bootstrap class="Dama\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
     </extensions>
 
     <testsuites>
@@ -37,7 +37,7 @@
     </coverage>
 
     <php>
-        <env name="APP_ENV" value="test"/>
+        <env name="APP_ENV" value="test" force="true"/>
         <env name="KERNEL_CLASS" value="App\Kernel"/>
         <!--
             DATABASE_URL — from .env.test (sqlite by default for fast unit tests).
