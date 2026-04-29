@@ -33,6 +33,9 @@ node_modules/
 # CS Fixer
 .php-cs-fixer.cache
 
+# Symfony auto-generated config reference (IDE hints only)
+/config/reference.php
+
 # AI Agents
 AGENTS.local.md
 
