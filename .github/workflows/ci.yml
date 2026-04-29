@@ -46,6 +46,9 @@ jobs:
       APP_ENV: test
       APP_DEBUG: '0'
       APP_SECRET: ci-secret
+      MERCURE_URL: http://localhost/.well-known/mercure
+      MERCURE_PUBLIC_URL: http://localhost/.well-known/mercure
+      MERCURE_JWT_SECRET: ci-mercure-secret
 
     steps:
       - name: Checkout code
