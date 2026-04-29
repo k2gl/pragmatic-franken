@@ -113,9 +113,12 @@ Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.l
 | `docs/adr/0008-testing-strategy.md` | writing tests or CI gates |
 | `docs/adr/0009-shared-architecture.md` | Rule-of-Three / extracting Shared |
 | `docs/adr/0010-documentation-and-ai-layout.md` | adding docs, editing AGENTS.md |
+| `docs/adr/0011-event-sourcing-lite.md` | domain events, async side effects, event-driven decoupling |
 | `docs/guides/development.md` | day-to-day commands, scaffolding details |
 | `docs/guides/testing.md` | concrete testing examples |
 | `docs/guides/worker-mode.md` | debugging FrankenPHP worker behavior |
+| `docs/guides/mercure-integration.md` | real-time SSE via Mercure; publishing and subscribing |
+| `docs/guides/sdk-generation.md` | generating TypeScript types from Result DTOs |
 
 ADR-0003 is the umbrella *Pragmatism Charter* — load it whenever you're tempted to add an extra layer or interface, or when deciding whether the Message Bus is overkill for a CRUD case.
 

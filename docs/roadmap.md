@@ -140,8 +140,8 @@ make integrate-mercure
 
 | Quarter | Focus | Status |
 |---------|-------|--------|
-| Q1 | Real-time & Connectivity | 🔜 Next |
-| Q2 | AI & Agentic Autonomy | 📋 Planned |
+| Q1 | Real-time & Connectivity | ✅ Done |
+| Q2 | AI & Agentic Autonomy | 🔜 Next |
 | Q3 | Edge & Performance | 📋 Planned |
 | Q4 | Frontend & Ecosystem | 📋 Planned |
 

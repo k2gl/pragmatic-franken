@@ -25,12 +25,14 @@
         "symfony/runtime": "^8.0",
         "symfony/security-bundle": "^8.0",
         "symfony/twig-bundle": "^8.0",
+        "symfony/mercure-bundle": "^0.3",
         "symfony/uid": "*",
         "symfony/validator": "^8.0",
         "symfony/var-exporter": "^8.0"
     },
     "require-dev": {
         "dama/doctrine-test-bundle": "^8.2",
+        "fakerphp/faker": "^1.24",
         "doctrine/doctrine-migrations-bundle": "*",
         "k2gl/phpunit-fluent-assertions": "*",
         "laravel/pint": "*",

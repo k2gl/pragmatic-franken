@@ -23,7 +23,7 @@ For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** �
 | Frontend (default) | AssetMapper + Twig | no Webpack/Vite needed for HTML-first |
 | Code style | Laravel Pint (PSR-12) | one-flag autofix |
 | Static analysis | PHPStan level 10 | enforced in CI |
-| Tests | PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA | pyramid 60/30/10 |
+| Tests | PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA + Faker + Fluent Assertions | pyramid 60/30/10 |
 
 ## Quickstart
 
@@ -87,13 +87,15 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 | [0008](docs/adr/0008-testing-strategy.md) | Testing Strategy | Accepted |
 | [0009](docs/adr/0009-shared-architecture.md) | Shared Architecture | Accepted |
 | [0010](docs/adr/0010-documentation-and-ai-layout.md) | Documentation & AI Layout | Accepted |
+| [0011](docs/adr/0011-event-sourcing-lite.md) | Event Sourcing Lite | Accepted |
 
 ## Guides
 
 - [`docs/guides/development.md`](docs/guides/development.md) — daily commands, slice scaffolding details
 - [`docs/guides/testing.md`](docs/guides/testing.md) — concrete PHPUnit + Foundry + Messenger-Test patterns
 - [`docs/guides/worker-mode.md`](docs/guides/worker-mode.md) — debugging FrankenPHP worker behavior
-- [`docs/mercure.md`](docs/mercure.md) — real-time updates
+- [`docs/guides/mercure-integration.md`](docs/guides/mercure-integration.md) — real-time SSE via FrankenPHP's built-in Mercure hub
+- [`docs/guides/sdk-generation.md`](docs/guides/sdk-generation.md) — auto-generate TypeScript types from PHP Result DTOs
 - [`docs/performance.md`](docs/performance.md) — benchmark methodology
 - [`docs/roadmap.md`](docs/roadmap.md) — quarterly plan
 
