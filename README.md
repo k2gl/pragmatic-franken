@@ -7,7 +7,7 @@
 [![PHPStan Level 10](https://img.shields.io/badge/PHPStan-Level%2010-cyan)](https://phpstan.org)
 [![CI](https://img.shields.io/github/actions/workflow/status/k2gl/pragmatic-franken/ci.yml?branch=main&label=CI)](https://github.com/k2gl/pragmatic-franken/actions)
 
-PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Vertical Slices + CQRS over Symfony Messenger. PostgreSQL 16, Redis 7. Designed to be readable by both humans and AI agents.
+PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Vertical Slices + CQRS over Symfony Messenger. PostgreSQL 17, Redis 7. Designed to be readable by both humans and AI agents.
 
 For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** — it is the single source of truth, ≤ 2 000 tokens, equally usable by developers and AI tools.
 
@@ -18,7 +18,7 @@ For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** �
 | Application server | FrankenPHP 1.x (Caddy + worker mode) | one binary, HTTP/3, kernel kept hot |
 | Framework | Symfony 8.0 | mature, attribute-based wiring |
 | Bus | Symfony Messenger (CQRS) | sync commands/queries, async events |
-| Database | PostgreSQL 16 | Doctrine ORM 3 |
+| Database | PostgreSQL 17 | Doctrine ORM 3 |
 | Cache / Queue | Redis 7 | Predis + Messenger transport |
 | Frontend (default) | AssetMapper + Twig | no Webpack/Vite needed for HTML-first |
 | Code style | Laravel Pint (PSR-12) | one-flag autofix |
@@ -93,9 +93,9 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 - [`docs/guides/development.md`](docs/guides/development.md) — daily commands, slice scaffolding details
 - [`docs/guides/testing.md`](docs/guides/testing.md) — concrete PHPUnit + Foundry + Messenger-Test patterns
 - [`docs/guides/worker-mode.md`](docs/guides/worker-mode.md) — debugging FrankenPHP worker behavior
-- [`docs/MERCURE.md`](docs/MERCURE.md) — real-time updates
-- [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) — benchmark methodology
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — quarterly plan
+- [`docs/mercure.md`](docs/mercure.md) — real-time updates
+- [`docs/performance.md`](docs/performance.md) — benchmark methodology
+- [`docs/roadmap.md`](docs/roadmap.md) — quarterly plan
 
 ## AI agents
 
