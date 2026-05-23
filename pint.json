@@ -13,5 +13,8 @@
         "node_modules",
         "coverage",
         "var"
+    ],
+    "notPath": [
+        "config/reference.php"
     ]
 }
