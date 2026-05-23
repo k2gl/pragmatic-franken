@@ -129,19 +129,19 @@ db-reset: down ## Destroy and rebuild database
 ##—————— ✅ Tests ——————
 test: ## Run all PHPUnit tests (fail-fast)
 	@echo "$(GREEN)Running all tests...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --fail-fast
+	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --stop-on-failure
 
 test-unit: ## Run unit tests only (#[Group('unit')])
 	@echo "$(GREEN)Running unit tests...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=unit --fail-fast
+	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=unit --stop-on-failure
 
 test-integration: ## Run integration tests only (#[Group('integration')])
 	@echo "$(GREEN)Running integration tests...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=integration --fail-fast
+	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=integration --stop-on-failure
 
 test-e2e: ## Run API/E2E tests only (#[Group('e2e')])
 	@echo "$(GREEN)Running E2E tests...$(RESET)"
-	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=e2e --fail-fast
+	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=e2e --stop-on-failure
 
 test-coverage: ## Run tests with text coverage report
 	@echo "$(GREEN)Running tests with coverage...$(RESET)"
@@ -172,8 +172,8 @@ ci: lint-check analyze test ## Simulate CI pipeline (no auto-fix)
 
 smoke: ## End-to-end smoke check (console boots, /healthz responds)
 	@echo "$(YELLOW)Running smoke check...$(RESET)"
-	$(DC) exec $(DC_APP) bin/console list >/dev/null
-	@curl -fsS http://localhost:$${HTTP_PORT:-8750}/healthz | tee /dev/stderr | grep -q '"ok":true'
+	$(DC) exec -T $(DC_APP) bin/console list >/dev/null
+	@$(DC) exec -T $(DC_APP) sh -c 'curl -fsS -k --resolve $$SERVER_NAME:443:127.0.0.1 https://$$SERVER_NAME/healthz' | tee /dev/stderr | grep -q '"ok":true'
 	@echo "$(GREEN)Smoke check passed!$(RESET)"
 
 docs-check: ## Lint ADR front-matter and AGENTS.md token budget

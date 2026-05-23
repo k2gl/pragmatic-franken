@@ -30,6 +30,11 @@ services:
       DATABASE_URL: "postgres://user:password@db:5432/app_db?serverVersion=17&charset=utf8"
       REDIS_URL: "redis://redis:6379"
       MESSENGER_TRANSPORT_DSN: "redis://redis:6379/messages"
+      # bin/console reads only the real process env (no Dotenv), so config-required
+      # vars must be passed explicitly. Mercure values come from .env.
+      MERCURE_URL: "${MERCURE_URL}"
+      MERCURE_PUBLIC_URL: "${MERCURE_PUBLIC_URL}"
+      MERCURE_JWT_SECRET: "${MERCURE_JWT_SECRET}"
       PHP_INI_SCAN_DIR: ":/usr/local/etc/php/conf.d"
       XDEBUG_MODE: "${XDEBUG_MODE:-off}"
       XDEBUG_CLIENT_HOST: "host.docker.internal"
@@ -47,7 +52,9 @@ services:
       redis:
         condition: service_started
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost/healthz"]
+      # Caddy auto-redirects HTTP->HTTPS on SERVER_NAME, so probe HTTPS directly.
+      # --resolve pins the cert hostname to the loopback the container listens on.
+      test: ["CMD-SHELL", "curl -fsS -k --resolve ${SERVER_NAME}:443:127.0.0.1 https://${SERVER_NAME}/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -66,7 +73,7 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d app_db"]
       interval: 10s
@@ -82,7 +89,7 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
