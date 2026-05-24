@@ -18,6 +18,32 @@ if (PHP_VERSION_ID < 80500) {
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
-$kernel = new Kernel($_SERVER['APP_ENV'] ?? 'dev', (bool) ($_SERVER['APP_DEBUG'] ?? true));
+$env = $_SERVER['APP_ENV'] ?? 'dev';
+$debug = (bool) ($_SERVER['APP_DEBUG'] ?? true);
+
+// The Kernel environment is fixed at construction — before the Console
+// Application parses options — so honour --env/-e and --no-debug straight from
+// argv (mirrors what the Symfony Runtime does for the HTTP entrypoint).
+$argv = $_SERVER['argv'] ?? [];
+if (is_array($argv)) {
+    foreach ($argv as $i => $arg) {
+        if (!is_string($arg)) {
+            continue;
+        }
+
+        if ($arg === '--env' || $arg === '-e') {
+            $next = $argv[$i + 1] ?? null;
+            $env = is_string($next) ? $next : $env;
+        } elseif (str_starts_with($arg, '--env=')) {
+            $env = substr($arg, 6);
+        } elseif (str_starts_with($arg, '-e') && strlen($arg) > 2) {
+            $env = substr($arg, 2);
+        } elseif ($arg === '--no-debug') {
+            $debug = false;
+        }
+    }
+}
+
+$kernel = new Kernel($env, $debug);
 $application = new Application($kernel);
 $application->run();
