@@ -1,0 +1,6 @@
+doctrine:
+    dbal:
+        # Run tests against a separate database (e.g. app -> app_test) so they never
+        # touch the dev/runtime DB. Foundry's ResetDatabase recreates the schema, and
+        # without this the runtime DATABASE_URL (the dev DB) would be wiped.
+        dbname_suffix: _test
