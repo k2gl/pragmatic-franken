@@ -11,7 +11,7 @@ USER_ID := $(shell id -u)
 GROUP_ID := $(shell id -g)
 
 # Executables (local)
-DC = UID=$(USER_ID) GID=$(GROUP_ID) docker compose
+DC = UID=$(USER_ID) GID=$(GROUP_ID) docker compose --progress=plain
 
 # Docker container name (matches docker-compose service "app")
 DC_APP = app
@@ -56,7 +56,7 @@ install: env-create build up db-migrate ## 🚀 Full setup: containers, dependen
 ##—————— 🐳 Docker ——————
 build: ## Build Docker images
 	@echo "$(RED)Building Docker images...$(RESET)"
-	$(DC) build --pull
+	DOCKER_BUILDKIT=1 $(DC) build --pull
 
 rebuild: ## Rebuild Docker images (no cache)
 	@echo "$(RED)Rebuilding Docker images...$(RESET)"
