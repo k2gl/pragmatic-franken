@@ -31,7 +31,7 @@ The template's promises become CI-proven facts.
 
 - `src/SharedKernel/` — typed Doctrine repository base, RFC 9457 problem+json
   exception listeners, worker heartbeat, universal seed command
-- `src/Context/{Name}/` layout with context-level `Entity/`/`Repository/` (ADR-0012/0013)
+- `src/Context/{Name}/` layout with context-level `Entity/`/`Repository/` (new ADRs ported from the CRM)
 - **Task example slice** — the missing real-entity reference: entity → migration →
   repository → factory → validated 422 → tests, wired to Mercure live updates
 - Test kit: `sendJsonRequest()`, typed `responseReader()`, violation asserts, auth hook
@@ -44,7 +44,7 @@ The template's promises become CI-proven facts.
 - Build provenance attestations on release images (GitHub Artifact Attestations)
 - Opt-in deploy gate: verify image provenance before rollout (`gh attestation verify`
   and the dogfooded `app:verify-attestation` on `k2gl/sigstore-verify`)
-- ADR-0018 supply-chain policy + guide
+- Supply-chain policy ADR + guide
 - `symfony/scheduler` example in worker mode (honest `SCHEDULER_ENABLED` path)
 - `dev/agent-smoke.sh` as a required CI job — "scaffolded code passes PHPStan 10
   and tests untouched" becomes a verifiable badge, not a vibe
