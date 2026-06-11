@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "41e81ef9de6d3e60f520ad0aace6f0bd",
+    "content-hash": "6dceb64835361a421ad7e47a654a1c40",
     "packages": [
         {
             "name": "composer/semver",
@@ -1197,6 +1197,167 @@
                 "source": "https://github.com/doctrine/sql-formatter/tree/1.5.4"
             },
             "time": "2026-02-08T16:21:46+00:00"
+        },
+        {
+            "name": "k2gl/app-env",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/k2gl/app-env.git",
+                "reference": "56c400b3ca9433b6972a4f0ae30fda48bf084635"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/k2gl/app-env/zipball/56c400b3ca9433b6972a4f0ae30fda48bf084635",
+                "reference": "56c400b3ca9433b6972a4f0ae30fda48bf084635",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "k2gl/phpunit-fluent-assertions": "^12",
+                "laravel/pint": "~1.20.0",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^10.5|^11.0|^12.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "K2gl\\Component\\AppEnv\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nickolay Harin",
+                    "email": "l0gic@ya.ru"
+                }
+            ],
+            "description": "PHP application environment service",
+            "homepage": "https://github.com/k2gl/app-env",
+            "keywords": [
+                "app env",
+                "appenv",
+                "application environment",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/k2gl/app-env/issues",
+                "source": "https://github.com/k2gl/app-env"
+            },
+            "time": "2026-06-10T02:01:34+00:00"
+        },
+        {
+            "name": "k2gl/entity-exist",
+            "version": "1.14.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/k2gl/entity-exist.git",
+                "reference": "2793526c379bce16a72c12a8252c6aa771425b51"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/k2gl/entity-exist/zipball/2793526c379bce16a72c12a8252c6aa771425b51",
+                "reference": "2793526c379bce16a72c12a8252c6aa771425b51",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/orm": "^2.13|^3.0",
+                "php": "^8.1",
+                "symfony/dependency-injection": "^6.1|^7.0|^8.0",
+                "symfony/validator": "^6.1|^7.0|^8.0"
+            },
+            "require-dev": {
+                "k2gl/phpunit-fluent-assertions": "^12",
+                "laravel/pint": "~1.20.0",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^10.5|^11.0|^12.0",
+                "rector/rector": "^2.0",
+                "roave/security-advisories": "dev-latest",
+                "symfony/phpunit-bridge": "^6.1|^7.0|^8.0",
+                "symfony/var-dumper": "^6.1|^7.0|^8.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "K2gl\\Component\\Validator\\Constraint\\EntityExist\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nickolay Harin",
+                    "email": "l0gic@ya.ru"
+                }
+            ],
+            "description": "Checks if there is at least one row with the required field in the database, for example, a row with the same identifier",
+            "support": {
+                "issues": "https://github.com/k2gl/entity-exist/issues",
+                "source": "https://github.com/k2gl/entity-exist"
+            },
+            "time": "2026-06-05T18:14:21+00:00"
+        },
+        {
+            "name": "k2gl/enum",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/k2gl/enum.git",
+                "reference": "f3baebba88c76907d78ef1db87575c324844e1c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/k2gl/enum/zipball/f3baebba88c76907d78ef1db87575c324844e1c6",
+                "reference": "f3baebba88c76907d78ef1db87575c324844e1c6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "k2gl/phpunit-fluent-assertions": "^12",
+                "laravel/pint": "~1.20.0",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^10.5|^11.0|^12.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "K2gl\\Enum\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nickolay Harin",
+                    "email": "l0gic@ya.ru"
+                }
+            ],
+            "description": "PHP BackedEnum spiced with syntactic sugar",
+            "homepage": "https://github.com/k2gl/enum",
+            "keywords": [
+                "backedEnum",
+                "enum",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/k2gl/enum/issues",
+                "source": "https://github.com/k2gl/enum"
+            },
+            "time": "2026-06-05T18:23:04+00:00"
         },
         {
             "name": "lcobucci/jwt",
@@ -7499,6 +7660,63 @@
                 "source": "https://github.com/FakerPHP/Faker/tree/v1.24.1"
             },
             "time": "2024-11-21T13:46:39+00:00"
+        },
+        {
+            "name": "k2gl/array-reader",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/k2gl/array-reader.git",
+                "reference": "4d4761a93a0bd5ab529ecd4fa31f65917bb7d2b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/k2gl/array-reader/zipball/4d4761a93a0bd5ab529ecd4fa31f65917bb7d2b3",
+                "reference": "4d4761a93a0bd5ab529ecd4fa31f65917bb7d2b3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "k2gl/phpunit-fluent-assertions": "^12",
+                "laravel/pint": "~1.20.0",
+                "phpstan/phpstan": "^2.1",
+                "phpunit/phpunit": "^10|^11|^12"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "K2gl\\ArrayReader\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nickolay Harin",
+                    "email": "l0gic@ya.ru"
+                }
+            ],
+            "description": "Tiny, zero-dependency typed reader for mixed arrays (decoded JSON, CSV rows, config, request payloads) with strict and lenient access.",
+            "homepage": "https://github.com/k2gl/array-reader",
+            "keywords": [
+                "PHPStan",
+                "array",
+                "casting",
+                "dto",
+                "json",
+                "psalm",
+                "type-safe",
+                "typed"
+            ],
+            "support": {
+                "issues": "https://github.com/k2gl/array-reader/issues",
+                "source": "https://github.com/k2gl/array-reader"
+            },
+            "time": "2026-06-02T19:42:24+00:00"
         },
         {
             "name": "k2gl/phpunit-fluent-assertions",

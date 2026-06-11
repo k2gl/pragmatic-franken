@@ -27,6 +27,7 @@ make slice context=Foo feature=Bar  # scaffold a new slice
 ```
 src/
   Kernel.php                            # App\Kernel
+  SharedKernel/                         # cross-context infra: repo base, problem+json listeners (ADR-0009)
   Context/{Name}/
     Entity/                             # Doctrine entities of the context
     Repository/                         # typed repositories (extend SharedKernel DoctrineRepository)
@@ -115,6 +116,8 @@ Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.l
 | `docs/adr/0009-shared-architecture.md` | Rule-of-Three / extracting Shared |
 | `docs/adr/0010-documentation-and-ai-layout.md` | adding docs, editing AGENTS.md |
 | `docs/adr/0011-event-sourcing-lite.md` | domain events, async side effects, event-driven decoupling |
+| `docs/adr/0012-ubiquitous-language.md` | naming, where entities/repositories live |
+| `docs/adr/0013-doctrine-repository-pattern.md` | persistence, writing repositories |
 | `docs/guides/development.md` | day-to-day commands, scaffolding details |
 | `docs/guides/testing.md` | concrete testing examples |
 | `docs/guides/worker-mode.md` | debugging FrankenPHP worker behavior |

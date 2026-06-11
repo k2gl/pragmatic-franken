@@ -23,6 +23,9 @@
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/migrations": "^3.8",
         "doctrine/orm": "^3.3",
+        "k2gl/app-env": "^1.0",
+        "k2gl/entity-exist": "^1.14",
+        "k2gl/enum": "^2.1",
         "nelmio/api-doc-bundle": "^5.9",
         "nelmio/cors-bundle": "^2.6",
         "predis/predis": "^3.3",
@@ -47,6 +50,7 @@
     "require-dev": {
         "dama/doctrine-test-bundle": "^8.2",
         "fakerphp/faker": "^1.24",
+        "k2gl/array-reader": "^2.1",
         "k2gl/phpunit-fluent-assertions": "^12.4",
         "laravel/pint": "^1.29",
         "phpstan/phpstan": "^2.1",

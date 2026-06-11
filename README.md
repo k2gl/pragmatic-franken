@@ -91,6 +91,8 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 | [0009](docs/adr/0009-shared-architecture.md) | Shared Architecture | Accepted |
 | [0010](docs/adr/0010-documentation-and-ai-layout.md) | Documentation & AI Layout | Accepted |
 | [0011](docs/adr/0011-event-sourcing-lite.md) | Event Sourcing Lite | Accepted |
+| [0012](docs/adr/0012-ubiquitous-language.md) | Ubiquitous Language & Entity Placement | Accepted |
+| [0013](docs/adr/0013-doctrine-repository-pattern.md) | Doctrine Repository Pattern | Accepted |
 
 ## Guides
 
