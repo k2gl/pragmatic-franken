@@ -1,160 +1,67 @@
 ---
 audience: human
 tier: 3
-last_reviewed: 2026-04-28
-summary: "Quarterly product roadmap. Human-only — load on demand for planning context, not for code generation."
+last_reviewed: 2026-06-11
+summary: "Wave-based roadmap: hygiene/day-one-green → CRM-proven backports → supply-chain & agent differentiators → distribution. Human-only — load on demand for planning context, not for code generation."
 ---
 
-# Pragmatic Franken Roadmap 2026
+# Pragmatic Franken Roadmap
 
 > **"Stop refactoring. Start delivering."**
 
-## Vision
+The roadmap is organized in waves, each shipping as a release. Grounded in
+production experience from a real CRM grown out of this skeleton: ~25 of its
+first 40 commits were infrastructure repair — every item below either ports a
+proven piece back or removes that fork tax up front.
 
-Pragmatic Franken evolves from a development foundation into a complete "Cheat Code" for modern PHP development. The roadmap focuses on removing friction, adding AI autonomy, and optimizing for edge performance.
+## Wave 1 — Hygiene & day-one-green (v1.0)
 
----
+The template's promises become CI-proven facts.
 
-## 🟦 Q1: Real-time & Connectivity
+- ✅ Production image boots — verified by the `prod-image` CI job on every PR
+- ✅ One honest pipeline: hard gates for `composer audit`, Trivy, Gitleaks; zero `continue-on-error`
+- ✅ Single env truth: dotenv + `.env.dist`, no compose duplication, loopback var-driven ports
+- ✅ Tests on PostgreSQL with a `_test` dbname suffix (sqlite split removed)
+- ✅ `/healthz` (liveness) vs `/ready` (readiness) per ADR-0005, all probes honest
+- ✅ Working Mercure hub (private Caddy site, reverse-proxied under the TLS origin)
+- ✅ `dev/check-docs.sh` verifies doc claims against reality (make targets, routes, ADR table)
+- ✅ Community floor: LICENSE, SECURITY.md, CODEOWNERS, dependabot, release-please
 
-### 1.1 Mercure Hub Integration
+## Wave 2 — CRM-proven backports (v1.1–1.2)
 
-**Goal:** Native WebSocket support via FrankenPHP for instant notifications.
+- `src/SharedKernel/` — typed Doctrine repository base, RFC 9457 problem+json
+  exception listeners, worker heartbeat, universal seed command
+- `src/Context/{Name}/` layout with context-level `Entity/`/`Repository/` (ADR-0012/0013)
+- **Task example slice** — the missing real-entity reference: entity → migration →
+  repository → factory → validated 422 → tests, wired to Mercure live updates
+- Test kit: `sendJsonRequest()`, typed `responseReader()`, violation asserts, auth hook
+- Ops: blue-green `rollout.sh` with health gate, `backup.sh`, prod/proxy compose, deployment & disaster-recovery guides
+- `dev/worktree.sh` — parallel isolated stacks for multi-agent development
+- Observability compose profile (Prometheus + Grafana), CI coverage floor
 
-```bash
-# Expected command
-make integrate-mercure
-```
+## Wave 3 — Differentiators: supply chain & agents (v1.3–1.4)
 
-**Deliverables:**
-- Mercure configuration in `config/packages/mercure.yaml`
-- Example feature: `src/Notification/Features/LiveUpdates/`
-- Documentation: `docs/guides/mercure-integration.md`
+- Build provenance attestations on release images (GitHub Artifact Attestations)
+- Opt-in deploy gate: verify image provenance before rollout (`gh attestation verify`
+  and the dogfooded `app:verify-attestation` on `k2gl/sigstore-verify`)
+- ADR-0018 supply-chain policy + guide
+- `symfony/scheduler` example in worker mode (honest `SCHEDULER_ENABLED` path)
+- `dev/agent-smoke.sh` as a required CI job — "scaffolded code passes PHPStan 10
+  and tests untouched" becomes a verifiable badge, not a vibe
+- `docs/recipes/` — JWT auth, feature flags, SPA frontend, preview environments
+- `make init` — fork identity: rename, generated secrets, prune examples
 
-### 1.2 Event Sourcing Lite
+## Wave 4 — Distribution (v2.0)
 
-**Goal:** Pattern for critical business slices (e.g., Billing).
+- Packagist: `composer create-project k2gl/pragmatic-franken`
+- README repositioning: two-path quickstart, honest comparison vs
+  symfony/skeleton / symfony-docker / API Platform, declared non-goals
+- `UPGRADE.md` + fork-maintenance guide (templates aren't merged — changes are applied)
+- Launch posts (EN/RU) built on the verifiable claims above
 
-**Deliverables:**
-- ADR: `docs/adr/0010-event-sourcing-lite.md`
-- Example feature: `src/Billing/Features/ProcessPayment/`
-- Test patterns for event sourcing
+## Non-goals
 
-### 1.3 SDK Generator
-
-**Goal:** Auto-generate TypeScript clients from Features/Dto.php
-
-**Deliverables:**
-- Script: `dev/generate-sdk.sh`
-- Output: `packages/client-sdk/`
-- Documentation: `docs/guides/sdk-generation.md`
-
----
-
-## 🟨 Q2: AI & Agentic Autonomy
-
-### 2.1 Self-Healing CI
-
-**Goal:** CI pipeline that auto-fixes type errors via AI agent.
-
-**Deliverables:**
-- GitHub Action: `.github/workflows/ai-fix.yml`
-- Integration with OpenAI/Anthropic API
-- Documentation: `docs/guides/ai-ci.md`
-
-### 2.2 Interactive Scaffolding
-
-**Goal:** `make slice` becomes interactive — AI asks for parameters and drafts logic.
-
-**Deliverables:**
-- Enhanced script: `dev/create-slice.sh`
-- AI prompts for feature description
-- Auto-generate first draft of Handler logic
-
-### 2.3 Context Injection
-
-**Goal:** Automatic project context gathering for LLMs.
-
-**Deliverables:**
-- Script: `dev/generate-context.sh`
-- Output: `context.json` for Claude/GPT-4
-- Integration with AGENTS.md
-
----
-
-## 🟩 Q3: Edge & Performance
-
-### 3.1 Static Binary Builds
-
-**Goal:** Compile project to single binary via FrankenPHP for Edge deployment.
-
-**Deliverables:**
-- Documentation: `docs/guides/static-build.md`
-- Script: `dev/build-static.sh`
-- Deployment guide: Fly.io, Cloudflare
-
-### 3.2 Memory Management
-
-**Goal:** Worker profiling for long-running sessions.
-
-**Deliverables:**
-- ADR: `docs/adr/0011-memory-management.md`
-- Profiling tools integration
-- Example: `dev/memory-profile.sh`
-
-### 3.3 Native SQLite Support
-
-**Goal:** Litestream optimization for cheap hosting.
-
-**Deliverables:**
-- Configuration for SQLite + Litestream
-- Documentation: `docs/guides/sqlite-litestream.md`
-- Example docker-compose for local development
-
----
-
-## 🟧 Q4: Frontend & Ecosystem
-
-### 4.1 HTMX / LiveWire Presets
-
-**Goal:** Ready components for SPA-vibe while staying in PHP.
-
-**Deliverables:**
-- Example: `src/Shared/Infrastructure/Components/`
-- Documentation: `docs/guides/htmx-presets.md`
-- Template components
-
-### 4.2 Public Templates Marketplace
-
-**Goal:** Ready-made modules marketplace (Auth, Blog, Payments).
-
-**Deliverables:**
-- `modules/` directory structure
-- Package registry documentation
-- Template: `modules/authentication/`
-- Template: `modules/payments/`
-
----
-
-## 📋 Release Cadence
-
-| Quarter | Focus | Status |
-|---------|-------|--------|
-| Q1 | Real-time & Connectivity | ✅ Done |
-| Q2 | AI & Agentic Autonomy | 🔜 Next |
-| Q3 | Edge & Performance | 📋 Planned |
-| Q4 | Frontend & Ecosystem | 📋 Planned |
-
----
-
-## Contributing
-
-Want to help? Pick a task from any quadrant:
-
-1. Check open issues with label `good-first-issue`
-2. Review ADRs in `docs/adr/`
-3. Propose new modules in `modules/`
-
----
-
-**"Stop refactoring. Start delivering."**
+Authentication in core, bundled SPA, feature-flag tables, preview environments
+by default, Kubernetes/Helm, multi-DB support, composer-dependency signature
+verification (no Packagist attestation ecosystem yet), per-IDE AI rule files,
+and anything whose example CI cannot execute.
