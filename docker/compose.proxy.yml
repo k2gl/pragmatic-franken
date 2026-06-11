@@ -1,0 +1,51 @@
+# Front reverse proxy: a single Caddy that owns host :80/:443 (+ HTTP/3 on
+# udp), provisions Let's Encrypt certificates automatically for each
+# subdomain, and routes by hostname to the per-environment app containers over
+# the shared network.
+#
+# Two domains cannot both bind host :443, so the per-env app containers stay
+# on plain internal :80 and this proxy terminates TLS for all of them.
+#
+#   docker network create app-shared   # once
+#   cd /srv/app/proxy
+#   docker compose -f compose.proxy.yml up -d
+#
+# Domains are read from an env file in this directory (.env):
+#   APEX_DOMAIN=example.com            # redirects to PROD_DOMAIN
+#   PROD_DOMAIN=app.example.com
+#   STAGE_DOMAIN=stage.app.example.com
+
+services:
+  proxy:
+    image: caddy:2-alpine
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - shared
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  shared:
+    name: "${PROXY_NETWORK:-app-shared}"
+    external: true

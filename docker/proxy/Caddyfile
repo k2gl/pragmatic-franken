@@ -1,0 +1,57 @@
+# Front proxy routing. Domains come from the proxy's .env (APEX_DOMAIN /
+# PROD_DOMAIN / STAGE_DOMAIN). Upstreams are the app containers' aliases on
+# the shared network (APP_ALIAS per environment, e.g. app-prod / app-stage).
+#
+# Caddy auto-provisions and renews TLS for every hostname via Let's Encrypt as
+# long as the A-records point here and ports 80/443 are reachable.
+
+# Security headers for every vhost. HSTS forces HTTPS in the browser, nosniff
+# kills MIME sniffing, DENY blocks <iframe> embedding (clickjacking),
+# Referrer-Policy keeps full URLs from leaking to third parties, -Server
+# removes the banner.
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+}
+
+# App-environment upstream. Dynamic alias resolution (not a static upstream):
+# during a zero-downtime deploy (blue-green, ops/rollout.sh) TWO containers
+# briefly live behind the alias — Caddy re-resolves the A-records every
+# `refresh` and balances across both; lb_try_* instantly moves a request from
+# the dying old container to the new one, fail_duration drops the dead one
+# from rotation. resolvers — Docker's built-in DNS (127.0.0.11). The argument
+# is the container alias on the shared network.
+(app_upstream) {
+	reverse_proxy {
+		dynamic a {
+			name {args[0]}
+			port 80
+			refresh 2s
+			resolvers 127.0.0.11
+		}
+		lb_policy round_robin
+		lb_try_duration 5s
+		lb_try_interval 250ms
+		fail_duration 10s
+	}
+}
+
+# Apex redirects to the prod domain.
+{$APEX_DOMAIN} {
+	redir https://{$PROD_DOMAIN}{uri} permanent
+}
+
+{$PROD_DOMAIN} {
+	import security_headers
+	import app_upstream app-prod
+}
+
+{$STAGE_DOMAIN} {
+	import security_headers
+	import app_upstream app-stage
+}

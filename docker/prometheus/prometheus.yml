@@ -7,16 +7,9 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+  # Caddy/FrankenPHP metrics from the admin endpoint (compose network only).
   - job_name: 'frankenphp'
     static_configs:
-      - targets: ['app:80']
+      - targets: ['app:2019']
     metrics_path: '/metrics'
     scrape_interval: 5s
-
-  - job_name: 'postgres'
-    static_configs:
-      - targets: ['db:5432']
-
-  - job_name: 'redis'
-    static_configs:
-      - targets: ['redis:6379']

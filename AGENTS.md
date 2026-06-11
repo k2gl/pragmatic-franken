@@ -88,7 +88,7 @@ FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless 
 
 ## Testing
 
-Pyramid 60 / 30 / 10 (unit / integration / e2e). Recommended coverage targets (fork policy, not a CI gate): Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 %. Layout mirrors `src/` at `tests/Context/{Name}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See ADR-0008, `docs/guides/testing.md`.
+Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % statement-coverage floor; per-layer targets (Domain ≥ 90 % …) are fork policy — see ADR-0008. Layout mirrors `src/` at `tests/Context/{Name}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See `docs/guides/testing.md`.
 
 ## Pitfalls
 
@@ -123,6 +123,9 @@ Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.l
 | `docs/guides/worker-mode.md` | debugging FrankenPHP worker behavior |
 | `docs/guides/mercure-integration.md` | real-time SSE via Mercure; publishing and subscribing |
 | `docs/guides/sdk-generation.md` | generating TypeScript types from Result DTOs |
+| `docs/guides/deployment.md` | deploying to a VDS, rollout, proxy topology |
+| `docs/guides/disaster-recovery.md` | backups, restore drill |
+| `docs/guides/parallel-sessions.md` | parallel isolated dev stacks (worktree forks) |
 
 ADR-0003 is the umbrella *Pragmatism Charter* — load it whenever you're tempted to add an extra layer or interface, or when deciding whether the Message Bus is overkill for a CRUD case.
 

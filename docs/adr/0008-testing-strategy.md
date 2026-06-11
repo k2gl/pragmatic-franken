@@ -6,12 +6,12 @@ date: 2026-04-27
 supersedes: []
 superseded_by: []
 audience: both
-summary: "PHPUnit 11 with mirror-of-src test layout; pyramid 60/30/10 (unit/integration/e2e); coverage thresholds Domain 90 / Application 80 / Infrastructure 60 / UI 40."
+summary: "PHPUnit 11 with mirror-of-src test layout; pyramid 60/30/10 (unit/integration/e2e); CI enforces a global 60% statement-coverage floor (dev/check-coverage.php); per-layer targets are recommended fork policy."
 ---
 
 # ADR-0008: Testing Strategy
 
-**TL;DR:** PHPUnit 11 is the test framework. Tests mirror `src/` one-to-one. Test type is encoded by the base class plus a `#[Group]` attribute, not by a top-level directory. Coverage gates are enforced per layer (Domain 90 / Application 80 / Infrastructure 60 / UI 40).
+**TL;DR:** PHPUnit 11 is the test framework. Tests mirror `src/` one-to-one. Test type is encoded by the base class plus a `#[Group]` attribute, not by a top-level directory. CI enforces one global coverage floor — 60 % of statements (`dev/check-coverage.php`, clover report); the per-layer targets below are recommended fork policy, not a CI gate.
 
 ## Context
 
@@ -22,7 +22,7 @@ Choosing a testing strategy for a PHP/Symfony/FrankenPHP project affects develop
 1. **Framework: PHPUnit 11.** Mature, deeply integrated with Symfony Test framework, abundant AI training data, full PHPStan compatibility. Pest is rejected for this boilerplate (less AI training data, extra plugin layer with Symfony).
 2. **Layout: mirror of `src/`** at `tests/{Context}/Features/{Feature}/`. Test *type* is communicated via the base class (`UnitTestCase` / `IntegrationTestCase` / `ApiTestCase`) and PHPUnit `#[Group]` attribute (`unit` / `integration` / `e2e`).
 3. **Pyramid: 60 / 30 / 10** (unit / integration / e2e). Most logic is exercised in cheap unit tests; integration covers persistence, Messenger, and external adapters; e2e validates HTTP contracts.
-4. **Coverage thresholds** (enforced in CI):
+4. **Coverage targets** (global 60 % floor enforced in CI; per-layer values are recommended fork policy):
 
 | Layer | Path glob | Minimum line coverage |
 |---|---|---|
@@ -65,7 +65,7 @@ Concrete examples live in `docs/guides/testing.md` (this ADR is the source of tr
 ### Negative
 
 - Test runners that filter only by directory cannot select "all unit tests" in one shot — must use `--group=unit`. Mitigated by Make targets.
-- Coverage thresholds require collector configuration in `phpunit.xml`. Initial setup cost.
+- The global floor needs a coverage driver in CI (pcov) and a clover report; per-layer gating is left to forks that want it.
 
 ## References
 

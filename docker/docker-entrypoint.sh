@@ -21,6 +21,14 @@ case "$1" in
         curl -fsS "http://localhost/ready" >/dev/null || exit 1
         exit 0
         ;;
+    worker)
+        # Background Messenger consumer (compose.prod.yml `worker` service).
+        # time-limit recycles the process hourly; restart: always re-runs it.
+        # WorkerHeartbeatListener refreshes the healthcheck marker every loop.
+        wait_for_database
+        echo "[entrypoint] Starting Messenger worker..."
+        exec php bin/console messenger:consume async --no-interaction --time-limit=3600 --memory-limit=256M
+        ;;
 esac
 
 # The Caddy mercure block refuses an empty key even when real-time features

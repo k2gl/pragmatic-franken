@@ -1,0 +1,177 @@
+# Production / staging compose. One file drives both environments; the
+# differences (project name, domain alias, secrets) come from an env file
+# selected at deploy time: `--env-file .env.stage` or `--env-file .env.prod`.
+#
+#   docker compose -f docker/compose.prod.yml --env-file .env.prod build
+#   docker compose -f docker/compose.prod.yml --env-file .env.prod up -d
+#
+# COMPOSE_PROJECT_NAME (from the env file) namespaces containers and volumes,
+# so stage and prod are fully isolated on a single host. The app joins the
+# external shared network under ${APP_ALIAS} so the front proxy can route by
+# hostname. db/redis stay private (no published ports).
+
+# Container log rotation: without limits json-file grows unbounded and fills
+# the single disk (disk-full takes down Postgres and the host).
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "20m"
+    max-file: "5"
+
+# Baseline hardening for every service: no-new-privileges blocks privilege
+# escalation through setuid binaries after an RCE. (Full non-root —
+# USER/cap_drop/read_only — is a separate exercise: permission/port risks.)
+x-hardening: &hardening
+  security_opt:
+    - "no-new-privileges:true"
+
+services:
+  app:
+    <<: *hardening
+    build:
+      context: ..
+      dockerfile: ./docker/frankenphp/Dockerfile
+      target: php_prod
+    restart: always
+    logging: *default-logging
+    # Caps keep one environment inside its lane: a leak in stage must not
+    # OOM-kill prod (both share the host). Generous — tighten from metrics.
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1024M
+          pids: 512
+    environment: &app-environment
+      APP_ENV: prod
+      APP_DEBUG: "0"
+      APP_SECRET: "${APP_SECRET}"
+      DATABASE_URL: "postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-app}?serverVersion=17&charset=utf8"
+      REDIS_URL: "redis://redis:6379"
+      MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=true"
+      # The prod image has an empty .env — config comes from real env vars.
+      MERCURE_URL: "http://localhost:3000/.well-known/mercure"
+      MERCURE_PUBLIC_URL: "${MERCURE_PUBLIC_URL:-}"
+      MERCURE_JWT_SECRET: "${MERCURE_JWT_SECRET:-}"
+      # Behind the front proxy Symfony must trust X-Forwarded-* only from it,
+      # otherwise REMOTE_ADDR is the proxy IP for every client.
+      TRUSTED_PROXIES: "${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}"
+      # The front proxy owns TLS; the app serves plain :80 on the shared net.
+      SERVER_NAME: ":80"
+      FRANKENPHP_CONFIG: "worker ./public/index.php"
+      FRANKENPHP_LOOP_MAX: "${FRANKENPHP_LOOP_MAX:-500}"
+      CADDY_GLOBAL_OPTIONS: |
+        auto_https off
+        admin off
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "docker-entrypoint", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      default: {}
+      shared:
+        aliases:
+          - "${APP_ALIAS}"
+
+  db:
+    <<: *hardening
+    image: postgres:17-alpine
+    restart: always
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+          pids: 512
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-app}"
+      POSTGRES_USER: "${POSTGRES_USER:-app}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - default
+
+  redis:
+    <<: *hardening
+    image: redis:7-alpine
+    restart: always
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          pids: 512
+    # maxmemory caps growth; volatile-lru evicts ONLY keys with a TTL (cache),
+    # so durable keys without TTL survive.
+    command:
+      - "redis-server"
+      - "--maxmemory"
+      - "384mb"
+      - "--maxmemory-policy"
+      - "volatile-lru"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  # Background Messenger consumer (Doctrine transport — no ext-redis needed).
+  # Same image as app; the `worker` entrypoint command waits for the DB and
+  # runs messenger:consume. Migrations/cache are the app container's job.
+  worker:
+    <<: *hardening
+    build:
+      context: ..
+      dockerfile: ./docker/frankenphp/Dockerfile
+      target: php_prod
+    restart: always
+    command: ["worker"]
+    logging: *default-logging
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          pids: 256
+    environment: *app-environment
+    depends_on:
+      db:
+        condition: service_healthy
+    # Messenger worker heartbeat (WorkerHeartbeatListener touches the marker on
+    # every loop iteration): freshness < 15 min covers one long message. The
+    # image-inherited check would probe Caddy (:2019), which isn't here.
+    healthcheck:
+      test: ["CMD-SHELL", "find /tmp/worker-heartbeat -mmin -15 | grep -q ."]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+    networks:
+      - default
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  default:
+  shared:
+    name: "${PROXY_NETWORK:-app-shared}"
+    external: true

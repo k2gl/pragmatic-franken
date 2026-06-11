@@ -102,6 +102,9 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 - [`docs/guides/worker-mode.md`](docs/guides/worker-mode.md) — debugging FrankenPHP worker behavior
 - [`docs/guides/mercure-integration.md`](docs/guides/mercure-integration.md) — real-time SSE via FrankenPHP's built-in Mercure hub
 - [`docs/guides/sdk-generation.md`](docs/guides/sdk-generation.md) — auto-generate TypeScript types from PHP Result DTOs
+- [`docs/guides/deployment.md`](docs/guides/deployment.md) — single-VDS topology, zero-downtime rollout
+- [`docs/guides/disaster-recovery.md`](docs/guides/disaster-recovery.md) — backups and the restore drill
+- [`docs/guides/parallel-sessions.md`](docs/guides/parallel-sessions.md) — isolated worktree stacks for parallel agents
 - [`docs/roadmap.md`](docs/roadmap.md) — roadmap
 
 ## AI agents
