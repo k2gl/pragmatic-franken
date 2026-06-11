@@ -25,7 +25,7 @@ The repository previously held AI instructions in **four** places: root (`AGENTS
 |---|---|---|---|
 | **1** | `/AGENTS.md` (≤ 200 lines, ≤ 2 000 tokens, ≤ 8 KB) | every AI tool, every developer | always loaded |
 | **2** | `docs/adr/*.md`, `docs/guides/*.md` | agents on demand, devs on demand | lazy, by `summary` front-matter or `audience` filter |
-| **3** | `README.md`, `docs/roadmap.md`, `docs/performance.md`, `docs/screenshots/` | humans | not loaded by agents by default |
+| **3** | `README.md`, `docs/roadmap.md` | humans | not loaded by agents by default |
 
 ### Required front-matter for Tier 2
 
