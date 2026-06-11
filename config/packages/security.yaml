@@ -1,17 +1,8 @@
-# Security Configuration for FrankenPHP
-
+# The skeleton ships no authentication on purpose: session vs JWT vs OAuth is
+# a product decision. Everything is public; add a user provider, an
+# authenticator and access_control rules when your project grows auth
+# (JWT setup proven in production: docs/recipes/jwt-auth.md).
 security:
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-            algorithm: 'auto'
-            cost: 12
-
-    providers:
-        app_user_provider:
-            entity:
-                class: App\User\Entity\User
-                property: email
-
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -19,10 +10,3 @@ security:
 
         main:
             lazy: true
-            provider: app_user_provider
-            logout:
-                path: app_logout
-
-    access_control:
-        - { path: ^/api/health, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
