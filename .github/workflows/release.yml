@@ -1,0 +1,118 @@
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app -d app"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build candidate image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frankenphp/Dockerfile
+          target: php_prod
+          load: true
+          tags: app:candidate
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Boot candidate and probe /ready
+        run: |
+          docker run -d --name candidate --network host \
+            -e SERVER_NAME=:8080 \
+            -e DATABASE_URL="postgresql://app:app_password@127.0.0.1:5432/app?serverVersion=17&charset=utf8" \
+            -e REDIS_URL=redis://127.0.0.1:6379 \
+            -e MESSENGER_TRANSPORT_DSN=redis://127.0.0.1:6379/messages \
+            -e APP_SECRET=release-check-secret \
+            -e MERCURE_URL=http://localhost:3000/.well-known/mercure \
+            -e MERCURE_PUBLIC_URL=http://localhost:3000/.well-known/mercure \
+            -e MERCURE_JWT_SECRET=release-check-mercure \
+            app:candidate
+          ok=""
+          for i in $(seq 1 30); do
+            if docker exec candidate curl -fsS http://localhost:8080/ready | grep -q '"ok":true'; then
+              echo "ready OK"
+              ok=1
+              break
+            fi
+            sleep 2
+          done
+          if [ -z "$ok" ]; then
+            echo "::error::candidate image failed to serve /ready"
+            docker logs candidate
+            exit 1
+          fi
+          docker rm -f candidate
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=
+            type=semver,pattern={{version}}
+
+      - name: Push image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frankenphp/Dockerfile
+          target: php_prod
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha

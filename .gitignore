@@ -39,3 +39,4 @@ node_modules/
 # AI Agents
 AGENTS.local.md
 
+docs/openapi.yaml

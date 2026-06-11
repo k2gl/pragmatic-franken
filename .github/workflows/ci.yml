@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  checks: write
 
 jobs:
   quality:
@@ -18,13 +17,13 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_DB: app_db
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app_password
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U user -d app_db"
+          --health-cmd "pg_isready -U app -d app"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
@@ -40,7 +39,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://user:password@127.0.0.1:5432/app_db?serverVersion=17&charset=utf8
+      DATABASE_URL: postgresql://app:app_password@127.0.0.1:5432/app?serverVersion=17&charset=utf8
       REDIS_URL: redis://127.0.0.1:6379
       MESSENGER_TRANSPORT_DSN: redis://127.0.0.1:6379/messages
       APP_ENV: test
@@ -61,25 +60,133 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql
           coverage: none
 
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-publish
+
       - name: Install dependencies
         run: composer install --no-interaction --no-scripts --prefer-dist --optimize-autoloader
+
+      - name: Dependency audit
+        run: composer audit
 
       - name: Smoke check (bin/console boots)
         run: php bin/console list >/dev/null
 
-      - name: Docs lint (ADR front-matter, AGENTS.md budget)
+      - name: Docs lint (ADR front-matter, AGENTS.md budget, doc claims)
         run: ./dev/check-docs.sh
 
       - name: Code style (Pint)
-        run: vendor/bin/pint --test
+        run: composer lint
 
       - name: Static analysis (PHPStan level 10)
-        run: vendor/bin/phpstan analyze --level=10
+        run: composer analyze
+
+      - name: OpenAPI spec generates
+        run: php bin/console nelmio:api-doc:dump --format=yaml > /dev/null
 
       - name: Prepare test database
         run: |
-          php bin/console doctrine:database:create --env=test --if-not-exists || true
-          php bin/console doctrine:migrations:migrate --no-interaction --env=test || true
+          php bin/console doctrine:database:create --env=test --if-not-exists
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test --allow-no-migration
 
       - name: Tests
         run: vendor/bin/phpunit --stop-on-failure
+
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  prod-image:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app -d app"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build php_prod image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frankenphp/Dockerfile
+          target: php_prod
+          load: true
+          tags: app:prod-ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Boot prod image and probe /ready
+        run: |
+          docker run -d --name prod --network host \
+            -e SERVER_NAME=:8080 \
+            -e DATABASE_URL="postgresql://app:app_password@127.0.0.1:5432/app?serverVersion=17&charset=utf8" \
+            -e REDIS_URL=redis://127.0.0.1:6379 \
+            -e MESSENGER_TRANSPORT_DSN=redis://127.0.0.1:6379/messages \
+            -e APP_SECRET=ci-prod-secret \
+            -e MERCURE_URL=http://localhost:3000/.well-known/mercure \
+            -e MERCURE_PUBLIC_URL=http://localhost:3000/.well-known/mercure \
+            -e MERCURE_JWT_SECRET=ci-mercure-secret \
+            app:prod-ci
+          ok=""
+          for i in $(seq 1 30); do
+            if docker exec prod curl -fsS http://localhost:8080/ready | grep -q '"ok":true'; then
+              echo "ready OK"
+              ok=1
+              break
+            fi
+            sleep 2
+          done
+          if [ -z "$ok" ]; then
+            echo "::error::prod image failed to serve /ready"
+            docker logs prod
+            exit 1
+          fi
+          docker exec prod php bin/console about
+
+      - name: Container security scan (Trivy)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: 'app:prod-ci'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      - name: docker-compose config is valid
+        run: docker compose config -q
