@@ -155,20 +155,22 @@ docker stats frankenphp
 
 ### Restart Strategies
 
-In `docker-compose.yml`:
+Worker recycling is driven by symfony/runtime (see ADR-0006):
 
 ```yaml
 environment:
-  PHP_MEMORY_LIMIT: 128M
-  PHP_MAX_REQUESTS: 500  # Restart after 500 requests
-  FRANKENPHP_MAX_JOBS: 8     # Max concurrent workers
+  FRANKENPHP_LOOP_MAX: 500       # worker exits after N requests (default 500)
+  FRANKENPHP_RESET_KERNEL: "1"   # optional: clone the kernel per request
 ```
 
-### When to Reset
+`memory_limit` and OPcache settings live in `docker/php/prod-optimizations.ini`,
+not in env vars.
 
-- **High traffic APIs**: Reset every 100-500 requests
-- **Background workers**: Reset on job completion
-- **CLI scripts**: Usually not needed (single execution)
+### When to Recycle
+
+- **High traffic APIs**: keep the default 500, lower it if memory grows between recycles
+- **Leak-free, hot paths**: raise `FRANKENPHP_LOOP_MAX` for maximum throughput
+- **CLI scripts**: not applicable (single execution)
 
 ---
 

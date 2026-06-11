@@ -27,7 +27,6 @@ make slice context=Foo feature=Bar  # scaffold a new slice
 ```
 src/
   Kernel.php                            # App\Kernel
-  Shared/                               # global infra (Bus, Persistence, base exceptions) — empty until needed
   {Context}/
     Features/{Feature}/
       Domain/                           # entities, value objects, domain events (optional)
@@ -82,11 +81,11 @@ src/User/Features/Register/
 
 ## Runtime mode
 
-FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless handlers only. Configure via `.env` (`FRANKENPHP_MAX_JOBS`, `PHP_MAX_REQUESTS`, `PHP_MEMORY_LIMIT`). Health probes at `/healthz` (liveness) and `/ready` (readiness). See ADR-0004, ADR-0005, `docs/guides/worker-mode.md`.
+FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless handlers only. Worker command comes from the `FRANKENPHP_CONFIG` env (compose / Dockerfile); PHP limits live in `docker/php/*.ini`. Health probes at `/healthz` (liveness) and `/ready` (readiness). See ADR-0004, ADR-0005, `docs/guides/worker-mode.md`.
 
 ## Testing
 
-Pyramid 60 / 30 / 10 (unit / integration / e2e). Coverage thresholds: Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 % — enforced in CI. Layout mirrors `src/` at `tests/{Context}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See ADR-0008, `docs/guides/testing.md`.
+Pyramid 60 / 30 / 10 (unit / integration / e2e). Recommended coverage targets (fork policy, not a CI gate): Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 %. Layout mirrors `src/` at `tests/{Context}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See ADR-0008, `docs/guides/testing.md`.
 
 ## Pitfalls
 

@@ -6,170 +6,54 @@ date: 2026-02-05
 supersedes: []
 superseded_by: []
 audience: both
-summary: "Standardized HTTP probes: /healthz (liveness), /ready (readiness with DB+Redis pings), /metrics (Prometheus). Reference implementation lives in src/Health/Features/Healthz/."
+summary: "Standardized HTTP probes: /healthz (liveness, no dependency calls) and /ready (readiness with DB+Redis pings). Reference implementation lives in src/Health/Features/Healthz/."
 ---
 
 # ADR-0005: Health Checks
 
-**TL;DR:** Three endpoints — `/healthz` (process is alive), `/ready` (dependencies reachable), `/metrics` (Prometheus). The reference slice in `src/Health/Features/Healthz/` is the canonical implementation pattern.
-
-## Decision
-
-Implement standardized health checks for Docker and Kubernetes deployments.
+**TL;DR:** Two endpoints — `/healthz` (process is alive, no dependency calls) and `/ready` (dependencies reachable). The reference slice in `src/Health/Features/Healthz/` is the canonical implementation pattern.
 
 ## Context
 
 Production environments require health endpoints to:
-- Verify application readiness
+- Verify application readiness before routing traffic
 - Detect dependency failures (DB, Redis)
-- Enable rolling deployments
-- Support Kubernetes liveness/readiness probes
+- Enable rolling deployments with health gates
+- Map cleanly onto Kubernetes-style liveness/readiness semantics
 
-## Implementation
+Mixing the two probes is the classic failure mode: if liveness checks dependencies, a DB outage restart-loops every app container and makes the outage worse.
 
-### PHP Health Endpoint
+## Decision
 
-```php
-// src/Health/Features/HealthCheck/HealthCheckController.php
-declare(strict_types=1);
+| Endpoint | Purpose | Body |
+|----------|---------|------|
+| `/healthz` | Liveness — the worker responds at all. Never calls dependencies. | `{"ok": true}` |
+| `/ready` | Readiness — dependencies reachable. Pings DB and Redis. | `{"ok": bool, "db": bool, "redis": bool}` + 503 when degraded |
 
-namespace App\Health\Features\HealthCheck;
+Both live in one slice — `src/Health/Features/Healthz/` — because they are facets of a single health feature:
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Attribute\Route;
+- `EntryPoint/Http/HealthzController.php` — both routes.
+- `Application/CheckHealthQuery.php` + `CheckHealthHandler.php` + `HealthStatus.php` — CQRS query for readiness.
+- `Infrastructure/DbPing.php`, `RedisPing.php` (+ interfaces) — the actual pings; interfaces exist so tests substitute them.
 
-final readonly class HealthCheckController
-{
-    #[Route('/healthz', methods: ['GET'])]
-    public function __invoke(): JsonResponse
-    {
-        return $this->json([
-            'status' => 'healthy',
-            'timestamp' => date('c'),
-        ]);
-    }
-}
-```
+## Who probes what
 
-### Detailed Health Check
+- **docker-compose (dev)**: container healthcheck hits `/ready` — compose only reports health and gates `depends_on`, it never restart-loops on unhealthy, so the richer signal is safe.
+- **`docker-entrypoint.sh healthcheck`** (prod image): hits `/ready` for the same reason; deployment tooling (`ops/rollout.sh`) gates traffic switches on it.
+- **CI**: the `prod-image` job boots the real image and asserts `/ready` returns `"ok":true` — the strongest end-to-end claim the template makes.
+- **Kubernetes** (if you deploy there): map `livenessProbe` → `/healthz`, `readinessProbe`/`startupProbe` → `/ready`. The endpoints were named for exactly this mapping.
 
-```php
-// src/Health/Infrastructure/HealthChecker.php
-declare(strict_types=1);
-
-namespace App\Health\Infrastructure;
-
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
-
-final readonly class HealthChecker
-{
-    public function __construct(
-        private EntityManagerInterface $em,
-        private MessageBusInterface $bus,
-    ) {}
-
-    public function check(): array
-    {
-        $checks = [
-            'database' => $this->checkDatabase(),
-            'messenger' => $this->checkMessenger(),
-        ];
-
-        $status = collect($checks)->every(fn($c) => $c['status'] === 'ok')
-            ? 'healthy'
-            : 'degraded';
-
-        return [
-            'status' => $status,
-            'checks' => $checks,
-            'timestamp' => date('c'),
-        ];
-    }
-
-    private function checkDatabase(): array
-    {
-        try {
-            $this->em->getConnection()->executeQuery('SELECT 1');
-            return ['status' => 'ok'];
-        } catch (\Exception $e) {
-            return ['status' => 'error', 'message' => $e->getMessage()];
-        }
-    }
-
-    private function checkMessenger(): array
-    {
-        try {
-            // Simple check - dispatch a test message
-            return ['status' => 'ok'];
-        } catch (\Exception $e) {
-            return ['status' => 'error', 'message' => $e->getMessage()];
-        }
-    }
-}
-```
-
-### Kubernetes Probe Configuration
-
-```yaml
-# kubernetes/deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-spec:
-  template:
-    spec:
-      containers:
-        - name: app
-          image: ghcr.io/k2gl/pragmatic-franken:latest
-          ports:
-            - containerPort: 443
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 443
-            initialDelaySeconds: 10
-            periodSeconds: 30
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: 443
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          startupProbe:
-            httpGet:
-              path: /healthz
-              port: 443
-            initialDelaySeconds: 0
-            periodSeconds: 5
-            failureThreshold: 30
-```
-
-### Docker Health Check
-
-```dockerfile
-# docker/frankenphp/Dockerfile
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:443/healthz || exit 1
-```
-
-## Health Check Endpoints
-
-| Endpoint | Purpose | Timeouts |
-|----------|---------|----------|
-| `/healthz` | Liveness - is app running? | Fast |
-| `/ready` | Readiness - is app ready to serve? | May include DB check |
-| `/metrics` | Prometheus metrics | N/A |
+Caddy metrics (Prometheus) are separate from app health: the admin endpoint inside the container serves them — `make stats`. See `docs/guides/worker-mode.md`.
 
 ## Consequences
 
 ### Positive
 
-- **Kubernetes Integration**: Proper rolling updates
-- **Failure Detection**: Quick detection of broken deployments
-- **Observability**: Standardized health metrics
+- **No restart loops**: liveness stays green during dependency outages; readiness takes the instance out of rotation instead.
+- **Deploy gates for free**: anything that can `curl /ready` can gate a rollout.
+- **Test substitution**: ping interfaces let unit tests simulate degraded states.
 
 ### Negative
 
-- **Overhead**: Detailed checks add latency
-- **Complexity**: Multiple health levels to manage
+- **Two endpoints to keep honest** — `dev/check-docs.sh` verifies both routes exist in `src/`.
+- `/ready` adds a DB+Redis round-trip per probe; keep probe intervals ≥ 10s.

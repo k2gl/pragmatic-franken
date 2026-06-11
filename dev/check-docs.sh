@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-# Lints documentation invariants:
+# Lints documentation invariants — docs must match reality:
 # - Every ADR has YAML front-matter with id/title/status/date/audience/summary.
 # - No broken ADR-XXXX references in markdown files.
 # - AGENTS.md fits the Tier-1 budget (≤ 8 KB, ≤ ~2000 tokens at 4 chars/token).
+# - Every `make <target>` mentioned in AGENTS.md/README exists in the Makefile.
+# - Routes claimed in AGENTS.md exist as #[Route] attributes in src/.
+# - README ADR table is in sync with docs/adr/*.
+# - Files referenced from AGENTS.md exist.
 
 set -euo pipefail
 
@@ -50,6 +54,41 @@ if [[ -f AGENTS.md ]]; then
     fi
     echo "AGENTS.md: ${bytes} bytes, ~${approx_tokens} tokens"
 fi
+
+# 4. `make <target>` claims in AGENTS.md / README.md must exist in the Makefile
+while IFS= read -r target; do
+    case "$target" in it|sure|sense|a|an|the) continue ;; esac  # prose, not targets
+    if ! grep -qE "^${target}:" Makefile; then
+        fail "Documented 'make ${target}' has no Makefile target"
+    fi
+done < <(grep -rhoE 'make [a-z][a-z0-9-]*' AGENTS.md README.md | awk '{print $2}' | sort -u)
+
+# 5. Health-probe routes claimed in AGENTS.md must exist in src/
+for route in /healthz /ready; do
+    if grep -q "${route}" AGENTS.md && ! grep -rq "Route('${route}'" src/; then
+        fail "AGENTS.md claims route '${route}' but no #[Route('${route}')] exists in src/"
+    fi
+done
+
+# 6. README ADR table ↔ docs/adr/* sync
+for adr in docs/adr/*.md; do
+    [[ -e "$adr" ]] || continue
+    if ! grep -q "$(basename "$adr")" README.md; then
+        fail "README.md ADR table is missing $(basename "$adr")"
+    fi
+done
+while IFS= read -r ref; do
+    if [[ ! -e "$ref" ]]; then
+        fail "README.md links missing ADR file '$ref'"
+    fi
+done < <(grep -oE 'docs/adr/[0-9]{4}[a-z0-9-]*\.md' README.md | sort -u)
+
+# 7. Files referenced from AGENTS.md must exist
+while IFS= read -r f; do
+    if [[ ! -e "$f" ]]; then
+        fail "AGENTS.md references missing file '$f'"
+    fi
+done < <(grep -oE 'docs/(adr|guides|recipes)/[A-Za-z0-9._-]+\.md' AGENTS.md | sort -u)
 
 if (( errors > 0 )); then
     echo "${errors} doc-check error(s)" >&2

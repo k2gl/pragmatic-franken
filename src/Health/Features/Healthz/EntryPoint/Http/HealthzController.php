@@ -12,6 +12,11 @@ use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Health probes per ADR-0005: /healthz is liveness (the process responds),
+ * /ready is readiness (dependencies reachable). Same slice on purpose —
+ * both are facets of one health feature.
+ */
 final class HealthzController
 {
     use HandleTrait;
@@ -22,7 +27,13 @@ final class HealthzController
     }
 
     #[Route('/healthz', name: 'app_healthz', methods: ['GET'])]
-    public function __invoke(): JsonResponse
+    public function healthz(): JsonResponse
+    {
+        return new JsonResponse(data: ['ok' => true]);
+    }
+
+    #[Route('/ready', name: 'app_ready', methods: ['GET'])]
+    public function ready(): JsonResponse
     {
         /** @var HealthStatus $status */
         $status = $this->handle(new CheckHealthQuery());

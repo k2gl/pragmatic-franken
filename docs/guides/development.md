@@ -19,7 +19,7 @@ summary: "Day-to-day development guide: setup, daily commands, slice scaffolding
 git clone https://github.com/k2gl/pragmatic-franken.git
 cd pragmatic-franken
 make install        # env-create + build + up + db-migrate
-make smoke          # confirms bin/console boots and /healthz responds
+make smoke          # confirms bin/console boots and /ready responds
 ```
 
 `make install` is idempotent: it creates `.env` from `.env.dist` (substituting your UID/GID), builds containers, brings them up, and runs Doctrine migrations.

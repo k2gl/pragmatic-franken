@@ -59,8 +59,8 @@ src/                              # application code
   Home/Features/Index/            # reference slice (Twig + AssetMapper, /)
 config/  bin/  public/  assets/
 docs/                             # ADRs and guides (Tier 2)
-  adr/                            # 10 ADRs with YAML front-matter
-  guides/{development,testing,worker-mode}.md
+  adr/                            # ADRs with YAML front-matter
+  guides/                         # development, testing, worker-mode, …
 dev/                              # codegen helpers (create-slice, new-adr, check-docs)
 ops/                              # deployment scripts
 tests/                            # mirrors src/ — tests/{Context}/Features/{Feature}/

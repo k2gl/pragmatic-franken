@@ -6,215 +6,68 @@ date: 2026-02-05
 supersedes: []
 superseded_by: []
 audience: both
-summary: "PHP memory_limit 512M, OPcache + JIT tuned for worker mode, FRANKENPHP_MAX_JOBS and PHP_MAX_REQUESTS bound worker recycling to bound memory growth."
+summary: "Worker recycling via FRANKENPHP_LOOP_MAX (symfony/runtime, default 500 requests), memory_limit 256M and OPcache tuned in docker/php/prod-optimizations.ini. Recycling bounds slow leaks; OPcache never revalidates inside an immutable image."
 ---
 
 # ADR-0006: Memory Management
 
-**TL;DR:** Worker processes recycle every `PHP_MAX_REQUESTS` requests; OPcache + JIT enabled in production; `memory_limit` 512M for AI workloads. Without recycling, slow leaks accumulate across the worker's lifetime.
-
-## Decision
-
-Configure PHP and FrankenPHP for optimal memory usage in production, especially for AI workloads.
+**TL;DR:** Worker processes recycle after `FRANKENPHP_LOOP_MAX` requests (default 500, enforced by symfony/runtime); `memory_limit` and OPcache live in `docker/php/prod-optimizations.ini`. Without recycling, slow leaks accumulate across the worker's lifetime.
 
 ## Context
 
-AI applications often require:
-- Large context windows (memory-intensive)
-- Long-running requests
-- Efficient garbage collection
-- Worker mode stability
+FrankenPHP worker mode keeps the Symfony kernel in memory between requests (ADR-0004). The price: any state that survives a request — static caches, leaked references, growing arrays — accumulates until the worker dies. Memory management is therefore about *bounding* growth, not eliminating it.
 
-## PHP Memory Configuration
+## Decision
 
-### php.ini Settings
+### Worker recycling (the real knob)
 
-```ini
-; Memory limit for AI workloads
-memory_limit = 512M
+`symfony/runtime` 8 drives the FrankenPHP worker loop natively (`FrankenPhpWorkerRunner`). Its knobs:
 
-; Increase for large inference requests
-max_execution_time = 300
+| Env var | Default | Effect |
+|---|---|---|
+| `FRANKENPHP_LOOP_MAX` | `500` | Worker exits after N requests; FrankenPHP starts a fresh one. Bounds slow leaks. |
+| `FRANKENPHP_RESET_KERNEL` | off | Clone the kernel after each request to mitigate cross-request state leaks (stronger isolation, small CPU cost). |
 
-; Optimize garbage collection
-zend.enable_gc = 1
-gc_max_lifetime = 600
+Lower `FRANKENPHP_LOOP_MAX` if memory grows visibly between recycles; raise it when handlers are proven leak-free and you want maximum throughput.
 
-; OPcache for production
-opcache.enable = 1
-opcache.enable_cli = 0
-opcache.memory_consumption = 256
-opcache.interned_strings_buffer = 32
-opcache.max_accelerated_files = 20000
-```
-
-### FrankenPHP Worker Mode
-
-```caddy
-# Caddyfile
-{
-    frankenphp {
-        worker {
-            file ./public/index.php
-            num 4
-            env PHP_MEMORY_LIMIT=512M
-        }
-    }
-}
-
-localhost {
-    root * public
-    php_server
-}
-```
-
-### Environment Variables
-
-```bash
-# .env.prod
-PHP_MEMORY_LIMIT=512M
-PHP_MAX_EXECUTION_TIME=300
-PHP_PM=dynamic
-PHP_PM_MAX_CHILDREN=16
-PHP_START_SERVERS=4
-```
-
-## Memory Optimization Strategies
-
-### 1. Streaming Responses for AI
-
-```php
-// Stream AI responses to reduce peak memory
-final readonly class StreamAiResponseAction
-{
-    public function __invoke(
-        GenerateContentMessage $message,
-        MessageBusInterface $bus,
-    ): Response {
-        return new StreamedResponse(function () use ($message, $bus) {
-            $result = $bus->dispatch($message);
-            foreach ($result->chunks() as $chunk) {
-                echo $chunk;
-                flush();
-            }
-        });
-    }
-}
-```
-
-### 2. Disable Xdebug in Production
-
-```dockerfile
-# docker/frankenphp/Dockerfile
-RUN if [ "$APP_ENV" = "prod" ]; then \
-    rm -f /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
-    fi
-```
-
-### 3. OPcache Configuration
+### PHP settings (shipped in `docker/php/prod-optimizations.ini`)
 
 ```ini
-; Validate timestamp hourly (not on every request)
-opcache.revalidate_freq = 3600
-
-; Enable file caching for generated files
-opcache.file_cache = /tmp/opcache
-
-; Disable save handlers that use memory
-opcache.save_comments = 0
+memory_limit=256M
+opcache.enable=1
+opcache.enable_cli=1
+opcache.memory_consumption=256
+opcache.interned_strings_buffer=32
+opcache.max_accelerated_files=20000
+opcache.validate_timestamps=0   ; code never changes inside a built image
+realpath_cache_size=4096K
+realpath_cache_ttl=600
 ```
 
-### 4. Garbage Collection Tuning
+Raise `memory_limit` per project by editing the ini — there is no env-var indirection on purpose: PHP ini values don't read the environment, and pretending otherwise is how dead config is born.
 
-```php
-// bootstrap.php
-if (PHP_ENV === 'prod') {
-    // Force GC run after every request with large memory usage
-    if (memory_get_usage(true) > 128 * 1024 * 1024) {
-        gc_collect_cycles();
-    }
-}
-```
+### Worker count
 
-## Container Memory Limits
+Thread/worker counts belong to the Caddy layer: the `frankenphp` global block in `docker/frankenphp/Caddyfile` (e.g. `num_threads`), or the worker line in `FRANKENPHP_CONFIG`. Defaults (2× CPU cores) are good until proven otherwise.
 
-### Docker Compose
+### Container limits
 
-```yaml
-services:
-  frankenphp:
-    build:
-      context: .
-      dockerfile: docker/frankenphp/Dockerfile
-    mem_limit: 1g
-    cpus: '2.0'
-    environment:
-      - PHP_MEMORY_LIMIT=512M
-```
+Memory caps are a deployment concern: set `mem_limit` (compose) on the host according to `workers × memory_limit + headroom`. The skeleton does not hardcode them.
 
-### Kubernetes Resource Limits
+## Rules for handler code
 
-```yaml
-# kubernetes/deployment.yaml
-resources:
-  requests:
-    memory: "512Mi"
-    cpu: "500m"
-  limits:
-    memory: "1Gi"
-    cpu: "2000m"
-```
-
-## Memory Monitoring
-
-### Prometheus Metrics
-
-```php
-// src/Shared/Infrastructure/Metrics/MemoryMetrics.php
-declare(strict_types=1);
-
-namespace App\Shared\Infrastructure\Metrics;
-
-final readonly class MemoryMetrics
-{
-    public function getMetrics(): array
-    {
-        return [
-            'php_memory_usage_bytes' => memory_get_usage(true),
-            'php_memory_peak_bytes' => memory_get_peak_usage(true),
-            'php_memory_limit_bytes' => $this->getMemoryLimit(),
-        ];
-    }
-
-    private function getMemoryLimit(): int
-    {
-        $limit = ini_get('memory_limit');
-        return match (true) {
-            str_ends_with($limit, 'G') => (int) ($limit) * 1024 * 1024 * 1024,
-            str_ends_with($limit, 'M') => (int) ($limit) * 1024 * 1024,
-            str_ends_with($limit, 'K') => (int) ($limit) * 1024,
-            default => (int) $limit,
-        };
-    }
-}
-```
+- No mutable static state (see ADR-0004). If unavoidable, reset it via `kernel.reset`.
+- Stream large responses (`StreamedResponse`) instead of buffering.
+- Watch `memory_get_peak_usage()` in `/metrics`-adjacent tooling when debugging (see `docs/guides/worker-mode.md`).
 
 ## Consequences
 
-### Positive
+**Positive:** leaks are bounded by recycling; OPcache fully warm for a worker's whole life; one file (`prod-optimizations.ini`) owns the numbers.
 
-- **Stable Workers**: No OOM crashes in long-running processes
-- **Predictable Performance**: Consistent memory usage
-- **Cost Efficiency**: Right-sized containers
-
-### Negative
-
-- **Configuration Complexity**: Multiple layers to configure
-- **Debugging Difficulty**: Harder to diagnose memory issues
-- **Trade-offs**: More memory = higher costs
+**Negative:** a worker's first request after recycling pays kernel boot again; misconfigured `FRANKENPHP_LOOP_MAX=0` (never recycle) turns any slow leak into an OOM.
 
 ## References
 
 - [FrankenPHP Worker Mode](https://frankenphp.dev/docs/worker-mode/)
-- [PHP Memory Management](https://www.php.net/manual/en/book.memory.php)
-- [Kubernetes Resource Management](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+- `vendor/symfony/runtime/Runner/FrankenPhpWorkerRunner.php` — the actual loop.
+- ADR-0004 — FrankenPHP runtime.
