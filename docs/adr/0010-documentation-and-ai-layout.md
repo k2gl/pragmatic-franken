@@ -53,6 +53,10 @@ summary: "≤300 character one-liner suitable for skimming without loading the b
 - **Per-IDE rule files** (`.cursorrules`, `.windsurfrules`, `.cursor/rules/*`, etc.). Every actively-developed AI tool resolves `AGENTS.md` either by direct convention (Cursor 0.45+, Claude Code, OpenAI Codex CLI, Aider, Codeium, Cline) or by being pointed at it. If a contributor's tool refuses, they create a local symlink and gitignore it. We will not duplicate.
 - **Per-tool prompt directories** (`prompts/`, `.config/agents/`, `SYSTEM_PROMPT.md`). The contents that are still load-bearing live in `AGENTS.md`; the rest is removed.
 
+### Carve-out: tool configuration is not context
+
+The single-source rule targets *context/prompt duplication* — knowledge that can drift. Tool **configuration** carries no architectural knowledge and is allowed, like `.editorconfig`: the repo ships `.claude/settings.json` (a shared command allowlist that reduces permission friction for Claude Code users). Machine-local variants (`.claude/settings.local.json`, `AGENTS.local.md`) stay gitignored.
+
 ### Rename of `scripts/`
 
 Codegen and developer helpers move to `dev/`; deployment scripts move to `ops/`. `bin/` stays for Symfony binaries (`bin/console`).
