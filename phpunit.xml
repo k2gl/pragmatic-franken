@@ -34,9 +34,9 @@
         <env name="APP_ENV" value="test" force="true"/>
         <env name="KERNEL_CLASS" value="App\Kernel"/>
         <!--
-            DATABASE_URL — from .env.test (sqlite by default for fast unit tests).
-                           Override per-run with: DATABASE_URL=postgres://... vendor/bin/phpunit
-            REDIS_URL, MESSENGER_TRANSPORT_DSN — from system env (container / CI).
+            DATABASE_URL — inherited from .env / real env (PostgreSQL); Doctrine
+                           appends the "_test" dbname suffix in the test env.
+            REDIS_URL, MESSENGER_TRANSPORT_DSN — from .env / real env.
         -->
     </php>
 </phpunit>

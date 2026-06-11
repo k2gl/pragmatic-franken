@@ -21,3 +21,10 @@ doctrine:
             #     dir: '%kernel.project_dir%/src/User/Entity'
             #     prefix: 'App\User\Entity'
             #     alias: User
+
+when@test:
+    doctrine:
+        dbal:
+            # Same PostgreSQL server, dedicated database: "app" → "app_test".
+            # No sqlite split — tests run against the engine that ships to prod.
+            dbname_suffix: '_test'

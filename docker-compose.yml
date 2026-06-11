@@ -22,32 +22,32 @@ services:
         protocol: tcp
     volumes:
       - ./:/app:cached
+      - ./docker/frankenphp/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     environment:
+      # Caddy / FrankenPHP process-level settings only. Application config
+      # (DATABASE_URL, APP_SECRET, …) is NOT duplicated here — Symfony reads it
+      # from the mounted .env via symfony/dotenv. Single source of truth.
       SERVER_NAME: "${SERVER_NAME:-localhost}"
-      APP_SECRET: "${APP_SECRET:-change-me-in-production}"
-      DATABASE_URL: "postgres://user:password@db:5432/app_db?serverVersion=17&charset=utf8"
-      REDIS_URL: "redis://redis:6379"
-      MESSENGER_TRANSPORT_DSN: "redis://redis:6379/messages"
-      PHP_INI_SCAN_DIR: ":/usr/local/etc/php/conf.d"
-      XDEBUG_MODE: "${XDEBUG_MODE:-off}"
-      XDEBUG_CLIENT_HOST: "host.docker.internal"
-      XDEBUG_START_WITH_REQUEST: "yes"
       FRANKENPHP_CONFIG: "worker ./public/index.php"
       CADDY_GLOBAL_OPTIONS: |
         metrics
-      SCHEDULER_ENABLED: "${SCHEDULER_ENABLED:-false}"
-      FRANKENPHP_MAX_JOBS: "${FRANKENPHP_MAX_JOBS:-8}"
-      PHP_MAX_REQUESTS: "${PHP_MAX_REQUESTS:-500}"
-      PHP_MEMORY_LIMIT: "${PHP_MEMORY_LIMIT:-128M}"
+      # Consumed by the Caddy mercure block (process env, not dotenv-readable).
+      MERCURE_JWT_SECRET: "${MERCURE_JWT_SECRET:-!ChangeMe!}"
+      XDEBUG_MODE: "${XDEBUG_MODE:-off}"
+      XDEBUG_CLIENT_HOST: "host.docker.internal"
+      XDEBUG_START_WITH_REQUEST: "yes"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost/healthz"]
+      # /ready = dependencies reachable (ADR-0005). Caddy serves the named
+      # SERVER_NAME site with an HTTP→HTTPS redirect, so probe HTTPS directly;
+      # --resolve pins the hostname to the loopback.
+      test: ["CMD-SHELL", "curl -fsS -k --resolve ${SERVER_NAME:-localhost}:443:127.0.0.1 https://${SERVER_NAME:-localhost}/ready"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -60,15 +60,17 @@ services:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: app_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      # Loopback-only and var-driven: parallel stacks offset DB_PORT instead of
+      # colliding on a globally published 5432.
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d app_db"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -82,7 +84,7 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s

@@ -1,6 +1,6 @@
-.PHONY: help shell e d install env-create \
+.PHONY: help shell e d install env-create composer-install \
         up run down build rebuild ps logs composer-chown \
-        db-migrate db-rollback db-seed db-console db-fresh db-reset \
+        db-migrate db-rollback db-seed db-console db-fresh db-reset test-db \
         test test-unit test-integration test-e2e test-coverage coverage-html \
         lint lint-check analyze check ci smoke docs-check \
         clean metrics docker-stats stats \
@@ -15,10 +15,6 @@ DC = UID=$(USER_ID) GID=$(GROUP_ID) docker compose --progress=plain
 
 # Docker container name (matches docker-compose service "app")
 DC_APP = app
-
-# Postgres credentials (must match docker-compose.yml)
-DB_USER = user
-DB_NAME = app_db
 
 # Colors
 RED    := $(shell tput setaf 1)
@@ -48,7 +44,7 @@ env-create: ## Create .env from .env.dist
 	@sed -i "s|^GID=.*|GID=$(GROUP_ID)|g" .env
 	@echo "$(GREEN).env created with UID:$(USER_ID) and GID:$(GROUP_ID)$(RESET)"
 
-install: env-create build up db-migrate ## 🚀 Full setup: containers, dependencies, database
+install: env-create build up composer-install db-migrate ## 🚀 Full setup: containers, dependencies, database
 	@echo ""
 	@echo "🐘 $(BLUE)Pragmatic Franken is igniting...$(RESET)"
 	@echo "🔥 $(GREEN)Done! Open https://pragmatic-franken.localhost:$${HTTPS_PORT:-4750} (set in .env).$(RESET)"
@@ -84,6 +80,11 @@ logs: ## Follow container logs
 	@echo "$(YELLOW)Showing and following logs...$(RESET)"
 	$(DC) logs --tail=20 --follow
 
+composer-install: ## Install PHP dependencies into the mounted project
+	@echo "$(BLUE)Installing composer dependencies...$(RESET)"
+	$(DC) exec $(DC_APP) composer install --no-interaction --prefer-dist
+	$(DC) exec $(DC_APP) sh -c 'chown -R $(USER_ID):$(GROUP_ID) vendor var composer.lock 2>/dev/null || true'
+
 composer-chown: ## Fix composer cache permissions
 	@echo "$(YELLOW)Fixing composer cache permissions...$(RESET)"
 	$(DC) exec $(DC_APP) chown -R $(USER_ID):$(GROUP_ID) /var/www/.composer 2>/dev/null || \
@@ -103,19 +104,19 @@ e: shell
 ##—————— Database ——————
 db-migrate: ## Run database migrations
 	@echo "$(BLUE)Running migrations...$(RESET)"
-	$(DC) exec $(DC_APP) bin/console doctrine:migrations:migrate --no-interaction
+	$(DC) exec $(DC_APP) bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
 
 db-rollback: ## Rollback last migration
 	@echo "$(BLUE)Rolling back last migration...$(RESET)"
 	$(DC) exec $(DC_APP) bin/console doctrine:migrations:migrate prev --no-interaction
 
-db-seed: ## Load fixtures
+db-seed: ## Seed demo data (app:seed)
 	@echo "$(BLUE)Seeding database...$(RESET)"
-	$(DC) exec $(DC_APP) bin/console doctrine:fixtures:load --no-interaction
+	@echo "$(YELLOW)Nothing to seed yet — app:seed ships with the first entity slice (see docs/roadmap.md).$(RESET)"
 
 db-console: ## Connect to PostgreSQL console
-	@echo "$(CYAN)Connecting to PostgreSQL ($(DB_USER)@$(DB_NAME))...$(RESET)"
-	$(DC) exec db psql -U $(DB_USER) -d $(DB_NAME)
+	@echo "$(CYAN)Connecting to PostgreSQL...$(RESET)"
+	$(DC) exec db sh -c 'psql -U $$POSTGRES_USER -d $$POSTGRES_DB'
 
 db-fresh: db-rollback db-migrate db-seed ## Full reset: rollback, migrate, seed
 	@echo "$(GREEN)Database freshened!$(RESET)"
@@ -127,27 +128,31 @@ db-reset: down ## Destroy and rebuild database
 	$(MAKE) db-migrate db-seed
 
 ##—————— ✅ Tests ——————
-test: ## Run all PHPUnit tests (fail-fast)
+test-db: ## Create + migrate the dedicated test database (app_test)
+	@$(DC) exec $(DC_APP) bin/console doctrine:database:create --env=test --if-not-exists
+	@$(DC) exec $(DC_APP) bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration
+
+test: test-db ## Run all PHPUnit tests (fail-fast)
 	@echo "$(GREEN)Running all tests...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --fail-fast
 
-test-unit: ## Run unit tests only (#[Group('unit')])
+test-unit: test-db ## Run unit tests only (#[Group('unit')])
 	@echo "$(GREEN)Running unit tests...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=unit --fail-fast
 
-test-integration: ## Run integration tests only (#[Group('integration')])
+test-integration: test-db ## Run integration tests only (#[Group('integration')])
 	@echo "$(GREEN)Running integration tests...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=integration --fail-fast
 
-test-e2e: ## Run API/E2E tests only (#[Group('e2e')])
+test-e2e: test-db ## Run API/E2E tests only (#[Group('e2e')])
 	@echo "$(GREEN)Running E2E tests...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --group=e2e --fail-fast
 
-test-coverage: ## Run tests with text coverage report
+test-coverage: test-db ## Run tests with text coverage report
 	@echo "$(GREEN)Running tests with coverage...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --coverage-text
 
-coverage-html: ## Generate HTML coverage report
+coverage-html: test-db ## Generate HTML coverage report
 	@echo "$(GREEN)Generating HTML coverage report...$(RESET)"
 	$(DC) exec $(DC_APP) ./vendor/bin/phpunit --coverage-html=coverage
 
@@ -170,10 +175,10 @@ check: lint analyze ## ✅ Run all checks before commit (lint + analyze)
 ci: lint-check analyze test ## Simulate CI pipeline (no auto-fix)
 	@echo "$(GREEN)CI pipeline complete!$(RESET)"
 
-smoke: ## End-to-end smoke check (console boots, /healthz responds)
+smoke: ## End-to-end smoke check (console boots, /ready responds)
 	@echo "$(YELLOW)Running smoke check...$(RESET)"
 	$(DC) exec $(DC_APP) bin/console list >/dev/null
-	@curl -fsS http://localhost:$${HTTP_PORT:-8750}/healthz | tee /dev/stderr | grep -q '"ok":true'
+	@$(DC) exec $(DC_APP) sh -c 'curl -fsS -k --resolve "$$SERVER_NAME:443:127.0.0.1" "https://$$SERVER_NAME/ready"' | tee /dev/stderr | grep -q '"ok":true'
 	@echo "$(GREEN)Smoke check passed!$(RESET)"
 
 docs-check: ## Lint ADR front-matter and AGENTS.md token budget
@@ -196,8 +201,8 @@ docker-stats: ## Show container resource usage
 	@docker stats --no-stream $$($(DC) ps -q)
 
 stats: ## 📊 Check FrankenPHP metrics
-	@echo "$(GREEN)Fetching FrankenPHP metrics (port 2019)...$(RESET)"
-	@curl -s http://localhost:2019/metrics | head -20
+	@echo "$(GREEN)Fetching FrankenPHP metrics (admin endpoint, in-container)...$(RESET)"
+	@$(DC) exec $(DC_APP) curl -s http://localhost:2019/metrics | head -20
 
 ##—————— 🛠 Dev Utilities ——————
 open-api: ## Generate OpenAPI spec

@@ -1,5 +1,8 @@
 framework:
     secret: '%env(APP_SECRET)%'
+    # Set TRUSTED_PROXIES when running behind a reverse proxy / load balancer.
+    trusted_proxies: '%env(default::TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
     session:
         storage_factory_id: session.storage.factory.mock_file
     http_method_override: false
