@@ -66,7 +66,7 @@ jobs:
             -e SERVER_NAME=:8080 \
             -e DATABASE_URL="postgresql://app:app_password@127.0.0.1:5432/app?serverVersion=17&charset=utf8" \
             -e REDIS_URL=redis://127.0.0.1:6379 \
-            -e MESSENGER_TRANSPORT_DSN=redis://127.0.0.1:6379/messages \
+            -e MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=true \
             -e APP_SECRET=release-check-secret \
             -e MERCURE_URL=http://localhost:3000/.well-known/mercure \
             -e MERCURE_PUBLIC_URL=http://localhost:3000/.well-known/mercure \

@@ -19,7 +19,8 @@ For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** â
 | Framework | Symfony 8.0 | mature, attribute-based wiring |
 | Bus | Symfony Messenger (CQRS) | sync commands/queries, async events |
 | Database | PostgreSQL 17 | Doctrine ORM 3 |
-| Cache / Queue | Redis 7 | Predis + Messenger transport |
+| Queue | Messenger on Doctrine transport | no extra extension, inspectable, CRM-proven |
+| Cache | Redis 7 (Predis) | ready for caching and custom needs |
 | Frontend (default) | AssetMapper + Twig | no Webpack/Vite needed for HTML-first |
 | Code style | Laravel Pint (PSR-12) | one-flag autofix |
 | Static analysis | PHPStan level 10 | enforced in CI |

@@ -6,12 +6,12 @@ date: 2026-02-04
 supersedes: []
 superseded_by: []
 audience: both
-summary: "Symfony Messenger as the primary bus. CQRS: Commands and Queries are synchronous; Events are asynchronous (Redis transport) for cross-context communication."
+summary: "Symfony Messenger as the primary bus. CQRS: Commands and Queries are synchronous; Events are asynchronous on the Doctrine transport (production-proven; swap the DSN for Redis/AMQP when throughput demands it)."
 ---
 
 # ADR-0002: Messenger Transport
 
-**TL;DR:** All write operations dispatch a `*Command` synchronously through Messenger. Reads dispatch a `*Query`. Cross-feature side effects use asynchronous `*Event`s on a Redis-backed transport. ADR-0003 (Pragmatism Charter) defines when this rule may be skipped (single-writer CRUD, legacy migration, perf-critical hot paths).
+**TL;DR:** All write operations dispatch a `*Command` synchronously through Messenger. Reads dispatch a `*Query`. Cross-feature side effects use asynchronous `*Event`s on the Doctrine transport (`doctrine://default?auto_setup=true` — no extra PHP extension, inspectable queue table, proven in the CRM grown from this skeleton; swap the DSN for Redis/AMQP when throughput demands it). ADR-0003 (Pragmatism Charter) defines when this rule may be skipped (single-writer CRUD, legacy migration, perf-critical hot paths).
 
 ## Context
 

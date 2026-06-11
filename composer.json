@@ -33,6 +33,7 @@
         "symfony/asset-mapper": "^8.0",
         "symfony/console": "^8.0",
         "symfony/doctrine-bridge": "^8.0",
+        "symfony/doctrine-messenger": "^8.1",
         "symfony/dotenv": "^8.0",
         "symfony/framework-bundle": "^8.0",
         "symfony/http-kernel": "^8.0",
