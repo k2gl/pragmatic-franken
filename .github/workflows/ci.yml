@@ -82,7 +82,7 @@ jobs:
         run: composer analyze
 
       - name: OpenAPI spec generates
-        run: php bin/console nelmio:api-doc:dump --format=yaml > /dev/null
+        run: php bin/console nelmio:apidoc:dump --format=yaml > /dev/null
 
       - name: Prepare test database
         run: |

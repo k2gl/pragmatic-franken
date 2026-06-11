@@ -213,7 +213,7 @@ stats: ## 📊 Check FrankenPHP metrics
 ##—————— 🛠 Dev Utilities ——————
 open-api: ## Generate OpenAPI spec
 	@echo "$(GREEN)Generating OpenAPI documentation...$(RESET)"
-	$(DC) exec $(DC_APP) bin/console nelmio:api-doc:dump > docs/openapi.yaml
+	$(DC) exec $(DC_APP) bin/console nelmio:apidoc:dump > docs/openapi.yaml
 	@echo "$(GREEN)OpenAPI spec written to docs/openapi.yaml$(RESET)"
 
 xdebug-on: ## Enable Xdebug at runtime
