@@ -1,37 +1,48 @@
+# Caddy/FrankenPHP configuration. Baked into all image stages and bind-mounted
+# over /etc/caddy/Caddyfile in dev (see docker-compose.yml), so edits apply on
+# container restart without a rebuild.
+#
+# Worker mode comes from the FRANKENPHP_CONFIG env var ("worker ./public/index.php");
+# symfony/runtime 8 drives the worker loop natively.
 {
-    # FrankenPHP configuration
-    frankenphp {
-        num_threads 8
-    }
+	{$CADDY_GLOBAL_OPTIONS}
 
-    admin off
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
 }
 
-:80 {
-    log {
-        format json
-        level INFO
-    }
+{$CADDY_EXTRA_CONFIG}
 
-    # Enable compression
-    encode zstd gzip
+{$SERVER_NAME:localhost} {
+	log {
+		format json
+	}
 
-    # Root directory
-    root * public/
+	root * public/
+	encode zstd br gzip
 
-    # PHP Server with Worker Mode
-    php_server {
-        root public/
-        index index.php
-        # Worker mode for Symfony - keeps Kernel in memory
-        env FRANKENPHP_WORKER_COMMAND "php public/index.php"
-        num_workers 4
-    }
+	# FrankenPHP's built-in Mercure hub lives on the private :3000 site below.
+	# Browsers subscribe through this site — same origin, no mixed content.
+	handle /.well-known/mercure* {
+		reverse_proxy localhost:3000
+	}
 
-    file_server
+	{$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	php_server
 }
 
-:2019 {
-    # Prometheus metrics endpoint
-    metrics
+# Private Mercure hub (not published by docker-compose). PHP publishes here over
+# plain HTTP (MERCURE_URL), avoiding TLS and Host-matching pitfalls in-container.
+http://:3000 {
+	mercure {
+		transport_url {$MERCURE_TRANSPORT_URL:bolt:///data/mercure.db}
+		publisher_jwt {env.MERCURE_JWT_SECRET}
+		subscriber_jwt {env.MERCURE_JWT_SECRET}
+		anonymous
+		subscriptions
+	}
+
+	respond "Not Found" 404
 }
