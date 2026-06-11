@@ -7,7 +7,7 @@ last_reviewed: 2026-04-28
 
 # AGENTS.md — Pragmatic Franken
 
-PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Architecture: Vertical Slices + CQRS over Symfony Messenger, FrankenPHP worker mode. This file is the **only** AI-default context — everything else loads on demand from `docs/`.
+PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Vertical Slices + CQRS over Messenger, worker mode. This file is the **only** AI-default context — everything else loads on demand from `docs/`.
 
 ## Quickstart
 
@@ -44,7 +44,7 @@ tests/   Context/{Name}/Features/{Feature}/   # mirror of src/
 
 ## Hard rules (DO / DO-NOT)
 
-- **DO** put feature code in `src/Context/{Name}/Features/{Feature}/`; entities in `src/Context/{Name}/Entity/`, repositories in `Repository/`. See ADR-0001.
+- **DO** put feature code in `src/Context/{Name}/Features/{Feature}/`; entities in `Entity/`, repositories in `Repository/` of the context. See ADR-0001.
 - **DO** name CQRS commands `Create{Feature}Command`, `Update{Feature}Command`, etc. — verb + noun.
 - **DO** use `#[AsMessageHandler]` on handlers and dispatch via `MessageBusInterface`.
 - **DO** name Symfony Console classes `*CliCommand extends Command` in `EntryPoint/Cli/`.
@@ -93,8 +93,8 @@ Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % state
 ## Pitfalls
 
 - Static state in worker mode → request leakage. Reset or avoid.
-- Copy-paste between slices is fine until ≥ 3 occurrences (Rule of Three). Then extract.
-- Returning entities through HTTP makes implicit DB queries during serialization; always pass through a DTO.
+- Copy-paste is fine until 3 occurrences (Rule of Three), then extract.
+- Returning entities over HTTP triggers implicit DB queries; return DTOs.
 - `make slice` writes a stub — replace placeholders before committing.
 
 ## Local overrides
@@ -129,7 +129,7 @@ Per-developer settings: `AGENTS.local.md` (gitignored, copy the `.example`). Per
 | `docs/guides/disaster-recovery.md` | backups, restore drill |
 | `docs/guides/parallel-sessions.md` | parallel isolated dev stacks (worktree forks) |
 
-ADR-0003 is the umbrella *Pragmatism Charter* — load it before adding any extra layer/interface, or to skip the Message Bus for a CRUD case.
+ADR-0003 is the umbrella *Pragmatism Charter* — load it before adding any extra layer/interface, or to skip the Message Bus for a CRUD case. Optional capability recipes (JWT auth, feature flags, SPA, preview envs) live in `docs/recipes/`.
 
 ## Forbidden patterns (agent-targeted)
 

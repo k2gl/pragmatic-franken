@@ -37,6 +37,9 @@ help: ## Show this help message
 		} \
 	}'
 
+init: ## 🪪 Fork identity: rename + secrets (name=my-app [vendor=acme prune=1 reset-git=1])
+	@./dev/init.sh --name=$(name) $(if $(vendor),--vendor=$(vendor)) $(if $(prune),--prune-examples) $(if $(reset-git),--reset-git)
+
 env-create: ## Create .env from .env.dist
 	@if [ ! -f .env.dist ]; then echo "$(RED)Error: .env.dist not found!$(RESET)"; exit 1; fi
 	cp -n .env.dist .env
