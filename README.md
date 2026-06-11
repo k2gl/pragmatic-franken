@@ -3,13 +3,22 @@
 [![License MIT](https://img.shields.io/badge/License-MIT-yellowgreen)](https://opensource.org/licenses/MIT)
 [![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777bb4?logo=php&logoColor=white)](https://www.php.net/releases/8.5/)
 [![FrankenPHP 1.x](https://img.shields.io/badge/FrankenPHP-1.x-006b5b?logo=docker&logoColor=white)](https://frankenphp.dev/)
-[![Symfony 8.0](https://img.shields.io/badge/Symfony-8.0-000000?logo=symfony&logoColor=white)](https://symfony.com/)
+[![Symfony 8](https://img.shields.io/badge/Symfony-8-000000?logo=symfony&logoColor=white)](https://symfony.com/)
 [![PHPStan Level 10](https://img.shields.io/badge/PHPStan-Level%2010-cyan)](https://phpstan.org)
 [![CI](https://img.shields.io/github/actions/workflow/status/k2gl/pragmatic-franken/ci.yml?branch=main&label=CI)](https://github.com/k2gl/pragmatic-franken/actions)
 
-PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Vertical Slices + CQRS over Symfony Messenger. PostgreSQL 17, Redis 7. Designed to be readable by both humans and AI agents.
+PHP 8.5 / Symfony 8 / FrankenPHP starter that a production CRM actually grew
+out of — and the lessons were ported back. Vertical Slices + CQRS over
+Messenger, PostgreSQL 17, worker mode, real prod image, supply-chain
+attestations. Designed to be operated by humans and AI agents alike.
 
-For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** — it is the single source of truth, ≤ 2 000 tokens, equally usable by developers and AI tools.
+**The promises are CI-proven, not vibes:**
+- the **production image boots** on every PR (`prod-image` job: build → run → `/ready`);
+- **scaffolded code passes PHPStan 10 + tests untouched** (`agent-smoke` job);
+- release images carry **SLSA build provenance**, and the deploy gate verifies it (ADR-0018);
+- docs are **linted against reality** (`make docs-check`: routes, Makefile targets, ADR sync).
+
+For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** — the single source of truth, ≤ 2 000 tokens, equally usable by developers and AI tools.
 
 ## Stack
 
@@ -28,14 +37,42 @@ For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** �
 
 ## Quickstart
 
+**Path 1 — template + Docker** (nothing but Docker needed):
+
 ```bash
-git clone https://github.com/k2gl/pragmatic-franken.git
-cd pragmatic-franken
-make install        # env, containers, deps, migrations
-make smoke          # bin/console list && /healthz
+gh repo create my-app --template k2gl/pragmatic-franken --clone && cd my-app
+# or: git clone https://github.com/k2gl/pragmatic-franken.git my-app
+make install                  # env, containers, deps, migrations
+make init name=my-app         # rename + real secrets (optionally: prune=1 reset-git=1)
+make smoke                    # bin/console + /ready
 ```
 
-The app comes up at `https://pragmatic-franken.localhost:${HTTPS_PORT:-4750}`. Caddy resolves `*.localhost` automatically — no `/etc/hosts` edits.
+**Path 2 — composer create-project** (needs PHP ≥ 8.5 on the host):
+
+```bash
+composer create-project k2gl/pragmatic-franken my-app
+cd my-app && make install && make init name=my-app
+```
+
+The app comes up at `https://my-app.localhost:${HTTPS_PORT:-4750}` (browsers
+resolve `*.localhost` automatically — no `/etc/hosts` edits). Try the example
+API: `POST /tasks`, `GET /tasks`, `POST /tasks/{id}/complete` — completion
+pushes a Mercure live update on `/tasks`.
+
+## Why not just symfony/skeleton?
+
+| | **pragmatic-franken** | symfony/skeleton | dunglas/symfony-docker | API Platform |
+|---|---|---|---|---|
+| Architecture opinion | Vertical Slices + CQRS, 14 ADRs | none | none | API-first framework |
+| Prod image | built, booted & scanned per PR | — | built | built |
+| Real example vertical | entity→migration→factory→tests | — | — | generated CRUD |
+| Deploy story | blue-green to a VDS + backups + DR drill | — | — | k8s helm |
+| Supply chain | attestations + offline verifier + gate | — | — | — |
+| Agent affordances | AGENTS.md (≤2k tokens) + CI-proven scaffolding | — | — | — |
+| Best when | product API/app on one VDS, agents in the loop | you want vanilla | you want plain Docker | your product *is* the API |
+
+Honest non-goals: no auth in core (recipe instead), no bundled SPA, no
+Kubernetes, no multi-DB. See [`docs/roadmap.md`](docs/roadmap.md#non-goals).
 
 ## Daily commands
 
@@ -49,7 +86,9 @@ The app comes up at `https://pragmatic-franken.localhost:${HTTPS_PORT:-4750}`. C
 | `make smoke` | end-to-end smoke check |
 | `make slice context=Foo feature=Bar` | scaffold a vertical slice |
 | `make adr title="My Decision"` | scaffold a new ADR |
-| `make docs-check` | lint ADR front-matter & AGENTS.md budget |
+| `make docs-check` | lint docs against reality (routes, targets, budgets) |
+| `make agent-smoke` | prove scaffolded code passes all gates untouched |
+| `make db-seed` | demo data (`app:seed`) |
 
 ## Project layout
 
@@ -106,7 +145,22 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 - [`docs/guides/deployment.md`](docs/guides/deployment.md) — single-VDS topology, zero-downtime rollout
 - [`docs/guides/disaster-recovery.md`](docs/guides/disaster-recovery.md) — backups and the restore drill
 - [`docs/guides/parallel-sessions.md`](docs/guides/parallel-sessions.md) — isolated worktree stacks for parallel agents
+- [`docs/guides/supply-chain.md`](docs/guides/supply-chain.md) — sign releases, verify before deploying
 - [`docs/roadmap.md`](docs/roadmap.md) — roadmap
+
+## Recipes (opt-in capabilities)
+
+Proven in the production CRM grown from this skeleton, documented instead of
+bundled: [JWT auth](docs/recipes/jwt-auth.md) ·
+[feature flags](docs/recipes/feature-flags.md) ·
+[SPA frontend](docs/recipes/spa-frontend.md) ·
+[preview environments](docs/recipes/preview-environments.md).
+
+## Staying close to the template
+
+Forks don't merge templates — they apply changes. Each release ships an
+[`UPGRADE.md`](UPGRADE.md) entry with the few changes worth porting; see
+[`docs/guides/fork-maintenance.md`](docs/guides/fork-maintenance.md).
 
 ## AI agents
 

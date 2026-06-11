@@ -85,6 +85,9 @@
         "check": [
             "@lint",
             "@analyze"
+        ],
+        "post-create-project-cmd": [
+            "@php -r \"echo PHP_EOL.'  Next steps:'.PHP_EOL.'    make install               # containers, deps, migrations'.PHP_EOL.'    make init name=<your-app>  # rename + real secrets'.PHP_EOL.'    make smoke                 # verify /ready'.PHP_EOL.PHP_EOL;\""
         ]
     },
     "config": {
