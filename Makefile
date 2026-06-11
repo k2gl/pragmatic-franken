@@ -184,6 +184,9 @@ smoke: ## End-to-end smoke check (console boots, /ready responds)
 docs-check: ## Lint ADR front-matter and AGENTS.md token budget
 	@./dev/check-docs.sh
 
+agent-smoke: ## Prove scaffolded code passes Pint + PHPStan + tests untouched
+	$(DC) exec $(DC_APP) bash ./dev/agent-smoke.sh
+
 ##—————— 🧹 Maintenance ——————
 clean: ## Clean cache and temporary files
 	@echo "$(YELLOW)Cleaning cache and temporary files...$(RESET)"

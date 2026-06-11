@@ -95,6 +95,9 @@ jobs:
       - name: Coverage floor (ADR-0008)
         run: php dev/check-coverage.php coverage.xml 60
 
+      - name: Agent smoke (scaffolded code passes all gates untouched)
+        run: ./dev/agent-smoke.sh
+
   secrets-scan:
     runs-on: ubuntu-latest
     steps:

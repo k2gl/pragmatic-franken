@@ -18,8 +18,9 @@ RUN apk add --no-cache \
         apcu \
         opcache
 
-# Separate layer: used by health probes (entrypoint, compose, CI boot tests).
-RUN apk add --no-cache curl
+# Separate layer: curl for health probes (entrypoint, compose, CI boot tests),
+# bash for dev/* scripts run inside the container.
+RUN apk add --no-cache curl bash
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_MEMORY_LIMIT=-1

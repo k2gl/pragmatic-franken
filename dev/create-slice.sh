@@ -43,7 +43,8 @@ final readonly class ${FEATURE}Command
 {
     public function __construct(
         // Add input fields here.
-    ) {}
+    ) {
+    }
 }
 EOF
 
@@ -78,7 +79,8 @@ final readonly class ${FEATURE}Result
 {
     public function __construct(
         // Add output fields here.
-    ) {}
+    ) {
+    }
 }
 EOF
 

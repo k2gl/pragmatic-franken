@@ -1,0 +1,47 @@
+# Optional, manually-dispatched, never required: a REAL agent (Claude Code)
+# builds a slice in this repo, then the standard gates judge the result.
+# Needs the ANTHROPIC_API_KEY secret; paid and non-deterministic by nature —
+# run before releases, not on every PR. The deterministic equivalent
+# (dev/agent-smoke.sh) is a required CI job.
+name: Agent E2E (optional)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-scripts --prefer-dist
+
+      - name: Run Claude Code
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::ANTHROPIC_API_KEY secret is not configured"
+            exit 1
+          fi
+          npm install -g @anthropic-ai/claude-code
+          claude -p "Read AGENTS.md. Scaffold a vertical slice for context Demo, feature Echo using ./dev/create-slice.sh Demo Echo, then fill the placeholders so the command carries a 'message' string and the handler returns it in the result. Do not touch any other files." \
+            --allowedTools "Bash(./dev/create-slice.sh*)" "Edit" "Read" "Write"
+
+      - name: Judge the result with the standard gates
+        run: |
+          vendor/bin/pint --test src/Context/Demo tests/Context/Demo
+          vendor/bin/phpstan analyze src/Context/Demo tests/Context/Demo --level=10 --no-progress --memory-limit=1G
+          vendor/bin/phpunit tests/Context/Demo
