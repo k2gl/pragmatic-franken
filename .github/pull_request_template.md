@@ -1,16 +1,16 @@
-## 📝 Описание изменений
-<!-- Кратко опишите, какую задачу решает этот PR -->
+## What & why
 
-## 🛠 Соответствие ADR 0001 (Pragmatic Symfony)
-*Проверьте ваш код на соответствие архитектурным принципам проекта:*
+<!-- One or two sentences: what does this PR change and what problem does it solve? -->
 
-- [ ] **Архитектура:** Использована стандартная цепочка `Controller -> Service -> Entity`. Нет лишних слоев и интерфейсов-пустышек.
-- [ ] **DTO & Валидация:** Валидация входных данных реализована через атрибуты `#[Assert]` внутри DTO.
-- [ ] **API Docs:** Свойства DTO описаны атрибутами `#[OA\Property]` для автогенерации Swagger.
-- [ ] **Modern Symfony:** В контроллерах задействован маппинг `#[MapRequestPayload]` или `#[MapQueryString]`.
-- [ ] **DX:** Использованы `public readonly` свойства в DTO и Autowiring в сервисах.
-- [ ] **Тесты:** Написан функциональный тест (`WebTestCase`), проверяющий основной сценарий (Happy Path).
+## Architecture checklist (ADR-0001, ADR-0003)
 
-## 🔗 Ссылки
-- **Задача:** # (номер задачи)
-- **ADR:** [ADR 0001: Pragmatic Symfony Architecture](./docs/adr/0001-pragmatic-symfony.md)
+- [ ] Feature code lives in `src/{Context}/Features/{Feature}/` — no global `Controllers/`, `Services/`, `Repositories/` dirs
+- [ ] Writes/reads go through Messenger (`*Command`/`*Query` + `#[AsMessageHandler]`), or the CRUD escape hatch of ADR-0003 applies
+- [ ] Handlers return Result DTOs, never Doctrine entities
+- [ ] No mutable static state (worker mode, ADR-0004)
+- [ ] Tests added/updated; `make ci` is green locally
+- [ ] Docs updated if behavior or commands changed (`make docs-check`)
+
+## Links
+
+<!-- Issues, ADRs, discussions. -->
