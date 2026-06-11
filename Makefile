@@ -112,7 +112,7 @@ db-rollback: ## Rollback last migration
 
 db-seed: ## Seed demo data (app:seed)
 	@echo "$(BLUE)Seeding database...$(RESET)"
-	@echo "$(YELLOW)Nothing to seed yet — app:seed ships with the first entity slice (see docs/roadmap.md).$(RESET)"
+	$(DC) exec $(DC_APP) bin/console app:seed --no-interaction
 
 db-console: ## Connect to PostgreSQL console
 	@echo "$(CYAN)Connecting to PostgreSQL...$(RESET)"

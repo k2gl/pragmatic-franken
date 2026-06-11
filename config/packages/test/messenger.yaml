@@ -1,4 +1,6 @@
 framework:
     messenger:
         transports:
-            async: 'in-memory://'
+            # zenstruck/messenger-test transport: queued messages are inspectable
+            # in tests via $this->transport('async') and never hit Redis.
+            async: 'test://'
