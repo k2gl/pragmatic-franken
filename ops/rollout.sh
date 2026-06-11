@@ -23,6 +23,23 @@ SERVICE="${1:-app}"
 # shellcheck disable=SC2086
 compose() { $COMPOSE "$@"; }
 
+# Opt-in supply-chain gate (ADR-0018): for registry-pulled images, refuse to
+# roll out anything without verified build provenance. Requires gh CLI and
+#   DEPLOY_REQUIRE_ATTESTATION=true DEPLOY_IMAGE=ghcr.io/<owner>/<repo>:<tag>
+#   DEPLOY_REPO=<owner>/<repo>
+# Locally-built images (default deploy.sh flow) have no registry attestation —
+# the gate only applies to pull-based deploys.
+if [ "${DEPLOY_REQUIRE_ATTESTATION:-false}" = "true" ]; then
+    : "${DEPLOY_IMAGE:?DEPLOY_IMAGE is required when DEPLOY_REQUIRE_ATTESTATION=true}"
+    : "${DEPLOY_REPO:?DEPLOY_REPO is required when DEPLOY_REQUIRE_ATTESTATION=true}"
+    echo "[rollout] Verifying build provenance of ${DEPLOY_IMAGE}..."
+    if ! gh attestation verify "oci://${DEPLOY_IMAGE}" --repo "${DEPLOY_REPO}"; then
+        echo "[rollout] ERROR: provenance verification failed — refusing to roll out." >&2
+        exit 1
+    fi
+    echo "[rollout] Provenance OK."
+fi
+
 old="$(compose ps -q "$SERVICE" | head -1)"
 if [ -z "$old" ]; then
     echo "[rollout] '$SERVICE' is not running — first start, plain up."

@@ -94,6 +94,7 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 | [0011](docs/adr/0011-event-sourcing-lite.md) | Event Sourcing Lite | Accepted |
 | [0012](docs/adr/0012-ubiquitous-language.md) | Ubiquitous Language & Entity Placement | Accepted |
 | [0013](docs/adr/0013-doctrine-repository-pattern.md) | Doctrine Repository Pattern | Accepted |
+| [0018](docs/adr/0018-supply-chain-security.md) | Supply-Chain Security | Accepted |
 
 ## Guides
 

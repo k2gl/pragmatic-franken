@@ -26,6 +26,8 @@
         "k2gl/app-env": "^1.0",
         "k2gl/entity-exist": "^1.14",
         "k2gl/enum": "^2.1",
+        "k2gl/sigstore-verify": "^1.2",
+        "k2gl/slsa-provenance": "^1.1",
         "nelmio/api-doc-bundle": "^5.9",
         "nelmio/cors-bundle": "^2.6",
         "predis/predis": "^3.3",

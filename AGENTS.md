@@ -99,7 +99,7 @@ Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % state
 
 ## Local overrides
 
-Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.local.md.example`. Never override architectural rules there; only personal preferences (tone, language, paths).
+Per-developer settings: `AGENTS.local.md` (gitignored, copy the `.example`). Personal preferences only — never architectural rules.
 
 ## Pointer index
 
@@ -118,6 +118,8 @@ Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.l
 | `docs/adr/0011-event-sourcing-lite.md` | domain events, async side effects, event-driven decoupling |
 | `docs/adr/0012-ubiquitous-language.md` | naming, where entities/repositories live |
 | `docs/adr/0013-doctrine-repository-pattern.md` | persistence, writing repositories |
+| `docs/adr/0018-supply-chain-security.md` | attestations, verifying images/artifacts |
+| `docs/guides/supply-chain.md` | sign/verify how-to, deploy gate |
 | `docs/guides/development.md` | day-to-day commands, scaffolding details |
 | `docs/guides/testing.md` | concrete testing examples |
 | `docs/guides/worker-mode.md` | debugging FrankenPHP worker behavior |
@@ -127,7 +129,7 @@ Per-developer settings live in `AGENTS.local.md` (gitignored) — copy `AGENTS.l
 | `docs/guides/disaster-recovery.md` | backups, restore drill |
 | `docs/guides/parallel-sessions.md` | parallel isolated dev stacks (worktree forks) |
 
-ADR-0003 is the umbrella *Pragmatism Charter* — load it whenever you're tempted to add an extra layer or interface, or when deciding whether the Message Bus is overkill for a CRUD case.
+ADR-0003 is the umbrella *Pragmatism Charter* — load it before adding any extra layer/interface, or to skip the Message Bus for a CRUD case.
 
 ## Forbidden patterns (agent-targeted)
 
