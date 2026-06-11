@@ -26,4 +26,19 @@ final class TaskRepository extends DoctrineRepository
     {
         return $this->findBy([], ['createdAt' => 'DESC'], $limit);
     }
+
+    /** Bulk-delete tasks completed before the cutoff; returns the count. */
+    public function deleteCompletedBefore(\DateTimeImmutable $cutoff): int
+    {
+        $deleted = $this->createQueryBuilder('task')
+            ->delete()
+            ->where('task.completedAt IS NOT NULL')
+            ->andWhere('task.completedAt < :cutoff')
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
+        \assert(\is_int($deleted));
+
+        return $deleted;
+    }
 }

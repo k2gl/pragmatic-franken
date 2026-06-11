@@ -25,9 +25,16 @@ case "$1" in
         # Background Messenger consumer (compose.prod.yml `worker` service).
         # time-limit recycles the process hourly; restart: always re-runs it.
         # WorkerHeartbeatListener refreshes the healthcheck marker every loop.
+        # SCHEDULER_ENABLED=true also consumes the symfony/scheduler transport
+        # (recurring tasks, e.g. PurgeCompletedTasks).
         wait_for_database
-        echo "[entrypoint] Starting Messenger worker..."
-        exec php bin/console messenger:consume async --no-interaction --time-limit=3600 --memory-limit=256M
+        transports="async"
+        if [ "$SCHEDULER_ENABLED" = 'true' ]; then
+            transports="async scheduler_default"
+        fi
+        echo "[entrypoint] Starting Messenger worker (transports: $transports)..."
+        # shellcheck disable=SC2086
+        exec php bin/console messenger:consume $transports --no-interaction --time-limit=3600 --memory-limit=256M
         ;;
 esac
 

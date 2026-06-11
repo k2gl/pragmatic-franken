@@ -60,6 +60,9 @@ services:
       SERVER_NAME: ":80"
       FRANKENPHP_CONFIG: "worker ./public/index.php"
       FRANKENPHP_LOOP_MAX: "${FRANKENPHP_LOOP_MAX:-500}"
+      # Consumed by the worker service entrypoint: also consume the
+      # symfony/scheduler transport (recurring tasks).
+      SCHEDULER_ENABLED: "${SCHEDULER_ENABLED:-true}"
       CADDY_GLOBAL_OPTIONS: |
         auto_https off
         admin off
