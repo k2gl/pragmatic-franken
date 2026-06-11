@@ -60,7 +60,7 @@ final class LoginHandlerTest extends TestCase
 }
 ```
 
-The reference unit test in this repo is [`tests/Health/Features/Healthz/CheckHealthHandlerTest.php`](../../tests/Health/Features/Healthz/CheckHealthHandlerTest.php).
+The reference unit test in this repo is [`tests/Context/Health/Features/Healthz/CheckHealthHandlerTest.php`](../../tests/Context/Health/Features/Healthz/CheckHealthHandlerTest.php).
 
 ## Integration test (real database, Foundry factories)
 
@@ -95,7 +95,7 @@ final class RegisterHandlerTest extends IntegrationTestCase
 ## E2E test (HTTP via WebTestCase)
 
 ```php
-namespace App\Tests\Health\Features\Healthz;
+namespace App\Tests\Context\Health\Features\Healthz;
 
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -115,7 +115,7 @@ final class HealthzControllerTest extends WebTestCase
 }
 ```
 
-The reference e2e test lives at [`tests/Health/Features/Healthz/HealthzControllerTest.php`](../../tests/Health/Features/Healthz/HealthzControllerTest.php).
+The reference e2e test lives at [`tests/Context/Health/Features/Healthz/HealthzControllerTest.php`](../../tests/Context/Health/Features/Healthz/HealthzControllerTest.php).
 
 ## Async / Messenger
 

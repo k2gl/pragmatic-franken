@@ -87,7 +87,7 @@ framework:
                     auto_setup: true
 
         routing:
-            App\Billing\Features\ProcessPayment\Domain\PaymentProcessed: async
+            App\Context\Billing\Features\ProcessPayment\Domain\PaymentProcessed: async
 ```
 
 For tests, override the transport with an in-memory sink so domain events are captured without a real Redis consumer:

@@ -6,12 +6,12 @@ date: 2026-02-05
 supersedes: []
 superseded_by: []
 audience: both
-summary: "Standardized HTTP probes: /healthz (liveness, no dependency calls) and /ready (readiness with DB+Redis pings). Reference implementation lives in src/Health/Features/Healthz/."
+summary: "Standardized HTTP probes: /healthz (liveness, no dependency calls) and /ready (readiness with DB+Redis pings). Reference implementation lives in src/Context/Health/Features/Healthz/."
 ---
 
 # ADR-0005: Health Checks
 
-**TL;DR:** Two endpoints — `/healthz` (process is alive, no dependency calls) and `/ready` (dependencies reachable). The reference slice in `src/Health/Features/Healthz/` is the canonical implementation pattern.
+**TL;DR:** Two endpoints — `/healthz` (process is alive, no dependency calls) and `/ready` (dependencies reachable). The reference slice in `src/Context/Health/Features/Healthz/` is the canonical implementation pattern.
 
 ## Context
 
@@ -30,7 +30,7 @@ Mixing the two probes is the classic failure mode: if liveness checks dependenci
 | `/healthz` | Liveness — the worker responds at all. Never calls dependencies. | `{"ok": true}` |
 | `/ready` | Readiness — dependencies reachable. Pings DB and Redis. | `{"ok": bool, "db": bool, "redis": bool}` + 503 when degraded |
 
-Both live in one slice — `src/Health/Features/Healthz/` — because they are facets of a single health feature:
+Both live in one slice — `src/Context/Health/Features/Healthz/` — because they are facets of a single health feature:
 
 - `EntryPoint/Http/HealthzController.php` — both routes.
 - `Application/CheckHealthQuery.php` + `CheckHealthHandler.php` + `HealthStatus.php` — CQRS query for readiness.

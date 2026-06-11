@@ -55,21 +55,24 @@ The app comes up at `https://pragmatic-franken.localhost:${HTTPS_PORT:-4750}`. C
 ```
 src/                              # application code
   Kernel.php                      # App\Kernel (Symfony MicroKernel)
-  Health/Features/Healthz/        # reference slice (JSON, /healthz)
-  Home/Features/Index/            # reference slice (Twig + AssetMapper, /)
-config/  bin/  public/  assets/
+  SharedKernel/                   # cross-context infra (repository base, problem+json listeners)
+  Context/{Name}/                 # bounded contexts: Entity/, Repository/, Features/{Feature}/
+    Health/Features/Healthz/      # reference slice (JSON, /healthz + /ready)
+    Home/Features/Index/          # reference slice (Twig + AssetMapper, /)
+config/  bin/  public/  assets/   # standard Symfony layout
+migrations/                       # Doctrine migrations
 docs/                             # ADRs and guides (Tier 2)
   adr/                            # ADRs with YAML front-matter
   guides/                         # development, testing, worker-mode, …
 dev/                              # codegen helpers (create-slice, new-adr, check-docs)
 ops/                              # deployment scripts
-tests/                            # mirrors src/ — tests/{Context}/Features/{Feature}/
+tests/                            # mirrors src/ — tests/Context/{Name}/Features/{Feature}/
 docker/                           # Dockerfile, Caddyfile, php.ini
 AGENTS.md                         # Tier-1 agent context, ≤ 2 000 tokens
 AGENTS.local.md.example           # per-developer overrides template (gitignored target)
 ```
 
-The two example slices (`Health/Healthz`, `Home/Index`) are reference implementations — `Healthz` is normative for ADR-0005 health checks; `Home/Index` is non-normative (drop it for API-only or SPA projects).
+The example slices (`Health/Healthz`, `Home/Index`, `Task`) are reference implementations — `Healthz` is normative for ADR-0005 health checks, `Task` for the full entity → migration → factory → tests vertical; `Home/Index` is non-normative (drop it for API-only or SPA projects).
 
 ## Architecture decisions
 

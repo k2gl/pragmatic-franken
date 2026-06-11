@@ -11,7 +11,7 @@ summary: "Symfony AssetMapper is the default for HTML-first apps (no Webpack/Vit
 
 # ADR-0007: AssetMapper
 
-**TL;DR:** Default frontend tooling is AssetMapper. The shipped `src/Home/Features/Index/` slice is a reference example, **not** an architectural commitment. Projects building an SPA can replace it with a `frontend/` workspace driven by Vite without violating any other ADR.
+**TL;DR:** Default frontend tooling is AssetMapper. The shipped `src/Context/Home/Features/Index/` slice is a reference example, **not** an architectural commitment. Projects building an SPA can replace it with a `frontend/` workspace driven by Vite without violating any other ADR.
 
 ## Decision
 

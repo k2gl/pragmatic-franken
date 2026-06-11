@@ -14,9 +14,9 @@ return function (ContainerConfigurator $container): void {
         ->load('App\\', '../src/')
             ->exclude([
                 '../src/Kernel.php',
-                '../src/*/Entity/',
-                '../src/*/Enum/',
-                '../src/*/Features/*/Domain/',
+                '../src/Context/*/Entity/',
+                '../src/Context/*/Enum/',
+                '../src/Context/*/Features/*/Domain/',
             ]);
 
     $container->services()

@@ -50,7 +50,7 @@ These stubs are already committed to `.env.test`. MercureBundle resolves the hub
 
 ## Publishing from a slice
 
-The reference implementation lives at `src/Notification/Features/LiveUpdates/`.
+The reference implementation lives at `src/Context/Notification/Features/LiveUpdates/`.
 
 ### Command + Handler
 
@@ -125,7 +125,7 @@ For private updates, the hub checks the subscriber's JWT cookie — see [Mercure
 
 ## Testing
 
-Unit-test handlers by mocking `HubInterface` — see `tests/Notification/Features/LiveUpdates/PublishLiveUpdateHandlerTest.php`.
+Unit-test handlers by mocking `HubInterface` — see `tests/Context/Notification/Features/LiveUpdates/PublishLiveUpdateHandlerTest.php`.
 
 E2E tests that need a live hub require the FrankenPHP container running (`make up`). Guard them with a `#[Group('e2e')]` attribute and skip in CI without Docker.
 

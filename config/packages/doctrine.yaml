@@ -14,12 +14,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src'
                 prefix: 'App'
                 alias: App
-            # Per-module mapping example (uncomment when a module ships Doctrine entities):
+            # Per-context mapping example (uncomment when a context ships Doctrine entities):
             # User:
             #     type: attribute
             #     is_bundle: false
-            #     dir: '%kernel.project_dir%/src/User/Entity'
-            #     prefix: 'App\User\Entity'
+            #     dir: '%kernel.project_dir%/src/Context/User/Entity'
+            #     prefix: 'App\Context\User\Entity'
             #     alias: User
 
 when@test:

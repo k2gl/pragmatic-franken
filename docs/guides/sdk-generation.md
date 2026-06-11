@@ -39,7 +39,7 @@ The script is idempotent — re-run after every Result class change.
 
 ## Output example
 
-Given `src/Billing/Features/ProcessPayment/Application/ProcessPaymentResult.php`:
+Given `src/Context/Billing/Features/ProcessPayment/Application/ProcessPaymentResult.php`:
 
 ```php
 final readonly class ProcessPaymentResult

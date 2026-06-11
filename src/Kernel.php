@@ -15,7 +15,7 @@ class Kernel extends BaseKernel
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
         // Attribute-based routes from every slice's EntryPoint/Http/ controllers.
-        foreach (glob($this->getProjectDir().'/src/*/Features/*/EntryPoint/Http', GLOB_ONLYDIR) ?: [] as $dir) {
+        foreach (glob($this->getProjectDir().'/src/Context/*/Features/*/EntryPoint/Http', GLOB_ONLYDIR) ?: [] as $dir) {
             $routes->import($dir, 'attribute');
         }
         // Optional global controllers under src/Controller/ if a project adds one.

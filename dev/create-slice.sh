@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Generates a vertical slice scaffold for src/{Context}/Features/{Feature}/.
+# Generates a vertical slice scaffold for src/Context/{Context}/Features/{Feature}/.
 # {Context} is a DDD Bounded Context (Eric Evans / Vaughn Vernon) — top-level
 # directories like User/, Billing/, Health/ each have their own ubiquitous
 # language and consistency boundary.
@@ -19,8 +19,8 @@ if [[ -z "$CONTEXT" || -z "$FEATURE" ]]; then
     exit 1
 fi
 
-DIR="src/$CONTEXT/Features/$FEATURE"
-TEST_DIR="tests/$CONTEXT/Features/$FEATURE"
+DIR="src/Context/$CONTEXT/Features/$FEATURE"
+TEST_DIR="tests/Context/$CONTEXT/Features/$FEATURE"
 
 if [[ -e "$DIR" ]]; then
     echo "Refusing to overwrite existing $DIR" >&2
@@ -37,7 +37,7 @@ cat > "$DIR/Application/${FEATURE}Command.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\${CONTEXT}\\Features\\${FEATURE}\\Application;
+namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application;
 
 final readonly class ${FEATURE}Command
 {
@@ -52,7 +52,7 @@ cat > "$DIR/Application/${FEATURE}Handler.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\${CONTEXT}\\Features\\${FEATURE}\\Application;
+namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application;
 
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 
@@ -72,7 +72,7 @@ cat > "$DIR/Application/${FEATURE}Result.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\${CONTEXT}\\Features\\${FEATURE}\\Application;
+namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application;
 
 final readonly class ${FEATURE}Result
 {
@@ -87,9 +87,9 @@ cat > "$DIR/EntryPoint/Http/${FEATURE}Controller.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\${CONTEXT}\\Features\\${FEATURE}\\EntryPoint\\Http;
+namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\EntryPoint\\Http;
 
-use App\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
 use Symfony\\Component\\HttpFoundation\\JsonResponse;
 use Symfony\\Component\\Messenger\\HandleTrait;
 use Symfony\\Component\\Messenger\\MessageBusInterface;
@@ -119,11 +119,11 @@ cat > "$TEST_DIR/${FEATURE}HandlerTest.php" <<EOF
 
 declare(strict_types=1);
 
-namespace App\\Tests\\${CONTEXT}\\Features\\${FEATURE};
+namespace App\\Tests\\Context\\${CONTEXT}\\Features\\${FEATURE};
 
-use App\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
-use App\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Handler;
-use App\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Result;
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Handler;
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Result;
 use App\\Tests\\Support\\TestCase\\UnitTestCase;
 use PHPUnit\\Framework\\Attributes\\Group;
 

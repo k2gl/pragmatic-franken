@@ -74,9 +74,9 @@ pragmatic-franken/
 make slice context=Billing feature=Subscribe
 ```
 
-This generates `src/Billing/Features/Subscribe/` with `Application/SubscribeCommand.php`, `Application/SubscribeHandler.php`, `Application/SubscribeResult.php`, `EntryPoint/Http/SubscribeController.php`, plus a matching `tests/Billing/Features/Subscribe/SubscribeHandlerTest.php`. Open the files and replace the placeholders.
+This generates `src/Context/Billing/Features/Subscribe/` with `Application/SubscribeCommand.php`, `Application/SubscribeHandler.php`, `Application/SubscribeResult.php`, `EntryPoint/Http/SubscribeController.php`, plus a matching `tests/Context/Billing/Features/Subscribe/SubscribeHandlerTest.php`. Open the files and replace the placeholders.
 
-The reference slice for JSON endpoints is [`src/Health/Features/Healthz/`](../../src/Health/Features/Healthz/). The reference for Twig + AssetMapper is [`src/Home/Features/Index/`](../../src/Home/Features/Index/) (non-normative — drop it for API-only projects).
+The reference slice for JSON endpoints is [`src/Context/Health/Features/Healthz/`](../../src/Context/Health/Features/Healthz/). The reference for Twig + AssetMapper is [`src/Context/Home/Features/Index/`](../../src/Context/Home/Features/Index/) (non-normative — drop it for API-only projects).
 
 ## Common patterns
 

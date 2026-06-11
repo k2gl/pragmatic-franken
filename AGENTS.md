@@ -27,21 +27,23 @@ make slice context=Foo feature=Bar  # scaffold a new slice
 ```
 src/
   Kernel.php                            # App\Kernel
-  {Context}/
+  Context/{Name}/
+    Entity/                             # Doctrine entities of the context
+    Repository/                         # typed repositories (extend SharedKernel DoctrineRepository)
     Features/{Feature}/
-      Domain/                           # entities, value objects, domain events (optional)
+      Domain/                           # value objects, domain events (optional)
       Application/                      # *Command / *Query / *Handler / *Result
-      Infrastructure/                   # adapters: Doctrine repos, HTTP clients, etc.
+      Infrastructure/                   # adapters: HTTP clients, gateways, etc.
       EntryPoint/Http/{Feature}Controller.php
       EntryPoint/Cli/{Verb}{Feature}CliCommand.php   # if a CLI entry exists
 config/  bin/  public/  assets/         # standard Symfony layout
-docs/    dev/  ops/                     # ADRs, codegen, deploy
-tests/   {Context}/Features/{Feature}/   # mirror of src/
+docs/    dev/  ops/  migrations/        # ADRs, codegen, deploy, Doctrine migrations
+tests/   Context/{Name}/Features/{Feature}/   # mirror of src/
 ```
 
 ## Hard rules (DO / DO-NOT)
 
-- **DO** put feature code in `src/{Context}/Features/{Feature}/`. See ADR-0001.
+- **DO** put feature code in `src/Context/{Name}/Features/{Feature}/`; entities in `src/Context/{Name}/Entity/`, repositories in `Repository/`. See ADR-0001.
 - **DO** name CQRS commands `Create{Feature}Command`, `Update{Feature}Command`, etc. — verb + noun.
 - **DO** use `#[AsMessageHandler]` on handlers and dispatch via `MessageBusInterface`.
 - **DO** name Symfony Console classes `*CliCommand extends Command` in `EntryPoint/Cli/`.
@@ -56,7 +58,7 @@ tests/   {Context}/Features/{Feature}/   # mirror of src/
 ## Slice anatomy (canonical, ADR-0001)
 
 ```
-src/User/Features/Register/
+src/Context/User/Features/Register/
   Application/RegisterCommand.php
   Application/RegisterHandler.php
   Application/RegisterResult.php
@@ -65,7 +67,7 @@ src/User/Features/Register/
   EntryPoint/Cli/RegisterUserCliCommand.php  # bin/console user:register (optional)
 ```
 
-`Domain/` is added only when the feature has its own value objects, entities, or domain events. Cross-feature shared code lives at the next level up (`src/{Context}/Shared/`) only after the Rule of Three (used in 3+ slices). See ADR-0009.
+`Domain/` is added only when the feature has its own value objects or domain events. Cross-feature shared code lives at the next level up (`src/Context/{Name}/Shared/`) only after the Rule of Three (used in 3+ slices); cross-context infrastructure goes to `src/SharedKernel/`. See ADR-0009.
 
 ## Naming cheat-sheet
 
@@ -77,7 +79,7 @@ src/User/Features/Register/
 | Result DTO | `{Feature}Result` | `Application/` |
 | HTTP controller | `{Feature}Controller` | `EntryPoint/Http/` |
 | Symfony Console | `{Verb}{Feature}CliCommand` extends `Command` | `EntryPoint/Cli/` |
-| Domain event | `{Feature}{PastTenseVerb}` | `Domain/` (intra-feature) or `src/{Context}/Shared/Events/` (cross-context) |
+| Domain event | `{Feature}{PastTenseVerb}` | `Domain/` (intra-feature) or `src/Context/{Name}/Shared/Events/` (cross-context) |
 
 ## Runtime mode
 
@@ -85,7 +87,7 @@ FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless 
 
 ## Testing
 
-Pyramid 60 / 30 / 10 (unit / integration / e2e). Recommended coverage targets (fork policy, not a CI gate): Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 %. Layout mirrors `src/` at `tests/{Context}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See ADR-0008, `docs/guides/testing.md`.
+Pyramid 60 / 30 / 10 (unit / integration / e2e). Recommended coverage targets (fork policy, not a CI gate): Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 %. Layout mirrors `src/` at `tests/Context/{Name}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See ADR-0008, `docs/guides/testing.md`.
 
 ## Pitfalls
 
