@@ -27,20 +27,20 @@ final readonly class CompleteTaskHandler
         // Throws EntityNotFoundException → 404 problem+json (SharedKernel listener).
         $task = $this->tasks->get($command->taskId);
 
-        if (! $task->isCompleted()) {
+        if (! $task->completed) {
             $task->complete();
             $this->tasks->save($task);
 
             $this->eventBus->dispatch(new TaskCompleted(
-                taskId: (string) $task->id(),
-                title: $task->title(),
+                taskId: (string) $task->id,
+                title: $task->title,
                 completedAt: $this->completedAtOf($task),
             ));
         }
 
         return new CompleteTaskResult(
-            id: (string) $task->id(),
-            title: $task->title(),
+            id: (string) $task->id,
+            title: $task->title,
             completed: true,
             completedAt: $this->completedAtOf($task)->format(DateTimeInterface::ATOM),
         );
@@ -48,7 +48,7 @@ final readonly class CompleteTaskHandler
 
     private function completedAtOf(Task $task): DateTimeImmutable
     {
-        $completedAt = $task->completedAt();
+        $completedAt = $task->completedAt;
         \assert($completedAt !== null);
 
         return $completedAt;

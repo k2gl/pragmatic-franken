@@ -32,7 +32,7 @@ final class PurgeCompletedTasksHandlerTest extends IntegrationTestCase
 
         $repository = TaskFactory::repository();
         fact($repository->count())->is(2);
-        fact($repository->find($fresh->id()))->notNull();
+        fact($repository->find($fresh->id))->notNull();
     }
 
     private function ageCompletedAt(Task $task, string $modifier): void

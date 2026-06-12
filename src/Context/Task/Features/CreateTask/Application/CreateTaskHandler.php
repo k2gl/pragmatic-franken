@@ -24,10 +24,10 @@ final readonly class CreateTaskHandler
         $this->tasks->save($task);
 
         return new CreateTaskResult(
-            id: (string) $task->id(),
-            title: $task->title(),
-            completed: $task->isCompleted(),
-            createdAt: $task->createdAt()->format(DateTimeInterface::ATOM),
+            id: (string) $task->id,
+            title: $task->title,
+            completed: $task->completed,
+            createdAt: $task->createdAt->format(DateTimeInterface::ATOM),
         );
     }
 }

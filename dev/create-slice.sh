@@ -136,9 +136,13 @@ final class ${FEATURE}HandlerTest extends UnitTestCase
 {
     public function test_handler_returns_result(): void
     {
+        // arrange
         \$handler = new ${FEATURE}Handler;
+
+        // act
         \$result = \$handler(new ${FEATURE}Command);
 
+        // assert
         self::assertInstanceOf(${FEATURE}Result::class, \$result);
     }
 }

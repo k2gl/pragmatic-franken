@@ -17,8 +17,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Demo data for manual testing (`make db-seed`). Idempotent-ish: skips when
  * tasks already exist. Refused in prod — seeding production is an incident,
- * not a feature. Extend per project as new contexts appear (the CRM version
- * seeds users, products and prospects the same way).
+ * not a feature. Extend per project as new contexts appear — real projects seed
+ * users, catalogs and the like the same way.
  */
 #[AsCommand(name: 'app:seed', description: 'Seed demo data for manual testing (dev only)')]
 final class SeedCliCommand extends Command

@@ -21,7 +21,7 @@ final class CompleteTaskTest extends ApiTestCase
     {
         $task = TaskFactory::createOne(['title' => 'Close the loop']);
 
-        $this->sendJsonRequest('POST', sprintf('/tasks/%s/complete', $task->id()));
+        $this->sendJsonRequest('POST', sprintf('/tasks/%s/complete', $task->id));
 
         fact($this->responseStatusCode())->is(200);
         fact($this->responseReader()->nested('data')->bool('completed'))->true();
@@ -34,7 +34,7 @@ final class CompleteTaskTest extends ApiTestCase
     {
         $task = TaskFactory::new()->completed()->create();
 
-        $this->sendJsonRequest('POST', sprintf('/tasks/%s/complete', $task->id()));
+        $this->sendJsonRequest('POST', sprintf('/tasks/%s/complete', $task->id));
 
         fact($this->responseStatusCode())->is(200);
         $this->transport('async')->queue()->assertContains(TaskCompleted::class, 0);

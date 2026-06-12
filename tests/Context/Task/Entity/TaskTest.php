@@ -17,9 +17,9 @@ final class TaskTest extends UnitTestCase
     {
         $task = new Task('Write docs');
 
-        fact($task->isCompleted())->false();
-        fact($task->title())->is('Write docs');
-        fact($task->completedAt())->null();
+        fact($task->completed)->false();
+        fact($task->title)->is('Write docs');
+        fact($task->completedAt)->null();
     }
 
     public function test_complete_is_idempotent(): void
@@ -27,11 +27,11 @@ final class TaskTest extends UnitTestCase
         $task = new Task('Write docs');
 
         $task->complete();
-        $firstCompletedAt = $task->completedAt();
+        $firstCompletedAt = $task->completedAt;
 
         $task->complete();
 
-        fact($task->isCompleted())->true();
-        fact($task->completedAt())->is($firstCompletedAt);
+        fact($task->completed)->true();
+        fact($task->completedAt)->is($firstCompletedAt);
     }
 }

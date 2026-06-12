@@ -9,12 +9,14 @@ use App\SharedKernel\Infrastructure\Persistence\DoctrineRepository;
 use DateTimeImmutable;
 
 /**
- * @method Task|null find($id, $lockMode = null, $lockVersion = null)
- * @method Task|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
- * @method list<Task> findAll()
- * @method list<Task> findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
- *
  * @extends DoctrineRepository<Task>
+ *
+ * @method Task       get(string $id, ?int $lockMode = null, ?int $lockVersion = null)
+ * @method Task       reference(mixed $id)
+ * @method Task|null  find($id, $lockMode = null, $lockVersion = null)
+ * @method Task|null  findOneBy(array<string, mixed> $criteria, ?array<string, string> $orderBy = null)
+ * @method list<Task> findAll()
+ * @method list<Task> findBy(array<string, mixed> $criteria, ?array<string, string> $orderBy = null, ?int $limit = null, ?int $offset = null)
  */
 final class TaskRepository extends DoctrineRepository
 {

@@ -20,47 +20,27 @@ class Task
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME)]
-    private Uuid $id;
+    public private(set) Uuid $id;
 
     #[ORM\Column(length: 255)]
-    private string $title;
+    public private(set) string $title;
 
     #[ORM\Column(nullable: true)]
-    private ?DateTimeImmutable $completedAt = null;
+    public private(set) ?DateTimeImmutable $completedAt = null;
 
     #[ORM\Column]
-    private DateTimeImmutable $createdAt;
+    public private(set) DateTimeImmutable $createdAt;
+
+    /** Virtual (unmapped) — hooks are for get-only computed properties. */
+    public bool $completed {
+        get => $this->completedAt !== null;
+    }
 
     public function __construct(string $title)
     {
         $this->id = Uuid::v7();
         $this->title = $title;
         $this->createdAt = new DateTimeImmutable;
-    }
-
-    public function id(): Uuid
-    {
-        return $this->id;
-    }
-
-    public function title(): string
-    {
-        return $this->title;
-    }
-
-    public function isCompleted(): bool
-    {
-        return $this->completedAt !== null;
-    }
-
-    public function completedAt(): ?DateTimeImmutable
-    {
-        return $this->completedAt;
-    }
-
-    public function createdAt(): DateTimeImmutable
-    {
-        return $this->createdAt;
     }
 
     /** Idempotent: completing a completed task keeps the original timestamp. */
