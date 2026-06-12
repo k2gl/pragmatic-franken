@@ -71,10 +71,10 @@ pragmatic-franken/
 ## Creating a new slice
 
 ```bash
-make slice context=Billing feature=Subscribe
+make slice context=Newsletter feature=Subscribe
 ```
 
-This generates `src/Context/Billing/Features/Subscribe/` with `Application/SubscribeCommand.php`, `Application/SubscribeHandler.php`, `Application/SubscribeResult.php`, `EntryPoint/Http/SubscribeController.php`, plus a matching `tests/Context/Billing/Features/Subscribe/SubscribeHandlerTest.php`. Open the files and replace the placeholders.
+This generates `src/Context/Newsletter/Features/Subscribe/` with `Application/SubscribeHandler.php`, `Application/Message/SubscribeCommand.php`, `Application/Dto/SubscribeResult.php`, `EntryPoint/Http/SubscribeController.php`, plus a matching `tests/Context/Newsletter/Features/Subscribe/SubscribeHandlerTest.php`. Open the files and replace the placeholders.
 
 The reference slice for JSON endpoints is [`src/Context/Health/Features/Healthz/`](../../src/Context/Health/Features/Healthz/). The reference for Twig + AssetMapper is [`src/Context/Home/Features/Index/`](../../src/Context/Home/Features/Index/) (non-normative — drop it for API-only projects).
 
@@ -82,45 +82,52 @@ The reference slice for JSON endpoints is [`src/Context/Health/Features/Healthz/
 
 ### Validating input with attributes
 
-Place validation on the request DTO so it's deserialized and validated by `#[MapRequestPayload]`:
+Place validation on the `*Request` DTO (`Application/Dto/`) so it's deserialized and validated by `#[MapRequestPayload]`; the command stays a pure data carrier:
 
 ```php
-namespace App\Task\Features\CreateTask\Application;
+namespace App\Context\Task\Features\CreateTask\Application\Dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-final readonly class CreateTaskCommand
+final readonly class CreateTaskRequest
 {
     public function __construct(
         #[Assert\NotBlank]
-        #[Assert\Length(min: 3, max: 255)]
+        #[Assert\Length(max: 255)]
         public string $title,
-        #[Assert\Positive]
-        public int $columnId,
     ) {}
 }
 ```
 
 ### Dispatching a command from a controller
 
+Controllers use `HandleTrait::handle()`, build the command from the validated request and wrap the result in the `data` envelope:
+
 ```php
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 final class CreateTaskController
 {
-    public function __construct(private MessageBusInterface $bus) {}
+    use HandleTrait;
 
-    #[Route('/task', methods: ['POST'])]
-    public function __invoke(#[MapRequestPayload] CreateTaskCommand $cmd): JsonResponse
+    public function __construct(MessageBusInterface $messageBus)
     {
-        $envelope = $this->bus->dispatch($cmd);
-        // ... return JSON
+        $this->messageBus = $messageBus;
+    }
+
+    #[Route('/tasks', methods: ['POST'])]
+    public function __invoke(#[MapRequestPayload] CreateTaskRequest $request): JsonResponse
+    {
+        $result = $this->handle(new CreateTaskCommand($request->title));
+
+        return new JsonResponse(['data' => $result], Response::HTTP_CREATED);
     }
 }
 ```
 
-For sync handlers that return a value, use `HandleTrait::handle()` (see `HealthzController` for an example).
+The shipped reference is [`src/Context/Task/Features/CreateTask/`](../../src/Context/Task/Features/CreateTask/).
 
 ### Enums for status
 

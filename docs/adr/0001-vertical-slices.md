@@ -34,7 +34,7 @@ Each business action is a self-contained directory inside a Bounded Context:
 src/{Context}/Features/{Feature}/
 ```
 
-`{Context}` here is a **DDD Bounded Context** (Eric Evans, Vaughn Vernon) — a part of the system with its own ubiquitous language, model, and consistency boundary. `User`, `Billing`, `Inventory`, `Health` are bounded contexts; `User.Login` and `User.Register` are slices within the `User` context. The term `{Context}` is preferred over `{Module}` because the top-level dir is a strategic boundary, not just a code-organisation namespace.
+`{Context}` here is a **DDD Bounded Context** (Eric Evans, Vaughn Vernon) — a part of the system with its own ubiquitous language, model, and consistency boundary. `User`, `Task`, `Inventory`, `Health` are bounded contexts; `User.Login` and `User.Register` are slices within the `User` context. The term `{Context}` is preferred over `{Module}` because the top-level dir is a strategic boundary, not just a code-organisation namespace.
 
 ### 2. Canonical slice layout
 

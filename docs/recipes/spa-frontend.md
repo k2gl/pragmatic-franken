@@ -2,13 +2,13 @@
 audience: both
 tier: 2
 last_reviewed: 2026-06-11
-summary: "Replace AssetMapper+Twig with a Vue/React SPA in frontend/: a spa_builder Docker stage compiles it into the prod image; Caddy serves the app shell with history-mode fallback. Pattern proven in the production CRM."
+summary: "Replace AssetMapper+Twig with a Vue/React SPA in frontend/: a spa_builder Docker stage compiles it into the prod image; Caddy serves the app shell with history-mode fallback. Pattern proven in real production projects."
 ---
 
 # Recipe: SPA frontend (Vue/React)
 
 The skeleton's default frontend is AssetMapper + Twig (ADR-0007) — zero build
-tooling. When a project outgrows it, the CRM-proven pattern is a `frontend/`
+tooling. When a project outgrows it, the production-proven pattern is a `frontend/`
 workspace compiled **inside the Docker build**, so deploys stay single-artifact.
 
 ## Layout

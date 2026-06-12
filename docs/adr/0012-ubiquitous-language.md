@@ -13,7 +13,7 @@ summary: "Entities and repositories live at context level (src/Context/{Name}/En
 
 **TL;DR:** A bounded context owns its entities: `src/Context/{Name}/Entity/` and
 `Repository/` sit next to `Features/`. Names use full domain words
-(`prospectList`, not `pl`; `CompleteTask`, not `CmplTsk`). Ported from the CRM
+(`prospectList`, not `pl`; `CompleteTask`, not `CmplTsk`). Ported from real projects
 that grew out of this skeleton, where feature-local entities caused churn the
 moment a second feature needed the same aggregate.
 
@@ -39,7 +39,7 @@ isolation, or copy-paste that violates sanity.
    (English by default). Abbreviations are allowed only for universally
    understood terms (`id`, `url`, `http`).
 5. **One glossary per project.** Forks document their domain glossary in an ADR
-   (the CRM's ADR-0012 lists Deal, Prospect, Activity, …) so humans and agents
+   (a real project's glossary lists Deal, Prospect, Activity, …) so humans and agents
    share the same vocabulary.
 
 ## Consequences

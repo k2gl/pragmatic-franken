@@ -30,7 +30,7 @@ never converges. The cure is a strict definition of *what* may be shared and
 ### Two levels
 
 1. **SharedKernel** (`src/SharedKernel/`) — cross-context infrastructure glue.
-   Shipped contents (ported from the production CRM grown from this skeleton):
+   Shipped contents (ported from real production projects grown from this skeleton):
 
    ```
    src/SharedKernel/

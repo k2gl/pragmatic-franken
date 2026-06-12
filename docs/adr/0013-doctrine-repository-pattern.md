@@ -23,7 +23,7 @@ non-CRUD scenarios (`clear()`, batch imports).
 The naive `$entityManager->getRepository(X::class)->…` style loses types:
 PHPStan sees `find(): ?object`, magic `findOneByEmail` calls are invisible to
 static analysis, and `persist()+flush()` pairs scatter across handlers with no
-single semantic "save". Proven in the CRM (and the k2gl/time-pick reference)
+single semantic "save". Proven in real projects (and the k2gl/time-pick reference)
 before being ported back here.
 
 ## Decision

@@ -2,7 +2,7 @@
 audience: both
 tier: 2
 last_reviewed: 2026-06-11
-summary: "Single-VDS deployment: stage + prod as isolated compose projects behind one front Caddy that terminates TLS; zero-downtime blue-green rollout gated on /ready. Ported from the production CRM grown out of this skeleton."
+summary: "Single-VDS deployment: stage + prod as isolated compose projects behind one front Caddy that terminates TLS; zero-downtime blue-green rollout gated on /ready. Ported from real production projects grown out of this skeleton."
 ---
 
 # Deployment — single VDS, stage + prod
@@ -69,7 +69,7 @@ blue-green overlap the old code runs on the already-migrated schema.
 ## CI/CD
 
 `release.yml` builds, boot-tests and pushes the image on every main commit and
-tag. Hook deployment to your taste — the CRM triggers `deploy.sh` over SSH:
+tag. Hook deployment to your taste — real projects trigger `deploy.sh` over SSH:
 stage auto-deploys on push to main; prod is a manual `workflow_dispatch` with
 `REF=<tag>` after stage soak. Verify image provenance before rollout — see
 `docs/guides/supply-chain.md`.

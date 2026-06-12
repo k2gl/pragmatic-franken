@@ -11,7 +11,7 @@ summary: "Symfony Messenger as the primary bus. CQRS: Commands and Queries are s
 
 # ADR-0002: Messenger Transport
 
-**TL;DR:** All write operations dispatch a `*Command` synchronously through Messenger. Reads dispatch a `*Query`. Cross-feature side effects use asynchronous `*Event`s on the Doctrine transport (`doctrine://default?auto_setup=true` — no extra PHP extension, inspectable queue table, proven in the CRM grown from this skeleton; swap the DSN for Redis/AMQP when throughput demands it). ADR-0003 (Pragmatism Charter) defines when this rule may be skipped (single-writer CRUD, legacy migration, perf-critical hot paths).
+**TL;DR:** All write operations dispatch a `*Command` synchronously through Messenger. Reads dispatch a `*Query`. Cross-feature side effects use asynchronous `*Event`s on the Doctrine transport (`doctrine://default?auto_setup=true` — no extra PHP extension, inspectable queue table, proven in real projects grown from this skeleton; swap the DSN for Redis/AMQP when throughput demands it). ADR-0003 (Pragmatism Charter) defines when this rule may be skipped (single-writer CRUD, legacy migration, perf-critical hot paths).
 
 ## Context
 
@@ -65,37 +65,38 @@ graph LR
 **Naming:** `*Command` for commands, `*Handler` for handlers
 
 ```php
-// src/Task/Features/CreateTask/CreateTaskCommand.php
+// src/Context/Task/Features/CreateTask/Application/Message/CreateTaskCommand.php
 declare(strict_types=1);
 
-namespace App\Task\Features\CreateTask;
+namespace App\Context\Task\Features\CreateTask\Application\Message;
 
 final readonly class CreateTaskCommand
 {
     public function __construct(
         public string $title,
-        public int $columnId,
-        public ?string $description = null,
     ) {}
 }
 ```
 
 ```php
-// src/Task/Features/CreateTask/CreateTaskHandler.php
+// src/Context/Task/Features/CreateTask/Application/CreateTaskHandler.php
 declare(strict_types=1);
 
-namespace App\Task\Features\CreateTask;
+namespace App\Context\Task\Features\CreateTask\Application;
 
+use App\Context\Task\Features\CreateTask\Application\Dto\CreateTaskResult;
+use App\Context\Task\Features\CreateTask\Application\Message\CreateTaskCommand;
+use App\Context\Task\Repository\TaskRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final readonly class CreateTaskHandler
 {
     public function __construct(
-        private TaskRepository $repository,
+        private TaskRepository $tasks,
     ) {}
 
-    public function handle(CreateTaskCommand $command): CreateTaskResponse
+    public function __invoke(CreateTaskCommand $command): CreateTaskResult
     {
         // Business logic here
     }
@@ -107,14 +108,14 @@ final readonly class CreateTaskHandler
 **Purpose:** Handle read operations (data retrieval)
 
 ```php
-// src/Task/Features/GetTask/GetTaskQuery.php
+// src/Context/Task/Features/GetTask/Application/Message/GetTaskQuery.php
 declare(strict_types=1);
 
-namespace App\Task\Features\GetTask;
+namespace App\Context\Task\Features\GetTask\Application\Message;
 
 final readonly class GetTaskQuery
 {
-    public function __construct(public int $taskId) {}
+    public function __construct(public string $taskId) {}
 }
 ```
 
@@ -123,21 +124,24 @@ final readonly class GetTaskQuery
 **Purpose:** Notify other modules of domain changes
 
 ```php
-// src/Task/Features/Task/Event/TaskCompletedEvent.php
+// src/Context/Task/Features/CompleteTask/Domain/TaskCompleted.php
 declare(strict_types=1);
 
-namespace App\Task\Features\Task\Event;
+namespace App\Context\Task\Features\CompleteTask\Domain;
 
-use App\Shared\Services\EventBus;
+use DateTimeImmutable;
 
-final class TaskCompletedEvent
+final readonly class TaskCompleted
 {
     public function __construct(
-        public readonly int $taskId,
-        public readonly int $userId,
+        public string $taskId,
+        public string $title,
+        public DateTimeImmutable $completedAt,
     ) {}
 }
 ```
+
+Past-tense names, no `Event` suffix: `TaskCompleted`, not `TaskCompletedEvent` (ADR-0011).
 
 ## AI Use Cases
 
@@ -150,9 +154,9 @@ Messenger is particularly useful for AI workloads:
 final readonly class GenerateSummaryCommand
 {
     public function __construct(
-        public int $taskId,
+        public string $taskId,
         public string $content,
-        public string $model = 'gpt-4',
+        public string $model,
     ) {}
 }
 
@@ -162,10 +166,10 @@ final readonly class GenerateSummaryHandler
 {
     public function __construct(
         private LlmService $llm,
-        private TaskRepository $repository,
+        private TaskRepository $tasks,
     ) {}
 
-    public function handle(GenerateSummaryCommand $command): void
+    public function __invoke(GenerateSummaryCommand $command): void
     {
         $summary = $this->llm->generate($command->content, $command->model);
         // Store result, notify user
@@ -232,15 +236,15 @@ framework:
 
 | Scenario | Bus | Example |
 |----------|-----|---------|
-| Create/Update/Delete state | Command Bus | `CreateTaskMessage` |
-| Trigger side effects | Command Bus | `SendNotificationMessage` |
+| Create/Update/Delete state | Command Bus | `CreateTaskCommand` |
+| Trigger side effects | Command Bus | `PublishLiveUpdateCommand` |
 | Retrieve data only | Query Bus | `GetTaskQuery` |
-| Notify other modules | Event Bus | `TaskCompletedEvent` |
+| Notify other modules | Event Bus | `TaskCompleted` |
 
 ### Handler Best Practices
 
 1. **One handler per message**: Keep handlers focused
-2. **No return for commands**: Changes happen inside entities
+2. **Commands may return a Result DTO** for the HTTP layer — never an entity
 3. **Return DTOs for queries**: Never return entities
 4. **Use transaction middleware**: Ensure atomicity for commands
 5. **Validate early**: Validate DTOs before reaching handlers

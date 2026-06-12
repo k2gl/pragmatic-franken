@@ -29,7 +29,7 @@ For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** �
 | Framework | Symfony 8.0 | mature, attribute-based wiring |
 | Bus | Symfony Messenger (CQRS) | sync commands/queries, async events |
 | Database | PostgreSQL 17 | Doctrine ORM 3 |
-| Queue | Messenger on Doctrine transport | no extra extension, inspectable, CRM-proven |
+| Queue | Messenger on Doctrine transport | no extra extension, inspectable, production-proven |
 | Cache | Redis 7 (Predis) | ready for caching and custom needs |
 | Frontend (default) | AssetMapper + Twig | no Webpack/Vite needed for HTML-first |
 | Code style | Laravel Pint (PSR-12) | one-flag autofix |
@@ -151,7 +151,7 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 
 ## Recipes (opt-in capabilities)
 
-Proven in the production CRM grown from this skeleton, documented instead of
+Proven in real production projects grown from this skeleton, documented instead of
 bundled: [JWT auth](docs/recipes/jwt-auth.md) ·
 [feature flags](docs/recipes/feature-flags.md) ·
 [SPA frontend](docs/recipes/spa-frontend.md) ·

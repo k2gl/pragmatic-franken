@@ -28,76 +28,74 @@ Full event sourcing (event store + projections + snapshots) is powerful but expe
 ### 1. Domain events are immutable value objects
 
 ```php
-// src/Billing/Features/ProcessPayment/Domain/PaymentProcessed.php
-final readonly class PaymentProcessed
+// src/Context/Task/Features/CompleteTask/Domain/TaskCompleted.php
+final readonly class TaskCompleted
 {
     public function __construct(
-        public string $paymentId,
-        public int    $amountCents,
-        public string $currency,
-        public \DateTimeImmutable $processedAt,
+        public string $taskId,
+        public string $title,
+        public DateTimeImmutable $completedAt,
     ) {}
 }
 ```
 
 Rules:
 - `final readonly` — no subclassing, no mutation.
-- Past-tense naming: `PaymentProcessed`, `UserRegistered`, `OrderShipped`.
+- Past-tense naming: `TaskCompleted`, `UserRegistered`, `OrderShipped`.
 - Intra-feature events live in `Domain/` of the originating slice.
 - Events consumed by **other** bounded contexts move to `src/{Context}/Shared/Events/` — Rule of Three applies (ADR-0009).
 
 ### 2. Handlers dispatch domain events via the bus
 
 ```php
-// src/Billing/Features/ProcessPayment/Application/ProcessPaymentHandler.php
+// src/Context/Task/Features/CompleteTask/Application/CompleteTaskHandler.php
 #[AsMessageHandler]
-final readonly class ProcessPaymentHandler
+final readonly class CompleteTaskHandler
 {
-    public function __construct(private MessageBusInterface $eventBus) {}
+    public function __construct(
+        private TaskRepository $tasks,
+        private MessageBusInterface $eventBus,
+    ) {}
 
-    public function __invoke(ProcessPaymentCommand $command): ProcessPaymentResult
+    public function __invoke(CompleteTaskCommand $command): CompleteTaskResult
     {
-        $paymentId = (string) Uuid::v7();
-        $processedAt = new \DateTimeImmutable();
+        $task = $this->tasks->get($command->taskId);
 
-        $this->eventBus->dispatch(new PaymentProcessed(
-            paymentId: $paymentId,
-            amountCents: $command->amountCents,
-            currency: $command->currency,
-            processedAt: $processedAt,
-        ));
+        if (! $task->completed) {
+            $task->complete();
+            $this->tasks->save($task);
 
-        return new ProcessPaymentResult($paymentId, $command->amountCents, $command->currency, $processedAt);
+            $this->eventBus->dispatch(new TaskCompleted(
+                taskId: (string) $task->id,
+                title: $task->title,
+                completedAt: $task->completedAt ?? new DateTimeImmutable,
+            ));
+        }
+        // … build and return CompleteTaskResult
     }
 }
 ```
 
 ### 3. Subscribers are independent slice handlers
 
-A subscriber in another context is just a `#[AsMessageHandler]` handler for the domain event class. Route it async in `config/packages/messenger.yaml` to decouple throughput:
+A subscriber in another context is just a `#[AsMessageHandler]` handler for the domain event class — see `src/Context/Notification/Features/LiveUpdates/Application/OnTaskCompletedPublishLiveUpdate.php`, which reacts to `TaskCompleted` by publishing a Mercure live update. Route the event async in `config/packages/messenger.yaml` to decouple throughput:
 
 ```yaml
 # config/packages/messenger.yaml
 framework:
     messenger:
-        transports:
-            async:
-                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
-                options:
-                    auto_setup: true
-
         routing:
-            App\Context\Billing\Features\ProcessPayment\Domain\PaymentProcessed: async
+            App\Context\Task\Features\CompleteTask\Domain\TaskCompleted: async
 ```
 
-For tests, override the transport with an in-memory sink so domain events are captured without a real Redis consumer:
+For tests, override the transport with the zenstruck/messenger-test sink so queued events are inspectable without a real consumer:
 
 ```yaml
 # config/packages/test/messenger.yaml
 framework:
     messenger:
         transports:
-            async: 'in-memory://'
+            async: 'test://'
 ```
 
 ### 4. What "Lite" excludes
@@ -131,4 +129,4 @@ framework:
 - ADR-0001: Vertical Slices — slice location and domain event placement rules.
 - ADR-0002: Messenger Transport — async routing configuration.
 - ADR-0009: Shared Architecture — when to move events to `Shared/Events/`.
-- `src/Billing/Features/ProcessPayment/` — reference implementation.
+- `src/Context/Task/Features/CompleteTask/` (event origin) and `src/Context/Notification/Features/LiveUpdates/` (cross-context subscriber) — reference implementation.

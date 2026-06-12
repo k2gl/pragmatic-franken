@@ -2,7 +2,7 @@
 audience: both
 tier: 2
 last_reviewed: 2026-06-11
-summary: "Add stateless JWT auth (lexik) with rotating refresh tokens (gesdinet) — configs proven in the production CRM grown from this skeleton. The skeleton ships no auth on purpose; this recipe is the fastest safe path."
+summary: "Add stateless JWT auth (lexik) with rotating refresh tokens (gesdinet) — configs proven in real production projects grown from this skeleton. The skeleton ships no auth on purpose; this recipe is the fastest safe path."
 ---
 
 # Recipe: JWT authentication
@@ -22,7 +22,7 @@ bin/console lexik:jwt:generate-keypair    # writes config/jwt/{private,public}.p
 In prod, persist the keypair in a volume (`jwt:/app/config/jwt`) and set a
 `JWT_PASSPHRASE` — see the env handling below.
 
-## Configuration (CRM-proven)
+## Configuration (production-proven)
 
 ```yaml
 # config/packages/lexik_jwt_authentication.yaml

@@ -2,14 +2,14 @@
 audience: both
 tier: 2
 last_reviewed: 2026-06-11
-summary: "Label-driven PR preview environments on the VDS: add a label → an isolated stack at pr-<N>.<domain> with fresh seed or a prod-data copy; remove it → full teardown. Pattern from the production CRM; off by default (needs VDS, wildcard DNS, secrets)."
+summary: "Label-driven PR preview environments on the VDS: add a label → an isolated stack at pr-<N>.<domain> with fresh seed or a prod-data copy; remove it → full teardown. Pattern from real production projects; off by default (needs VDS, wildcard DNS, secrets)."
 ---
 
 # Recipe: PR preview environments
 
 Off by default on purpose: previews need a VDS, a wildcard DNS record and
 deploy secrets — shipping them enabled would break the fresh-fork
-day-one-green guarantee. The pattern below runs in production in the CRM
+day-one-green guarantee. The pattern below runs in production in real projects
 grown from this skeleton; lift `preview.yml` + `ops/preview.sh` from there
 when you adopt it.
 

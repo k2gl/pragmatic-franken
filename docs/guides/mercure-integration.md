@@ -121,7 +121,7 @@ For private updates, the hub checks the subscriber's JWT cookie — see [Mercure
 |---|---|
 | `/board/{id}` | All events for a board |
 | `/user/{userId}` | Per-user private notifications |
-| `/billing/payment/{id}` | Payment status updates |
+| `/tasks` | Task completion updates (shipped example) |
 
 ## Testing
 
