@@ -12,6 +12,8 @@ use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 
+use function K2gl\PHPUnitFluentAssertions\fact;
+
 #[Group('unit')]
 final class PublishLiveUpdateHandlerTest extends UnitTestCase
 {
@@ -29,8 +31,8 @@ final class PublishLiveUpdateHandlerTest extends UnitTestCase
             data: ['event' => 'task_created'],
         ));
 
-        self::assertInstanceOf(LiveUpdateResult::class, $result);
-        self::assertSame('msg-abc-123', $result->messageId);
+        fact($result)->instanceOf(LiveUpdateResult::class);
+        fact($result->messageId)->is('msg-abc-123');
     }
 
     public function test_private_flag_is_forwarded_to_update(): void

@@ -12,6 +12,8 @@ use App\Context\Health\Features\Healthz\Infrastructure\RedisPingInterface;
 use App\Tests\Support\TestCase\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
+use function K2gl\PHPUnitFluentAssertions\fact;
+
 #[Group('unit')]
 final class CheckHealthHandlerTest extends UnitTestCase
 {
@@ -26,8 +28,8 @@ final class CheckHealthHandlerTest extends UnitTestCase
         $handler = new CheckHealthHandler($db, $redis);
         $status = $handler(new CheckHealthQuery);
 
-        self::assertInstanceOf(HealthStatus::class, $status);
-        self::assertTrue($status->ok());
+        fact($status)->instanceOf(HealthStatus::class);
+        fact($status->ok())->true();
     }
 
     public function test_returns_not_ok_when_db_is_down(): void
@@ -41,8 +43,8 @@ final class CheckHealthHandlerTest extends UnitTestCase
         $handler = new CheckHealthHandler($db, $redis);
         $status = $handler(new CheckHealthQuery);
 
-        self::assertFalse($status->ok());
-        self::assertFalse($status->db);
-        self::assertTrue($status->redis);
+        fact($status->ok())->false();
+        fact($status->db)->false();
+        fact($status->redis)->true();
     }
 }
