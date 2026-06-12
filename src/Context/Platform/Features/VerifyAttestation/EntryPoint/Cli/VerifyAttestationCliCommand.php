@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Platform\Features\VerifyAttestation\EntryPoint\Cli;
 
-use App\Context\Platform\Features\VerifyAttestation\Application\VerifyAttestationQuery;
-use App\Context\Platform\Features\VerifyAttestation\Application\VerifyAttestationResult;
+use App\Context\Platform\Features\VerifyAttestation\Application\Message\VerifyAttestationQuery;
+use App\Context\Platform\Features\VerifyAttestation\Application\Dto\VerifyAttestationResult;
 use K2gl\Sigstore\Exception\SigstoreException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

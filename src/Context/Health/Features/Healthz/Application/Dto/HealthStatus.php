@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Context\Health\Features\Healthz\Application;
+namespace App\Context\Health\Features\Healthz\Application\Dto;
 
 final readonly class HealthStatus
 {

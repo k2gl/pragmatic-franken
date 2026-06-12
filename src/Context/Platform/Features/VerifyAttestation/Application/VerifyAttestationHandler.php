@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Platform\Features\VerifyAttestation\Application;
 
+use App\Context\Platform\Features\VerifyAttestation\Application\Dto\VerifyAttestationResult;
+use App\Context\Platform\Features\VerifyAttestation\Application\Message\VerifyAttestationQuery;
 use K2gl\InToto\Statement;
 use K2gl\Sigstore\Bundle;
 use K2gl\Sigstore\Exception\SigstoreException;

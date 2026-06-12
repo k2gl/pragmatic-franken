@@ -47,7 +47,7 @@ function camelCase(string $snake): string
 
 $files = new RegexIterator(
     new RecursiveIteratorIterator(new RecursiveDirectoryIterator($srcDir)),
-    '/\/Application\/[A-Z][a-zA-Z]+Result\.php$/',
+    '/\/Application\/(?:[A-Za-z0-9]+\/)*[A-Z][a-zA-Z]+Result\.php$/',
 );
 
 $interfaces = [];

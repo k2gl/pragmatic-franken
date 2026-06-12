@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Notification\Features\LiveUpdates\Application;
 
+use App\Context\Notification\Features\LiveUpdates\Application\Dto\LiveUpdateResult;
+use App\Context\Notification\Features\LiveUpdates\Application\Message\PublishLiveUpdateCommand;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

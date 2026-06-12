@@ -33,7 +33,7 @@ src/
     Repository/                         # typed repositories (extend SharedKernel DoctrineRepository)
     Features/{Feature}/
       Domain/                           # value objects, domain events (optional)
-      Application/                      # *Command / *Query / *Handler / *Result
+      Application/                      # Handler at root; Message/ (*Command|*Query), Dto/ (*Result)
       Infrastructure/                   # adapters: HTTP clients, gateways, etc.
       EntryPoint/Http/{Feature}Controller.php
       EntryPoint/Cli/{Verb}{Feature}CliCommand.php   # if a CLI entry exists
@@ -60,9 +60,9 @@ tests/   Context/{Name}/Features/{Feature}/   # mirror of src/
 
 ```
 src/Context/User/Features/Register/
-  Application/RegisterCommand.php
   Application/RegisterHandler.php
-  Application/RegisterResult.php
+  Application/Message/RegisterCommand.php
+  Application/Dto/RegisterResult.php
   Infrastructure/PasswordHasher.php
   EntryPoint/Http/RegisterController.php   # POST /user/register
   EntryPoint/Cli/RegisterUserCliCommand.php  # bin/console user:register (optional)
@@ -74,10 +74,10 @@ src/Context/User/Features/Register/
 
 | What | Class name | Location |
 |---|---|---|
-| CQRS command (write) | `Create{Feature}Command` | `Application/` |
-| CQRS query (read) | `Get{Feature}Query` | `Application/` |
-| Handler | `{Feature}Handler` | `Application/` |
-| Result DTO | `{Feature}Result` | `Application/` |
+| CQRS command (write) | `Create{Feature}Command` | `Application/Message/` |
+| CQRS query (read) | `Get{Feature}Query` | `Application/Message/` |
+| Handler / event subscriber | `{Feature}Handler`, `On{Event}{Reaction}` | `Application/` |
+| Result / other DTO | `{Feature}Result` | `Application/Dto/` |
 | HTTP controller | `{Feature}Controller` | `EntryPoint/Http/` |
 | Symfony Console | `{Verb}{Feature}CliCommand` extends `Command` | `EntryPoint/Cli/` |
 | Domain event | `{Feature}{PastTenseVerb}` | `Domain/` (intra-feature) or `src/Context/{Name}/Shared/Events/` (cross-context) |
@@ -96,10 +96,6 @@ Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % state
 - Copy-paste is fine until 3 occurrences (Rule of Three), then extract.
 - Returning entities over HTTP triggers implicit DB queries; return DTOs.
 - `make slice` writes a stub — replace placeholders before committing.
-
-## Local overrides
-
-Per-developer settings: `AGENTS.local.md` (gitignored, copy the `.example`). Personal preferences only — never architectural rules.
 
 ## Pointer index
 

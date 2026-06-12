@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Context\Task\Features\ListTasks\Application;
+namespace App\Context\Task\Features\CreateTask\Application\Dto;
 
-final readonly class TaskItem
+final readonly class CreateTaskResult
 {
     public function __construct(
         public string $id,

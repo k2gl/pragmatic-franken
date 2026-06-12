@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Context\Platform\Features\VerifyAttestation;
 
 use App\Context\Platform\Features\VerifyAttestation\Application\VerifyAttestationHandler;
-use App\Context\Platform\Features\VerifyAttestation\Application\VerifyAttestationQuery;
+use App\Context\Platform\Features\VerifyAttestation\Application\Message\VerifyAttestationQuery;
 use App\Tests\Support\TestCase\UnitTestCase;
 use K2gl\Sigstore\Exception\SigstoreException;
 use PHPUnit\Framework\Attributes\Group;

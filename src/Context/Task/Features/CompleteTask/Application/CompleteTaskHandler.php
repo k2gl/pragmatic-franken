@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Context\Task\Features\CompleteTask\Application;
 
 use App\Context\Task\Entity\Task;
+use App\Context\Task\Features\CompleteTask\Application\Dto\CompleteTaskResult;
+use App\Context\Task\Features\CompleteTask\Application\Message\CompleteTaskCommand;
 use App\Context\Task\Features\CompleteTask\Domain\TaskCompleted;
 use App\Context\Task\Repository\TaskRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

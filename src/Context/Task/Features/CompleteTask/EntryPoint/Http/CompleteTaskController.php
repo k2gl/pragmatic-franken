@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Task\Features\CompleteTask\EntryPoint\Http;
 
-use App\Context\Task\Features\CompleteTask\Application\CompleteTaskCommand;
-use App\Context\Task\Features\CompleteTask\Application\CompleteTaskResult;
+use App\Context\Task\Features\CompleteTask\Application\Message\CompleteTaskCommand;
+use App\Context\Task\Features\CompleteTask\Application\Dto\CompleteTaskResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;

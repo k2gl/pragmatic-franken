@@ -4,7 +4,9 @@
 # directories like User/, Task/, Health/ each have their own ubiquitous
 # language and consistency boundary.
 #
-# Layout follows ADR-0001 (DDD-layered slice).
+# Layout follows ADR-0001 (DDD-layered slice). Inside Application/ only the
+# *Handler sits at the root; the dispatched message goes in Message/, output
+# DTOs in Dto/.
 #
 # Usage: make slice context=User feature=Register
 #    or: ./dev/create-slice.sh User Register
@@ -27,17 +29,17 @@ if [[ -e "$DIR" ]]; then
     exit 1
 fi
 
-mkdir -p "$DIR/Application" "$DIR/Infrastructure" "$DIR/EntryPoint/Http" "$TEST_DIR"
+mkdir -p "$DIR/Application/Message" "$DIR/Application/Dto" "$DIR/Infrastructure" "$DIR/EntryPoint/Http" "$TEST_DIR"
 
 LCC=$(echo "$CONTEXT" | tr '[:upper:]' '[:lower:]')
 LCF=$(echo "$FEATURE" | tr '[:upper:]' '[:lower:]')
 
-cat > "$DIR/Application/${FEATURE}Command.php" <<EOF
+cat > "$DIR/Application/Message/${FEATURE}Command.php" <<EOF
 <?php
 
 declare(strict_types=1);
 
-namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application;
+namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Message;
 
 final readonly class ${FEATURE}Command
 {
@@ -54,6 +56,8 @@ declare(strict_types=1);
 
 namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application;
 
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Dto\\${FEATURE}Result;
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Message\\${FEATURE}Command;
 use Symfony\\Component\\Messenger\\Attribute\\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -67,12 +71,12 @@ final readonly class ${FEATURE}Handler
 }
 EOF
 
-cat > "$DIR/Application/${FEATURE}Result.php" <<EOF
+cat > "$DIR/Application/Dto/${FEATURE}Result.php" <<EOF
 <?php
 
 declare(strict_types=1);
 
-namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application;
+namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Dto;
 
 final readonly class ${FEATURE}Result
 {
@@ -89,7 +93,7 @@ declare(strict_types=1);
 
 namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\EntryPoint\\Http;
 
-use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Message\\${FEATURE}Command;
 use Symfony\\Component\\HttpFoundation\\JsonResponse;
 use Symfony\\Component\\Messenger\\HandleTrait;
 use Symfony\\Component\\Messenger\\MessageBusInterface;
@@ -121,9 +125,9 @@ declare(strict_types=1);
 
 namespace App\\Tests\\Context\\${CONTEXT}\\Features\\${FEATURE};
 
-use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Command;
 use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Handler;
-use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\${FEATURE}Result;
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Dto\\${FEATURE}Result;
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Message\\${FEATURE}Command;
 use App\\Tests\\Support\\TestCase\\UnitTestCase;
 use PHPUnit\\Framework\\Attributes\\Group;
 
@@ -140,4 +144,4 @@ final class ${FEATURE}HandlerTest extends UnitTestCase
 }
 EOF
 
-echo "Created $DIR (Application, Infrastructure, EntryPoint/Http) and $TEST_DIR"
+echo "Created $DIR (Application: Handler at root + Message/, Dto/; Infrastructure, EntryPoint/Http) and $TEST_DIR"

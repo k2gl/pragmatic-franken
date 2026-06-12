@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Task\Features\CreateTask\EntryPoint\Http;
 
-use App\Context\Task\Features\CreateTask\Application\CreateTaskCommand;
-use App\Context\Task\Features\CreateTask\Application\CreateTaskResult;
+use App\Context\Task\Features\CreateTask\Application\Message\CreateTaskCommand;
+use App\Context\Task\Features\CreateTask\Application\Dto\CreateTaskResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;

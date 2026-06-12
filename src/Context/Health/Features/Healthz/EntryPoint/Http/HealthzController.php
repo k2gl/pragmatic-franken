@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Health\Features\Healthz\EntryPoint\Http;
 
-use App\Context\Health\Features\Healthz\Application\CheckHealthQuery;
-use App\Context\Health\Features\Healthz\Application\HealthStatus;
+use App\Context\Health\Features\Healthz\Application\Message\CheckHealthQuery;
+use App\Context\Health\Features\Healthz\Application\Dto\HealthStatus;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\HandleTrait;

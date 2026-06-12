@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Context\Task\Features\ListTasks\Application;
+namespace App\Context\Task\Features\ListTasks\Application\Dto;
 
 final readonly class ListTasksResult
 {

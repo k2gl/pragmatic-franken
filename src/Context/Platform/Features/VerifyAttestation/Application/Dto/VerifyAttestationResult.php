@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Context\Platform\Features\VerifyAttestation\Application;
+namespace App\Context\Platform\Features\VerifyAttestation\Application\Dto;
 
 final readonly class VerifyAttestationResult
 {

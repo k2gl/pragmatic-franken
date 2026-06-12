@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\Context\Health\Features\Healthz;
 
 use App\Context\Health\Features\Healthz\Application\CheckHealthHandler;
-use App\Context\Health\Features\Healthz\Application\CheckHealthQuery;
-use App\Context\Health\Features\Healthz\Application\HealthStatus;
+use App\Context\Health\Features\Healthz\Application\Message\CheckHealthQuery;
+use App\Context\Health\Features\Healthz\Application\Dto\HealthStatus;
 use App\Context\Health\Features\Healthz\Infrastructure\DbPingInterface;
 use App\Context\Health\Features\Healthz\Infrastructure\RedisPingInterface;
 use App\Tests\Support\TestCase\UnitTestCase;

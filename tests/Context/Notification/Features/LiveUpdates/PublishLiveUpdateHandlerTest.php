@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Context\Notification\Features\LiveUpdates;
 
-use App\Context\Notification\Features\LiveUpdates\Application\LiveUpdateResult;
-use App\Context\Notification\Features\LiveUpdates\Application\PublishLiveUpdateCommand;
+use App\Context\Notification\Features\LiveUpdates\Application\Dto\LiveUpdateResult;
+use App\Context\Notification\Features\LiveUpdates\Application\Message\PublishLiveUpdateCommand;
 use App\Context\Notification\Features\LiveUpdates\Application\PublishLiveUpdateHandler;
 use App\Tests\Support\TestCase\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;

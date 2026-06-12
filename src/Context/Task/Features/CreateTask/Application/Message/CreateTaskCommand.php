@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Context\Task\Features\CreateTask\Application;
+namespace App\Context\Task\Features\CreateTask\Application\Message;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

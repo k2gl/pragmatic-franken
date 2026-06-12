@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Task\Features\ListTasks\EntryPoint\Http;
 
-use App\Context\Task\Features\ListTasks\Application\ListTasksQuery;
-use App\Context\Task\Features\ListTasks\Application\ListTasksResult;
+use App\Context\Task\Features\ListTasks\Application\Message\ListTasksQuery;
+use App\Context\Task\Features\ListTasks\Application\Dto\ListTasksResult;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;

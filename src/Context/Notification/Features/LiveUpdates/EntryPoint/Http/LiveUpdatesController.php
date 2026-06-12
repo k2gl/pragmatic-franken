@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Notification\Features\LiveUpdates\EntryPoint\Http;
 
-use App\Context\Notification\Features\LiveUpdates\Application\LiveUpdateResult;
-use App\Context\Notification\Features\LiveUpdates\Application\PublishLiveUpdateCommand;
+use App\Context\Notification\Features\LiveUpdates\Application\Dto\LiveUpdateResult;
+use App\Context\Notification\Features\LiveUpdates\Application\Message\PublishLiveUpdateCommand;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

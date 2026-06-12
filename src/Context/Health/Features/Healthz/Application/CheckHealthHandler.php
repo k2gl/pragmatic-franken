@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Context\Health\Features\Healthz\Application;
 
+use App\Context\Health\Features\Healthz\Application\Dto\HealthStatus;
+use App\Context\Health\Features\Healthz\Application\Message\CheckHealthQuery;
 use App\Context\Health\Features\Healthz\Infrastructure\DbPingInterface;
 use App\Context\Health\Features\Healthz\Infrastructure\RedisPingInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

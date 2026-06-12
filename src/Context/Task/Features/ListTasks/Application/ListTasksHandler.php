@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Context\Task\Features\ListTasks\Application;
 
+use App\Context\Task\Features\ListTasks\Application\Dto\ListTasksResult;
+use App\Context\Task\Features\ListTasks\Application\Dto\TaskItem;
+use App\Context\Task\Features\ListTasks\Application\Message\ListTasksQuery;
 use App\Context\Task\Repository\TaskRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use DateTimeInterface;

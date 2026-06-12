@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Context\Notification\Features\LiveUpdates\Application;
+namespace App\Context\Notification\Features\LiveUpdates\Application\Message;
 
 final readonly class PublishLiveUpdateCommand
 {

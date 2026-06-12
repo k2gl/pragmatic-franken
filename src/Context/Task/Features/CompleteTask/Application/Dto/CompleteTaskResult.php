@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Context\Task\Features\CompleteTask\Application;
+namespace App\Context\Task\Features\CompleteTask\Application\Dto;
 
 final readonly class CompleteTaskResult
 {
