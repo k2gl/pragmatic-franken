@@ -46,6 +46,14 @@ for f in .env.dist .env; do
 done
 sed -i "s|\"name\": \".*\"|\"name\": \"${VENDOR}/${NAME}\"|" composer.json
 sed -i "s|\"description\": \"[^\"]*\"|\"description\": \"${NAME} — bootstrapped from Pragmatic FrankenPHP (k2gl/pragmatic-franken)\"|" composer.json
+# The rename invalidates composer.lock's content-hash; refresh it when
+# composer is available (docker-only users get it on the next composer run).
+if command -v composer >/dev/null 2>&1; then
+    composer update --lock --no-interaction --quiet 2>/dev/null \
+        || log "could not refresh composer.lock hash (offline?) — run 'composer update --lock'."
+else
+    log "composer not on PATH — run 'composer update --lock' inside the container to refresh the lock hash."
+fi
 
 # --- secrets (only the gitignored .env) ---------------------------------------
 if [ -f .env ]; then

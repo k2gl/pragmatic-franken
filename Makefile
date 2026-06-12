@@ -131,8 +131,12 @@ db-reset: down ## Destroy and rebuild database
 	$(MAKE) db-migrate db-seed
 
 ##—————— ✅ Tests ——————
-test-db: ## Create + migrate the dedicated test database (app_test)
-	@$(DC) exec $(DC_APP) bin/console doctrine:database:create --env=test --if-not-exists
+test-db: ## Recreate + migrate the dedicated test database (app_test)
+	@# Drop first: Foundry's ResetDatabase rebuilds the schema from mapping,
+	@# which leaves the migration registry empty — a bare re-migrate would
+	@# then hit "relation already exists". Dropping keeps make test re-runnable.
+	@$(DC) exec $(DC_APP) bin/console doctrine:database:drop --env=test --force --if-exists
+	@$(DC) exec $(DC_APP) bin/console doctrine:database:create --env=test
 	@$(DC) exec $(DC_APP) bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration
 
 test: test-db ## Run all PHPUnit tests (fail-fast)

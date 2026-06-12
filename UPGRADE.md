@@ -28,11 +28,13 @@ Worth porting, smallest diff first:
    checks `messenger.transport.scheduler_default` exists before consuming it —
    a fork with zero `#[AsPeriodicTask]` no longer crash-loops with
    `SCHEDULER_ENABLED=true`.
-7. **`make test` idempotency**: Foundry `ResetDatabase` resets via migrations
-   (`config/packages/test/zenstruck_foundry.yaml`), keeping
-   `doctrine_migration_versions` consistent between runs.
-8. **Init prune fixes** (`dev/init.sh`): prune also removes `TaskFactory`,
-   deletes only the example migration, and rewrites the composer description.
+7. **`make test` idempotency**: `make test-db` now drops and recreates the
+   test database before migrating — Foundry's schema reset empties the
+   migration registry, so a bare re-migrate used to die with
+   "relation already exists".
+8. **Init fixes** (`dev/init.sh`): prune also removes `TaskFactory` and
+   deletes only the example migration; init rewrites the composer description
+   and refreshes the `composer.lock` content-hash after the rename.
 9. **AGENTS.local.md pattern removed**: machine-local agent settings live in
    `.claude/settings.local.json`; `AGENTS.md` stays the single context file.
 

@@ -1,9 +1,2 @@
 zenstruck_foundry:
     enable_auto_refresh_with_lazy_objects: true
-    orm:
-        reset:
-            # Reset through migrations, not schema:create — keeps
-            # doctrine_migration_versions consistent so `make test` stays
-            # re-runnable (schema mode wipes the registry, and the next
-            # test-db migrate hits "relation already exists").
-            mode: migrate
