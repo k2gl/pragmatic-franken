@@ -150,7 +150,7 @@ final class CreateTaskTest extends ApiTestCase
 `zenstruck/messenger-test` asserts queued messages without booting a worker. The shipped example is an e2e test: HTTP call → domain event queued on the `async` transport. Trimmed from [`tests/Context/Task/Features/CompleteTask/CompleteTaskTest.php`](../../tests/Context/Task/Features/CompleteTask/CompleteTaskTest.php):
 
 ```php
-use App\Context\Task\Features\CompleteTask\Domain\TaskCompleted;
+use App\Context\Task\Shared\Events\TaskCompleted;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
 #[Group('e2e')]

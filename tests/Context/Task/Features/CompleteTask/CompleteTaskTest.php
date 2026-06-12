@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Context\Task\Features\CompleteTask;
 
-use App\Context\Task\Features\CompleteTask\Domain\TaskCompleted;
+use App\Context\Task\Shared\Events\TaskCompleted;
 use App\Tests\Support\Factory\TaskFactory;
 use App\Tests\Support\TestCase\ApiTestCase;
 use PHPUnit\Framework\Attributes\Group;

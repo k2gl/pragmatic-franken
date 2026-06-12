@@ -64,7 +64,7 @@ final readonly class CreateTaskHandler
 ### 3. Event Bus — cross-context notifications
 
 ```php
-// src/Context/Task/Features/CompleteTask/Domain/TaskCompleted.php
+// src/Context/Task/Shared/Events/TaskCompleted.php (cross-context contract — ADR-0011)
 final readonly class TaskCompleted
 {
     public function __construct(

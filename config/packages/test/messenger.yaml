@@ -2,5 +2,5 @@ framework:
     messenger:
         transports:
             # zenstruck/messenger-test transport: queued messages are inspectable
-            # in tests via $this->transport('async') and never hit Redis.
+            # in tests via $this->transport('async') and never hit the real transport.
             async: 'test://'

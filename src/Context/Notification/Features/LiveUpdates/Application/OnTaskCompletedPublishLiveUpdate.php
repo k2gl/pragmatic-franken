@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Context\Notification\Features\LiveUpdates\Application;
 
 use App\Context\Notification\Features\LiveUpdates\Application\Message\PublishLiveUpdateCommand;
-use App\Context\Task\Features\CompleteTask\Domain\TaskCompleted;
+use App\Context\Task\Shared\Events\TaskCompleted;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use DateTimeInterface;

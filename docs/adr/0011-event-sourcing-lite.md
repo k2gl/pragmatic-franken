@@ -22,7 +22,7 @@ Full event sourcing (event store + projections + snapshots) is powerful but expe
 ### 1. Domain events are immutable value objects
 
 ```php
-// src/Context/Task/Features/CompleteTask/Domain/TaskCompleted.php
+// src/Context/Task/Shared/Events/TaskCompleted.php
 final readonly class TaskCompleted
 {
     public function __construct(
@@ -36,8 +36,8 @@ final readonly class TaskCompleted
 Rules:
 - `final readonly` — no subclassing, no mutation.
 - Past-tense naming: `TaskCompleted`, `UserRegistered`, `OrderShipped`.
-- Intra-feature events live in `Domain/` of the originating slice.
-- Events consumed by **other** bounded contexts move to `src/{Context}/Shared/Events/` — Rule of Three applies (ADR-0009).
+- Events consumed only inside their feature live in `Domain/` of the originating slice.
+- Events consumed by **other** bounded contexts live in `src/Context/{Name}/Shared/Events/` — an event with an external consumer is a context contract, not slice property; this keeps the originating slice deletable (ADR-0001). The shipped `TaskCompleted` lives there.
 
 ### 2. Handlers dispatch domain events via the bus
 
@@ -79,7 +79,7 @@ A subscriber in another context is just a `#[AsMessageHandler]` handler for the 
 framework:
     messenger:
         routing:
-            App\Context\Task\Features\CompleteTask\Domain\TaskCompleted: async
+            App\Context\Task\Shared\Events\TaskCompleted: async
 ```
 
 Tests override the transport with the zenstruck/messenger-test sink (`config/packages/test/messenger.yaml`: `async: 'test://'`), so queued events are inspectable without a real consumer.
@@ -107,4 +107,4 @@ No event store (append-only log), no aggregates rebuilt from events, no projecti
 - ADR-0001: Vertical Slices — slice location and domain event placement rules.
 - ADR-0002: Messenger Transport — async routing configuration.
 - ADR-0009: Shared Architecture — when to move events to `Shared/Events/`.
-- `src/Context/Task/Features/CompleteTask/` (event origin) and `src/Context/Notification/Features/LiveUpdates/` (cross-context subscriber) — reference implementation.
+- `src/Context/Task/Shared/Events/TaskCompleted.php` (the event), `src/Context/Task/Features/CompleteTask/` (origin), `src/Context/Notification/Features/LiveUpdates/` (cross-context subscriber) — reference implementation.
