@@ -30,7 +30,7 @@
 * **q1:** Mercure integration, Event Sourcing Lite, SDK generator ([adac6da](https://github.com/k2gl/pragmatic-franken/commit/adac6da371852876120366ef6daff024f12cbd8b))
 * **quality:** raise PHPStan to level 10 ([654ce77](https://github.com/k2gl/pragmatic-franken/commit/654ce7724da8f3f9c56315dad7e89fc4a4046f8f))
 * **scheduler:** recurring PurgeCompletedTasks via symfony/scheduler ([9637687](https://github.com/k2gl/pragmatic-franken/commit/96376876653bf50293678d0702165bbb9128c3a6))
-* **supply-chain:** attest releases, verify before deploy (ADR-0018) ([2fd60c6](https://github.com/k2gl/pragmatic-franken/commit/2fd60c6c5e82efef6a6a32d11d6a18523ed4488b))
+* **supply-chain:** attest releases, verify before deploy (ADR-0014) ([2fd60c6](https://github.com/k2gl/pragmatic-franken/commit/2fd60c6c5e82efef6a6a32d11d6a18523ed4488b))
 * Task reference slice — entity to tests, the full vertical ([23bb020](https://github.com/k2gl/pragmatic-franken/commit/23bb020f862dff80022ff742f62b02e2476b854a))
 
 

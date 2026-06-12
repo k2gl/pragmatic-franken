@@ -1,7 +1,7 @@
 ---
 audience: both
 tier: 2
-last_reviewed: 2026-04-28
+last_reviewed: 2026-06-12
 summary: "Day-to-day development guide: setup, daily commands, slice scaffolding, common patterns. Architectural rules live in ADRs; this is the operational complement."
 ---
 
@@ -130,17 +130,6 @@ final class CreateTaskController
 ```
 
 The shipped reference is [`src/Context/Task/Features/CreateTask/`](../../src/Context/Task/Features/CreateTask/).
-
-### Enums for status
-
-```php
-enum TaskStatus: string
-{
-    case TODO = 'todo';
-    case IN_PROGRESS = 'in_progress';
-    case DONE = 'done';
-}
-```
 
 ### Returning DTOs, never entities
 

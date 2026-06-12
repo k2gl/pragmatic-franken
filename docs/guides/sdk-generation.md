@@ -1,7 +1,7 @@
 ---
 audience: both
 tier: 2
-last_reviewed: 2026-04-29
+last_reviewed: 2026-06-12
 summary: "Auto-generate TypeScript type definitions from PHP Result DTOs. Run dev/generate-sdk.sh after adding or changing a *Result.php class."
 ---
 
@@ -21,7 +21,7 @@ The script is idempotent — re-run after every Result class change.
 
 ## How it works
 
-1. Finds all files matching `src/*/Features/*/Application/*Result.php`.
+1. Finds every `*Result.php` under `src/Context/*/Features/*/Application/`, nested subdirectories like `Dto/` included (exact regex in `dev/generate-sdk.sh`).
 2. Parses `public function __construct(...)` via regex — no autoloading required.
 3. Maps PHP types to TypeScript equivalents (see table below).
 4. Emits one `interface` per Result class into `packages/client-sdk/types.ts`.
