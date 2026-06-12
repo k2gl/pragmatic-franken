@@ -98,6 +98,82 @@ jobs:
       - name: Agent smoke (scaffolded code passes all gates untouched)
         run: ./dev/agent-smoke.sh
 
+  # The fork path must stay as green as the template itself: rename + prune,
+  # then the same gates with zero manual edits (catches orphaned factories,
+  # over-broad prune globs, scheduler assumptions).
+  init-smoke:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app -d app"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://app:app_password@127.0.0.1:5432/app?serverVersion=17&charset=utf8
+      REDIS_URL: redis://127.0.0.1:6379
+      MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=true
+      APP_ENV: test
+      APP_DEBUG: '0'
+      APP_SECRET: ci-secret
+      MERCURE_URL: http://localhost/.well-known/mercure
+      MERCURE_PUBLIC_URL: http://localhost/.well-known/mercure
+      MERCURE_JWT_SECRET: ci-mercure-secret
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql
+          coverage: none
+
+      - name: Fork identity + prune examples
+        run: ./dev/init.sh --name=smoke-fork --prune-examples
+
+      - name: Validate composer.json after rename
+        run: composer validate --strict --no-check-publish
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-scripts --prefer-dist --optimize-autoloader
+
+      - name: Code style (Pint)
+        run: composer lint
+
+      - name: Static analysis (PHPStan level 10)
+        run: composer analyze
+
+      - name: Prepare test database (no example migrations left)
+        run: |
+          php bin/console doctrine:database:create --env=test --if-not-exists
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test --allow-no-migration
+
+      - name: Tests on the pruned tree
+        run: vendor/bin/phpunit --stop-on-failure
+
   secrets-scan:
     runs-on: ubuntu-latest
     steps:
