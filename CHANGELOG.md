@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/k2gl/pragmatic-franken/compare/v1.0.0...v1.0.1) (2026-06-12)
+
+
+### Documentation
+
+* add v1.0.1 upgrade note ([e9ac71f](https://github.com/k2gl/pragmatic-franken/commit/e9ac71fe86d4b63fe6481c29532a9024d9439302))
+
 ## 1.0.0 (2026-06-12)
 
 
