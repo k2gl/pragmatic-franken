@@ -30,7 +30,14 @@ case "$1" in
         wait_for_database
         transports="async"
         if [ "$SCHEDULER_ENABLED" = 'true' ]; then
-            transports="async scheduler_default"
+            # A pruned fork may have zero #[AsPeriodicTask] left; then the
+            # scheduler_default transport does not exist and consuming it
+            # would crash-loop the worker. Probe before subscribing.
+            if php bin/console debug:container messenger.transport.scheduler_default >/dev/null 2>&1; then
+                transports="async scheduler_default"
+            else
+                echo "[entrypoint] SCHEDULER_ENABLED=true but no 'default' schedule is registered — consuming async only." >&2
+            fi
         fi
         echo "[entrypoint] Starting Messenger worker (transports: $transports)..."
         # shellcheck disable=SC2086

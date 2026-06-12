@@ -45,6 +45,7 @@ for f in .env.dist .env; do
         "$f"
 done
 sed -i "s|\"name\": \".*\"|\"name\": \"${VENDOR}/${NAME}\"|" composer.json
+sed -i "s|\"description\": \"[^\"]*\"|\"description\": \"${NAME} — bootstrapped from Pragmatic FrankenPHP (k2gl/pragmatic-franken)\"|" composer.json
 
 # --- secrets (only the gitignored .env) ---------------------------------------
 if [ -f .env ]; then
@@ -63,7 +64,10 @@ if [ "$PRUNE" = 1 ]; then
     log "Pruning example contexts (Notification, Task)..."
     rm -rf src/Context/Notification src/Context/Task \
            tests/Context/Notification tests/Context/Task
-    rm -f migrations/Version*.php
+    rm -f tests/Support/Factory/TaskFactory.php
+    # Template example migrations only (keep in sync when the template ships
+    # new ones) — a fork's own migrations must survive a late prune.
+    rm -f migrations/Version20260611032948.php
 
     # Drop their async routes; the file keeps the documented pattern.
     sed -i '/App\\Context\\Task\\/d' config/packages/messenger.yaml
