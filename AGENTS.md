@@ -80,7 +80,7 @@ src/Context/User/Features/Register/
 | Result / other DTO | `{Feature}Result` | `Application/Dto/` |
 | HTTP controller | `{Feature}Controller` | `EntryPoint/Http/` |
 | Symfony Console | `{Verb}{Feature}CliCommand` extends `Command` | `EntryPoint/Cli/` |
-| Domain event | `{Feature}{PastTenseVerb}` | `Domain/` (intra-feature) or `src/Context/{Name}/Shared/Events/` (cross-context) |
+| Domain event | `{Feature}{PastTenseVerb}` | `Domain/` or `src/Context/{Name}/Shared/Events/` |
 
 ## Runtime mode
 
@@ -103,7 +103,7 @@ Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % state
 |---|---|
 | `docs/adr/0001-vertical-slices.md` | adding/refactoring a slice or shared folder |
 | `docs/adr/0002-messenger-transport.md` | designing async flows, choosing transport |
-| `docs/adr/0003-pragmatic-symfony-architecture.md` | weighing extra abstraction; deciding when to skip the Message Bus |
+| `docs/adr/0003-pragmatic-symfony-architecture.md` | extra abstraction; skipping the Message Bus |
 | `docs/adr/0004-frankenphp-runtime.md` | worker behavior, env tuning, deploy |
 | `docs/adr/0005-health-checks.md` | adding probes or modifying `/healthz` |
 | `docs/adr/0006-memory-management.md` | OOM, GC, OPcache tuning |
@@ -111,21 +111,24 @@ Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % state
 | `docs/adr/0008-testing-strategy.md` | writing tests or CI gates |
 | `docs/adr/0009-shared-architecture.md` | Rule-of-Three / extracting Shared |
 | `docs/adr/0010-documentation-and-ai-layout.md` | adding docs, editing AGENTS.md |
-| `docs/adr/0011-event-sourcing-lite.md` | domain events, async side effects, event-driven decoupling |
+| `docs/adr/0011-event-sourcing-lite.md` | domain events, async side effects |
 | `docs/adr/0012-ubiquitous-language.md` | naming, where entities/repositories live |
 | `docs/adr/0013-doctrine-repository-pattern.md` | persistence, writing repositories |
 | `docs/adr/0014-supply-chain-security.md` | attestations, verifying images/artifacts |
+| `docs/adr/0015-scheduler-and-periodic-tasks.md` | recurring/cron work |
+| `docs/adr/0016-http-response-contract.md` | response shape, `data` envelope |
+| `docs/adr/0017-parallel-agent-sessions.md` | parallel sessions, worktree forks |
 | `docs/guides/supply-chain.md` | sign/verify how-to, deploy gate |
 | `docs/guides/development.md` | day-to-day commands, scaffolding details |
 | `docs/guides/testing.md` | concrete testing examples |
 | `docs/guides/worker-mode.md` | debugging FrankenPHP worker behavior |
-| `docs/guides/mercure-integration.md` | real-time SSE via Mercure; publishing and subscribing |
+| `docs/guides/mercure-integration.md` | real-time SSE via Mercure |
 | `docs/guides/sdk-generation.md` | generating TypeScript types from Result DTOs |
 | `docs/guides/deployment.md` | deploying to a VDS, rollout, proxy topology |
 | `docs/guides/disaster-recovery.md` | backups, restore drill |
-| `docs/guides/parallel-sessions.md` | parallel isolated dev stacks (worktree forks) |
+| `docs/guides/parallel-sessions.md` | worktree forks how-to |
 
-ADR-0003 is the umbrella *Pragmatism Charter* — load it before adding any extra layer/interface, or to skip the Message Bus for a CRUD case. Optional capability recipes (JWT auth, feature flags, SPA, preview envs) live in `docs/recipes/`.
+ADR-0003 is the umbrella *Pragmatism Charter* — load it before adding any extra layer/interface, or to skip the Message Bus for a CRUD case. Optional capability recipes live in `docs/recipes/`.
 
 ## Forbidden patterns (agent-targeted)
 

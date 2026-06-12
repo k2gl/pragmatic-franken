@@ -52,17 +52,19 @@ See [ADR-0001](../adr/0001-vertical-slices.md) for the canonical layout. At a gl
 pragmatic-franken/
 ├── src/
 │   ├── Kernel.php
-│   ├── Shared/                 # global infra glue (Bus, Persistence, Logging)
-│   └── {Context}/Features/{Feature}/
-│       ├── Domain/             # value objects, domain events (optional)
-│       ├── Application/        # *Command / *Query / *Handler / *Result
-│       ├── Infrastructure/     # adapters: Doctrine repos, HTTP clients
-│       └── EntryPoint/Http/    # *Controller.php with #[Route]
-├── tests/{Context}/Features/{Feature}/  # mirrors src/, type via base class + #[Group]
+│   ├── SharedKernel/           # cross-context infra (repo base, problem+json listeners)
+│   └── Context/{Context}/
+│       ├── Entity/  Repository/    # context-level model (ADR-0012, ADR-0013)
+│       └── Features/{Feature}/
+│           ├── Domain/             # value objects, domain events (optional)
+│           ├── Application/        # Handler at root; Message/ (*Command|*Query), Dto/ (*Request|*Result)
+│           ├── Infrastructure/     # adapters: HTTP clients, gateways (optional)
+│           └── EntryPoint/Http/    # *Controller.php with #[Route]
+├── tests/Context/{Context}/Features/{Feature}/  # mirrors src/, type via base class + #[Group]
 ├── config/  bin/  public/  assets/
-├── dev/                        # codegen helpers (create-slice, new-adr, check-docs)
+├── dev/                        # codegen helpers (create-slice, new-adr, check-docs, worktree)
 ├── ops/                        # deploy
-├── docs/{adr,guides}/
+├── docs/{adr,guides,recipes}/
 └── docker/
 ```
 
@@ -101,7 +103,7 @@ final readonly class CreateTaskRequest
 
 ### Dispatching a command from a controller
 
-Controllers use `HandleTrait::handle()`, build the command from the validated request and wrap the result in the `data` envelope:
+Controllers use `HandleTrait::handle()`, build the command from the validated request and wrap the result in the `data` envelope (ADR-0016):
 
 ```php
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -150,7 +152,7 @@ Query handlers return `*Result` DTOs. Don't expose Doctrine entities through HTT
 - **PHPStan level 10** (`phpstan.neon`). `make analyze`.
 - **Conventional Commits** for commit message headers.
 
-`make check` runs lint + analyze before every commit; `make ci` adds tests and matches the CI workflow exactly.
+`make check` runs lint + analyze before every commit; `make ci` adds tests. The CI `quality` job additionally runs the coverage floor, `docs-check`, `agent-smoke`, the OpenAPI dump and `composer audit`.
 
 ## Debugging
 

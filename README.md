@@ -135,6 +135,9 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 | [0012](docs/adr/0012-ubiquitous-language.md) | Ubiquitous Language & Entity Placement | Accepted |
 | [0013](docs/adr/0013-doctrine-repository-pattern.md) | Doctrine Repository Pattern | Accepted |
 | [0014](docs/adr/0014-supply-chain-security.md) | Supply-Chain Security | Accepted |
+| [0015](docs/adr/0015-scheduler-and-periodic-tasks.md) | Scheduler & Periodic Tasks | Accepted |
+| [0016](docs/adr/0016-http-response-contract.md) | HTTP Response Contract | Accepted |
+| [0017](docs/adr/0017-parallel-agent-sessions.md) | Parallel Agent Sessions | Accepted |
 
 ## Guides
 
