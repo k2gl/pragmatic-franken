@@ -23,7 +23,7 @@ SERVICE="${1:-app}"
 # shellcheck disable=SC2086
 compose() { $COMPOSE "$@"; }
 
-# Opt-in supply-chain gate (ADR-0018): for registry-pulled images, refuse to
+# Opt-in supply-chain gate (ADR-0014): for registry-pulled images, refuse to
 # roll out anything without verified build provenance. Requires gh CLI and
 #   DEPLOY_REQUIRE_ATTESTATION=true DEPLOY_IMAGE=ghcr.io/<owner>/<repo>:<tag>
 #   DEPLOY_REPO=<owner>/<repo>

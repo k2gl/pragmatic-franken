@@ -7,7 +7,7 @@ summary: "Verify what you deploy: release images carry SLSA provenance; gh attes
 
 # Supply chain: sign releases, verify before running
 
-Policy: ADR-0018. This guide is the practice.
+Policy: ADR-0014. This guide is the practice.
 
 ## What CI signs
 
@@ -65,4 +65,4 @@ wrong-identity are rejected.
 - Refresh the pinned root when Sigstore rotates keys:
   `gh attestation trusted-root > tests/.../fixtures/trusted_root.jsonl`.
 - `composer audit` is a hard CI gate for dependency advisories. Packagist
-  package signatures: out of scope until an ecosystem exists (ADR-0018).
+  package signatures: out of scope until an ecosystem exists (ADR-0014).

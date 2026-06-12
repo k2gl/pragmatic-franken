@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
- * Deploy gate (ADR-0018): verify a GitHub Artifact Attestation for a local
+ * Deploy gate (ADR-0014): verify a GitHub Artifact Attestation for a local
  * artifact offline before trusting it. Exit code 1 on ANY verification
  * failure — fail closed.
  *

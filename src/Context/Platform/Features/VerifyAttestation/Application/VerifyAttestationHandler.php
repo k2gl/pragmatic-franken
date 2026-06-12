@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
  * Offline, fail-closed verification of a GitHub Artifact Attestation
- * (Sigstore bundle) for a local artifact — ADR-0018. Checks all four claims:
+ * (Sigstore bundle) for a local artifact — ADR-0014. Checks all four claims:
  * the signature chains to the Sigstore trusted root, the transparency-log
  * inclusion holds, the signer identity is THIS repository's workflow, and the
  * subject digest matches the artifact byte-for-byte. Any failure throws.

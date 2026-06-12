@@ -1,5 +1,5 @@
 ---
-id: ADR-0018
+id: ADR-0014
 title: Supply-Chain Security
 status: Accepted
 date: 2026-06-11
@@ -9,7 +9,7 @@ audience: both
 summary: "Release images carry SLSA build provenance (GitHub Artifact Attestations, keyless). Deploys can gate on verification: gh attestation verify for registry pulls, app:verify-attestation (k2gl/sigstore-verify, offline, fail-closed) for artifacts. Dependencies: composer audit hard gate; no Packagist attestation ecosystem yet."
 ---
 
-# ADR-0018: Supply-Chain Security
+# ADR-0014: Supply-Chain Security
 
 **TL;DR:** Every pushed release image gets a SLSA build-provenance attestation
 signed with the workflow's OIDC identity (no secrets to leak). Consumers can

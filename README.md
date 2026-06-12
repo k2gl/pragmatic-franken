@@ -16,7 +16,7 @@ product on day one, operated by humans and AI agents alike.
 **The promises are CI-proven, not vibes:**
 - the **production image boots** on every PR (`prod-image` job: build → run → `/ready`);
 - **scaffolded code passes PHPStan 10 + tests untouched** (`agent-smoke` job);
-- release images carry **SLSA build provenance**, and the deploy gate verifies it (ADR-0018);
+- release images carry **SLSA build provenance**, and the deploy gate verifies it (ADR-0014);
 - docs are **linted against reality** (`make docs-check`: routes, Makefile targets, ADR sync).
 
 For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** — the single source of truth, ≤ 2 000 tokens, equally usable by developers and AI tools.
@@ -134,7 +134,7 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 | [0011](docs/adr/0011-event-sourcing-lite.md) | Event Sourcing Lite | Accepted |
 | [0012](docs/adr/0012-ubiquitous-language.md) | Ubiquitous Language & Entity Placement | Accepted |
 | [0013](docs/adr/0013-doctrine-repository-pattern.md) | Doctrine Repository Pattern | Accepted |
-| [0018](docs/adr/0018-supply-chain-security.md) | Supply-Chain Security | Accepted |
+| [0014](docs/adr/0014-supply-chain-security.md) | Supply-Chain Security | Accepted |
 
 ## Guides
 
