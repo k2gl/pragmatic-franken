@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Generates a vertical slice scaffold for src/Context/{Context}/Features/{Feature}/.
 # {Context} is a DDD Bounded Context (Eric Evans / Vaughn Vernon) — top-level
-# directories like User/, Billing/, Health/ each have their own ubiquitous
+# directories like User/, Task/, Health/ each have their own ubiquitous
 # language and consistency boundary.
 #
 # Layout follows ADR-0001 (DDD-layered slice).

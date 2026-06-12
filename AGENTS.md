@@ -22,7 +22,7 @@ make slice context=Foo feature=Bar  # scaffold a new slice
 
 ## Directory map
 
-`{Context}` = a DDD Bounded Context (`User`, `Billing`, `Health`…). Each has its own ubiquitous language and consistency boundary, not just a code module. See ADR-0001.
+`{Context}` = a DDD Bounded Context (`User`, `Task`, `Health`…). Each has its own ubiquitous language and consistency boundary, not just a code module. See ADR-0001.
 
 ```
 src/

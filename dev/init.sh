@@ -9,7 +9,7 @@
 #     (<name>.localhost) in .env.dist and .env, composer "name" (vendor/name)
 #   * generates real secrets into .env (gitignored): APP_SECRET,
 #     MERCURE_JWT_SECRET, POSTGRES_PASSWORD — .env.dist keeps !ChangeMe!
-#   * --prune-examples: removes the Billing, Notification and Task example
+#   * --prune-examples: removes the Notification and Task example
 #     contexts (Health, Home and Platform stay), stubs app:seed, clears the
 #     example migration
 #   * --reset-git: starts a fresh git history (single "init from template" commit)
@@ -60,13 +60,13 @@ fi
 
 # --- prune examples ------------------------------------------------------------
 if [ "$PRUNE" = 1 ]; then
-    log "Pruning example contexts (Billing, Notification, Task)..."
-    rm -rf src/Context/Billing src/Context/Notification src/Context/Task \
-           tests/Context/Billing tests/Context/Notification tests/Context/Task
+    log "Pruning example contexts (Notification, Task)..."
+    rm -rf src/Context/Notification src/Context/Task \
+           tests/Context/Notification tests/Context/Task
     rm -f migrations/Version*.php
 
     # Drop their async routes; the file keeps the documented pattern.
-    sed -i '/App\\Context\\Billing\\/d; /App\\Context\\Task\\/d' config/packages/messenger.yaml
+    sed -i '/App\\Context\\Task\\/d' config/packages/messenger.yaml
 
     # app:seed referenced the Task example — reset it to a stub awaiting the
     # first real entity.
