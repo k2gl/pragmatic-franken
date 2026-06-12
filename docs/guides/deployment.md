@@ -1,15 +1,14 @@
 ---
 audience: both
 tier: 2
-last_reviewed: 2026-06-11
+last_reviewed: 2026-06-12
 summary: "Single-VDS deployment: stage + prod as isolated compose projects behind one front Caddy that terminates TLS; zero-downtime blue-green rollout gated on /ready. Ported from real production projects grown out of this skeleton."
 ---
 
 # Deployment — single VDS, stage + prod
 
 One VDS hosts two isolated environments (`stage`, `prod`) fronted by a Caddy
-reverse proxy that terminates TLS. Everything below is ported from a real
-production setup.
+reverse proxy that terminates TLS.
 
 ## Topology
 

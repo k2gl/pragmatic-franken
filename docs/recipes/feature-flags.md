@@ -1,14 +1,14 @@
 ---
 audience: both
 tier: 2
-last_reviewed: 2026-06-11
+last_reviewed: 2026-06-12
 summary: "Runtime feature flags in a Platform context: enum catalog + DB override + FeatureFlags::isEnabled() read service. UI-managed toggles never live in env vars. Distilled from a real production project's decision record."
 ---
 
 # Recipe: feature flags & system settings
 
-Distilled from a real production project grown out of this skeleton (its decision
-record 0017). The rule that earns the recipe:
+Distilled from a real production project grown out of this skeleton. The rule
+that earns the recipe:
 
 > Any **UI-manageable boolean behavior toggle** goes through a `FeatureFlag`
 > enum + a `FeatureFlags` read service — never `%env(bool:*)%`. Env vars stay

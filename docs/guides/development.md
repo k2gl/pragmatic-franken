@@ -22,7 +22,7 @@ make install        # env-create + build + up + db-migrate
 make smoke          # confirms bin/console boots and /ready responds
 ```
 
-`make install` is idempotent: it creates `.env` from `.env.dist` (substituting your UID/GID), builds containers, brings them up, and runs Doctrine migrations.
+`make install` is idempotent; `.env` is created from `.env.dist` with your UID/GID substituted.
 
 ## Daily commands
 
@@ -46,29 +46,7 @@ make smoke          # confirms bin/console boots and /ready responds
 
 ## Project structure
 
-See [ADR-0001](../adr/0001-vertical-slices.md) for the canonical layout. At a glance:
-
-```
-pragmatic-franken/
-├── src/
-│   ├── Kernel.php
-│   ├── SharedKernel/           # cross-context infra (repo base, problem+json listeners)
-│   └── Context/{Context}/
-│       ├── Entity/  Repository/    # context-level model (ADR-0012, ADR-0013)
-│       └── Features/{Feature}/
-│           ├── Domain/             # value objects, domain events (optional)
-│           ├── Application/        # Handler at root; Message/ (*Command|*Query), Dto/ (*Request|*Result)
-│           ├── Infrastructure/     # adapters: HTTP clients, gateways (optional)
-│           └── EntryPoint/Http/    # *Controller.php with #[Route]
-├── tests/Context/{Context}/Features/{Feature}/  # mirrors src/, type via base class + #[Group]
-├── config/  bin/  public/  assets/
-├── dev/                        # codegen helpers (create-slice, new-adr, check-docs, worktree)
-├── ops/                        # deploy
-├── docs/{adr,guides,recipes}/
-└── docker/
-```
-
-`Domain/` and `Infrastructure/` are optional inside a slice — create them only when the feature actually needs them.
+The canonical slice anatomy lives in [ADR-0001](../adr/0001-vertical-slices.md); the top-level tree is in the README. Operational notes: `Domain/` and `Infrastructure/` are optional inside a slice — create them only when the feature actually needs them; entities and repositories sit at context level (`Entity/`, `Repository/` — ADR-0012, ADR-0013); codegen helpers live in `dev/`, deployment scripts in `ops/`.
 
 ## Creating a new slice
 

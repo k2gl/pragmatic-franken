@@ -7,15 +7,7 @@ summary: "FrankenPHP worker-mode operational guide. The kernel stays in memory; 
 
 # Worker Mode Best Practices
 
-FrankenPHP's Worker Mode allows your PHP application to boot once and handle thousands of requests without restarting. This is powerful but requires specific coding patterns.
-
-## Why Worker Mode Matters
-
-Traditional PHP-FPM boots, processes a request, and dies. Worker Mode keeps the process alive, reusing the booted kernel, opcache and database connections. That is the performance win — but only if your code respects the lifecycle.
-
-## The Golden Rule
-
-**Treat every request as if it might run forever.**
+Traditional PHP-FPM boots, processes a request, and dies. FrankenPHP's worker mode keeps the process alive — the booted kernel, opcache and database connections are reused across thousands of requests. That is the performance win, and it holds only if your code respects the lifecycle. The golden rule: **treat every request as if the process might run forever.**
 
 ---
 

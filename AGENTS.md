@@ -22,7 +22,7 @@ make slice context=Foo feature=Bar  # scaffold a new slice
 
 ## Directory map
 
-`{Context}` = a DDD Bounded Context (`User`, `Task`, `Health`…). Each has its own ubiquitous language and consistency boundary, not just a code module. See ADR-0001.
+`{Context}` = a DDD Bounded Context (`User`, `Task`, `Health`…) — its own ubiquitous language and consistency boundary (ADR-0001).
 
 ```
 src/
@@ -53,8 +53,9 @@ tests/   Context/{Name}/Features/{Feature}/   # mirror of src/
 - **DO-NOT** create global `Controllers/`, `Services/`, `Repositories/` directories.
 - **DO-NOT** create an interface unless ≥ 2 implementations or test substitution is unavoidable.
 - **DO-NOT** hold mutable static state — FrankenPHP worker mode reuses the kernel between requests. See ADR-0004.
-- **DO-NOT** return Doctrine entities from query handlers or controllers — return DTOs.
+- **DO-NOT** return Doctrine entities from query handlers or controllers — implicit lazy loads; return DTOs.
 - **DO-NOT** add files anywhere outside the slice for slice-scoped logic. Deletion of the slice folder must leave nothing dangling.
+- **DO** replace scaffold placeholders before committing — `make slice` writes a stub.
 
 ## Slice anatomy (canonical, ADR-0001)
 
@@ -90,29 +91,22 @@ FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless 
 
 Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % statement-coverage floor; per-layer targets (Domain ≥ 90 % …) are fork policy — see ADR-0008. Layout mirrors `src/` at `tests/Context/{Name}/Features/{Feature}/`. PHPUnit 12 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See `docs/guides/testing.md`.
 
-## Pitfalls
-
-- Static state in worker mode → request leakage. Reset or avoid.
-- Copy-paste is fine until 3 occurrences (Rule of Three), then extract.
-- Returning entities over HTTP triggers implicit DB queries; return DTOs.
-- `make slice` writes a stub — replace placeholders before committing.
-
 ## Pointer index
 
 | Doc | Load when |
 |---|---|
-| `docs/adr/0001-vertical-slices.md` | adding/refactoring a slice or shared folder |
-| `docs/adr/0002-messenger-transport.md` | designing async flows, choosing transport |
+| `docs/adr/0001-vertical-slices.md` | slice layout, shared folders |
+| `docs/adr/0002-messenger-transport.md` | async flows, transports |
 | `docs/adr/0003-pragmatic-symfony-architecture.md` | extra abstraction; skipping the Message Bus |
 | `docs/adr/0004-frankenphp-runtime.md` | worker behavior, env tuning, deploy |
-| `docs/adr/0005-health-checks.md` | adding probes or modifying `/healthz` |
+| `docs/adr/0005-health-checks.md` | probes, `/healthz`, `/ready` |
 | `docs/adr/0006-memory-management.md` | OOM, GC, OPcache tuning |
 | `docs/adr/0007-asset-mapper.md` | frontend assets / SPA decision |
-| `docs/adr/0008-testing-strategy.md` | writing tests or CI gates |
+| `docs/adr/0008-testing-strategy.md` | tests, CI gates |
 | `docs/adr/0009-shared-architecture.md` | Rule-of-Three / extracting Shared |
 | `docs/adr/0010-documentation-and-ai-layout.md` | adding docs, editing AGENTS.md |
 | `docs/adr/0011-event-sourcing-lite.md` | domain events, async side effects |
-| `docs/adr/0012-ubiquitous-language.md` | naming, where entities/repositories live |
+| `docs/adr/0012-ubiquitous-language.md` | naming, entity placement |
 | `docs/adr/0013-doctrine-repository-pattern.md` | persistence, writing repositories |
 | `docs/adr/0014-supply-chain-security.md` | attestations, verifying images/artifacts |
 | `docs/adr/0015-scheduler-and-periodic-tasks.md` | recurring/cron work |
