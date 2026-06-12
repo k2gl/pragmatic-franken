@@ -1,7 +1,7 @@
 ---
 audience: both
 tier: 2
-last_reviewed: 2026-04-29
+last_reviewed: 2026-06-12
 summary: "Step-by-step guide for adding real-time server-sent events to a vertical slice via Mercure and FrankenPHP's built-in hub."
 ---
 
@@ -9,44 +9,22 @@ summary: "Step-by-step guide for adding real-time server-sent events to a vertic
 
 FrankenPHP ships a Mercure hub as a built-in service — no separate process needed. Use it to push server-sent events (SSE) to browser clients without WebSocket complexity.
 
-`symfony/mercure-bundle` is already included in this boilerplate (`composer.json`) and registered in `config/bundles.php`. The config file `config/packages/mercure.yaml` is also pre-configured. The only step you need is to set the env vars below.
+`symfony/mercure-bundle` ships pre-wired: registered in `config/bundles.php`, configured in `config/packages/mercure.yaml` (hub URL, public URL and JWT secret all come from env vars). Working defaults are committed in `.env.dist` — local development needs no extra setup.
 
 ## Configuration
 
-### `config/packages/mercure.yaml`
-
-```yaml
-mercure:
-    hubs:
-        default:
-            url: '%env(MERCURE_URL)%'
-            public_url: '%env(MERCURE_PUBLIC_URL)%'
-            jwt:
-                secret: '%env(MERCURE_JWT_SECRET)%'
-                publish: ['*']
-```
-
-### `.env.local` (local development)
+The hub runs as a private `:3000` site inside the FrankenPHP container; the public site reverse-proxies `/.well-known/mercure` to it (see `docker/frankenphp/Caddyfile`). Hence two URLs in `.env.dist`:
 
 ```dotenv
-# Internal URL reachable from the PHP worker (same container as FrankenPHP)
-MERCURE_URL=https://pragmatic-franken.localhost:4750/.well-known/mercure
-# Public URL sent to browser clients
+# Internal URL — the PHP worker talks to the hub in-container over plain HTTP
+MERCURE_URL=http://localhost:3000/.well-known/mercure
+# Public URL — sent to browser clients
 MERCURE_PUBLIC_URL=https://pragmatic-franken.localhost:4750/.well-known/mercure
-# Must match the `hubOptions.jwt_key` in your Caddyfile
-MERCURE_JWT_SECRET=changeme-in-production
+# Signs hub JWTs (publisher_jwt / subscriber_jwt in the Caddyfile)
+MERCURE_JWT_SECRET=!ChangeMe!
 ```
 
-### `.env.test` (test / CI stubs)
-
-```dotenv
-# Stub values — no real hub needed for unit or smoke tests
-MERCURE_URL=http://localhost/.well-known/mercure
-MERCURE_PUBLIC_URL=http://localhost/.well-known/mercure
-MERCURE_JWT_SECRET=test-secret
-```
-
-These stubs are already committed to `.env.test`. MercureBundle resolves the hub URL eagerly at container compile time (via `EnvVarProcessor`), so stubs are required even when no real Mercure hub is present in CI.
+Override in `.env.local` only when you deviate from these defaults; `make init name=my-app` rewrites the public hostname and rotates the secret. `.env.test` carries committed stubs — MercureBundle resolves the hub URL eagerly at container compile time, so the vars must exist even where no hub runs (CI).
 
 ## Publishing from a slice
 
@@ -55,7 +33,7 @@ The reference implementation lives at `src/Context/Notification/Features/LiveUpd
 ### Command + Handler
 
 ```php
-// Application/PublishLiveUpdateCommand.php
+// Application/Message/PublishLiveUpdateCommand.php
 final readonly class PublishLiveUpdateCommand
 {
     public function __construct(
@@ -87,7 +65,7 @@ final readonly class PublishLiveUpdateHandler
 Dispatch from any other handler:
 
 ```php
-$this->commandBus->dispatch(new PublishLiveUpdateCommand(
+$this->messageBus->dispatch(new PublishLiveUpdateCommand(
     topic: '/board/42',
     data: ['event' => 'task_created', 'taskId' => $id],
 ));
@@ -101,7 +79,7 @@ $this->commandBus->dispatch(new PublishLiveUpdateCommand(
 { "topic": "/board/42", "data": { "event": "task_created" }, "private": false }
 ```
 
-Returns `201` with `{ "messageId": "..." }`.
+Returns `201` with `{ "data": { "messageId": "..." } }` — the response envelope from [ADR-0016](../adr/0016-http-response-contract.md).
 
 ## Subscribing (browser)
 

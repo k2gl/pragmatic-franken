@@ -1,7 +1,7 @@
 ---
 audience: both
 tier: 2
-last_reviewed: 2026-04-28
+last_reviewed: 2026-06-12
 summary: "FrankenPHP worker-mode operational guide. The kernel stays in memory; static state must be reset or avoided. Pairs with ADR-0004 (decision) and ADR-0006 (memory)."
 ---
 
@@ -11,7 +11,7 @@ FrankenPHP's Worker Mode allows your PHP application to boot once and handle tho
 
 ## Why Worker Mode Matters
 
-Traditional PHP-FPM boots, processes a request, and dies. Worker Mode keeps the process alive, caching opcache, database connections, and in-memory state. This delivers 3-5x performance gains—but only if your code respects the lifecycle.
+Traditional PHP-FPM boots, processes a request, and dies. Worker Mode keeps the process alive, reusing the booted kernel, opcache and database connections. That is the performance win — but only if your code respects the lifecycle.
 
 ## The Golden Rule
 
@@ -48,18 +48,6 @@ function getData($id) {
 
 ---
 
-### ❌ Static Counters
-
-```php
-// BAD: Counts persist forever
-static $requestCount = 0;
-$requestCount++;
-```
-
-**Problem:** Counter never resets. Useful for metrics, but ensure you have memory limits.
-
----
-
 ### ❌ Open Database Connections
 
 ```php
@@ -69,7 +57,7 @@ $pdo = new PDO(...);
 
 **Problem:** Each request opens a new connection. With Worker Mode, connections pile up.
 
-**Fix:** Use Doctrine's connection pooling or let FrankenPHP manage connections.
+**Fix:** Inject Doctrine's connection from the container — the kernel reuses it across requests, and DoctrineBundle reconnects when it goes stale.
 
 ---
 
@@ -105,7 +93,7 @@ $handle = fopen('/tmp/cache.txt', 'r+');
 
 **Problem:** Resource leak over time.
 
-**Fix:** Use `try {} finally {}` or `register_shutdown_function()`.
+**Fix:** Wrap in `try {} finally {}` so the handle closes within the request.
 
 ---
 
@@ -123,24 +111,17 @@ class UserService {
 }
 ```
 
-### ✅ Clean Up in Shutdown
+### ✅ Clean up per request, not per process
 
-```php
-register_shutdown_function(function() {
-    // Flush any pending logs
-    $this->logger->flush();
-    // Close external connections
-    $this->connection->close();
-});
-```
+`register_shutdown_function()` fires when the *worker* exits (after `FRANKENPHP_LOOP_MAX` requests) — not after each request. For per-request cleanup use a `kernel.terminate` listener, or implement `ResetInterface` / tag the service `kernel.reset` so symfony/runtime resets it between requests.
 
 ### ✅ Use Framework Tools
 
 Symfony's container and Doctrine already handle most edge cases:
 
-- **EntityManager**: Automatically clears managed state
-- **Container**: Returns fresh instances when configured
-- **Messenger**: Handles worker lifecycle for async tasks
+- **EntityManager**: reset between requests via `kernel.reset` (DoctrineBundle)
+- **Your stateful services**: join that reset with `ResetInterface` / the `kernel.reset` tag
+- **Messenger**: `messenger:consume` workers are long-lived too — the same rules apply
 
 ---
 
@@ -149,8 +130,8 @@ Symfony's container and Doctrine already handle most edge cases:
 ### Monitor Usage
 
 ```bash
-# Watch memory in container
-docker stats frankenphp
+make docker-stats   # container resource usage
+make stats          # FrankenPHP metrics
 ```
 
 ### Restart Strategies
@@ -176,25 +157,11 @@ not in env vars.
 
 ## Async Workers with Messenger
 
-FrankenPHP + Symfony Messenger = powerful async:
-
-```php
-// In your handler
-#[AsMessageHandler]
-class ProcessOrderHandler
-{
-    public function __invoke(ProcessOrder $command): void
-    {
-        // This runs in the same process
-        // Perfect for stateful processing
-    }
-}
-```
+Async messages run in `messenger:consume` processes — long-lived workers as well, so every rule above applies to handlers too.
 
 **Benefits:**
-- No separate queue infrastructure (Redis + Messenger only)
-- Keep database connections warm
-- Share opcache between jobs
+- No separate broker — the async transport rides on Doctrine (`MESSENGER_TRANSPORT_DSN=doctrine://default`)
+- Warm database connections and shared opcache between jobs
 
 ---
 
@@ -206,13 +173,13 @@ class ProcessOrderHandler
 | No singletons | ☐ |
 | DI over service locator | ☐ |
 | External cache for hot data | ☐ |
-| Cleanup on shutdown | ☐ |
+| Per-request cleanup (`kernel.reset` / `kernel.terminate`) | ☐ |
 | Memory limits configured | ☐ |
 
 ---
 
 ## References
 
-- [ADR 0006: Memory Management](adr/0006-memory-management.md)
+- [ADR 0006: Memory Management](../adr/0006-memory-management.md)
 - [FrankenPHP Documentation](https://frankenphp.dev/docs/worker-mode/)
 - [Symfony Messenger](https://symfony.com/doc/current/messenger.html)
