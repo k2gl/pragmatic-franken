@@ -34,7 +34,7 @@ For architecture rules and code-level guidance, see **[AGENTS.md](AGENTS.md)** â
 | Frontend (default) | AssetMapper + Twig | no Webpack/Vite needed for HTML-first |
 | Code style | Laravel Pint (PSR-12) | one-flag autofix |
 | Static analysis | PHPStan level 10 | enforced in CI |
-| Tests | PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA + Faker + Fluent Assertions | pyramid 60/30/10 |
+| Tests | PHPUnit 12 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA + Faker + Fluent Assertions | pyramid 60/30/10 |
 
 ## Quickstart
 

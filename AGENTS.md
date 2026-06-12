@@ -88,7 +88,7 @@ FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless 
 
 ## Testing
 
-Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % statement-coverage floor; per-layer targets (Domain ≥ 90 % …) are fork policy — see ADR-0008. Layout mirrors `src/` at `tests/Context/{Name}/Features/{Feature}/`. PHPUnit 11 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See `docs/guides/testing.md`.
+Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % statement-coverage floor; per-layer targets (Domain ≥ 90 % …) are fork policy — see ADR-0008. Layout mirrors `src/` at `tests/Context/{Name}/Features/{Feature}/`. PHPUnit 12 + Zenstruck (Foundry, Browser, Messenger-Test) + DAMA. See `docs/guides/testing.md`.
 
 ## Pitfalls
 

@@ -17,10 +17,10 @@ final class CheckHealthHandlerTest extends UnitTestCase
 {
     public function test_returns_ok_when_both_pings_succeed(): void
     {
-        $db = $this->createMock(DbPingInterface::class);
+        $db = $this->createStub(DbPingInterface::class);
         $db->method('isAlive')->willReturn(true);
 
-        $redis = $this->createMock(RedisPingInterface::class);
+        $redis = $this->createStub(RedisPingInterface::class);
         $redis->method('isAlive')->willReturn(true);
 
         $handler = new CheckHealthHandler($db, $redis);
@@ -32,10 +32,10 @@ final class CheckHealthHandlerTest extends UnitTestCase
 
     public function test_returns_not_ok_when_db_is_down(): void
     {
-        $db = $this->createMock(DbPingInterface::class);
+        $db = $this->createStub(DbPingInterface::class);
         $db->method('isAlive')->willReturn(false);
 
-        $redis = $this->createMock(RedisPingInterface::class);
+        $redis = $this->createStub(RedisPingInterface::class);
         $redis->method('isAlive')->willReturn(true);
 
         $handler = new CheckHealthHandler($db, $redis);
