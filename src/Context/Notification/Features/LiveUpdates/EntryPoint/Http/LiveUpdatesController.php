@@ -38,6 +38,6 @@ final class LiveUpdatesController
             private: $private,
         ));
 
-        return new JsonResponse(['messageId' => $result->messageId], Response::HTTP_CREATED);
+        return new JsonResponse(['data' => $result], Response::HTTP_CREATED);
     }
 }

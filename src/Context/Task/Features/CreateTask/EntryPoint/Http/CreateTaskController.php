@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Context\Task\Features\CreateTask\EntryPoint\Http;
 
-use App\Context\Task\Features\CreateTask\Application\Message\CreateTaskCommand;
+use App\Context\Task\Features\CreateTask\Application\Dto\CreateTaskRequest;
 use App\Context\Task\Features\CreateTask\Application\Dto\CreateTaskResult;
+use App\Context\Task\Features\CreateTask\Application\Message\CreateTaskCommand;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -23,11 +24,11 @@ final class CreateTaskController
     }
 
     #[Route('/tasks', name: 'app_task_create', methods: ['POST'])]
-    public function __invoke(#[MapRequestPayload] CreateTaskCommand $command): JsonResponse
+    public function __invoke(#[MapRequestPayload] CreateTaskRequest $request): JsonResponse
     {
         /** @var CreateTaskResult $result */
-        $result = $this->handle($command);
+        $result = $this->handle(new CreateTaskCommand($request->title));
 
-        return new JsonResponse($result, Response::HTTP_CREATED);
+        return new JsonResponse(['data' => $result], Response::HTTP_CREATED);
     }
 }

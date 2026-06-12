@@ -24,7 +24,7 @@ final class CompleteTaskTest extends ApiTestCase
         $this->sendJsonRequest('POST', sprintf('/tasks/%s/complete', $task->id()));
 
         fact($this->responseStatusCode())->is(200);
-        fact($this->responseReader()->bool('completed'))->true();
+        fact($this->responseReader()->nested('data')->bool('completed'))->true();
 
         // Domain event routed async (ADR-0011) — queued, not handled inline.
         $this->transport('async')->queue()->assertContains(TaskCompleted::class, 1);

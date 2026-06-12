@@ -22,7 +22,7 @@ final class ListTasksTest extends ApiTestCase
 
         fact($this->responseStatusCode())->is(200);
 
-        $items = $this->responseReader()->list('items');
+        $items = $this->responseReader()->nested('data')->list('items');
         fact(\count($items))->is(3);
     }
 }

@@ -26,6 +26,6 @@ final class ListTasksController
         /** @var ListTasksResult $result */
         $result = $this->handle(new ListTasksQuery);
 
-        return new JsonResponse($result);
+        return new JsonResponse(['data' => $result]);
     }
 }

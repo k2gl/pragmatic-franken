@@ -26,6 +26,6 @@ final class CompleteTaskController
         /** @var CompleteTaskResult $result */
         $result = $this->handle(new CompleteTaskCommand($taskId));
 
-        return new JsonResponse($result);
+        return new JsonResponse(['data' => $result]);
     }
 }

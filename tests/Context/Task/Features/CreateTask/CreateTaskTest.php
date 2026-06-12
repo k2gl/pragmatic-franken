@@ -19,8 +19,8 @@ final class CreateTaskTest extends ApiTestCase
         $this->sendJsonRequest('POST', '/tasks', json: ['title' => 'Ship Wave 2']);
 
         fact($this->responseStatusCode())->is(201);
-        fact($this->responseReader()->string('title'))->is('Ship Wave 2');
-        fact($this->responseReader()->bool('completed'))->false();
+        fact($this->responseReader()->nested('data')->string('title'))->is('Ship Wave 2');
+        fact($this->responseReader()->nested('data')->bool('completed'))->false();
         fact(TaskFactory::repository()->count())->is(1);
     }
 
