@@ -39,6 +39,7 @@ never converges. The cure is a strict definition of *what* may be shared and
      Infrastructure/Persistence/EntityNotFoundException.php
      Infrastructure/Http/ValidationExceptionListener.php  # 422 problem+json (RFC 9457)
      Infrastructure/Http/SecurityExceptionListener.php    # 403 problem+json
+     Infrastructure/Http/NotFoundExceptionListener.php    # 404 problem+json
      Infrastructure/Messenger/WorkerHeartbeatListener.php # worker container healthcheck
      Infrastructure/Cli/SeedCliCommand.php                # app:seed — demo data for dev
    ```

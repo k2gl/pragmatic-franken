@@ -41,7 +41,7 @@ tests/
 ├── Support/                                  # framework helpers, not tests
 │   ├── TestCase/{UnitTestCase, IntegrationTestCase, ApiTestCase}.php
 │   ├── Factory/                              # Foundry factories
-│   └── Helper/
+│   └── Faker/                                # FakerTrait ($this->faker())
 └── Context/{Name}/Features/{Feature}/{Feature}*Test.php
 ```
 
