@@ -1,4 +1,4 @@
-# Pragmatic Franken
+# Pragmatic FrankenPHP
 
 [![License MIT](https://img.shields.io/badge/License-MIT-yellowgreen)](https://opensource.org/licenses/MIT)
 [![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777bb4?logo=php&logoColor=white)](https://www.php.net/releases/8.5/)
@@ -7,10 +7,11 @@
 [![PHPStan Level 10](https://img.shields.io/badge/PHPStan-Level%2010-cyan)](https://phpstan.org)
 [![CI](https://img.shields.io/github/actions/workflow/status/k2gl/pragmatic-franken/ci.yml?branch=main&label=CI)](https://github.com/k2gl/pragmatic-franken/actions)
 
-PHP 8.5 / Symfony 8 / FrankenPHP starter that a production CRM actually grew
-out of — and the lessons were ported back. Vertical Slices + CQRS over
-Messenger, PostgreSQL 17, worker mode, real prod image, supply-chain
-attestations. Designed to be operated by humans and AI agents alike.
+**Pragmatic FrankenPHP** is a PHP 8.5 / Symfony 8 / FrankenPHP starter that
+real production projects actually grew out of — and the lessons were ported
+back. Vertical Slices + CQRS over Messenger, PostgreSQL 17, worker mode, real
+prod image, supply-chain attestations. The goal: fork it and ship a real
+product on day one, operated by humans and AI agents alike.
 
 **The promises are CI-proven, not vibes:**
 - the **production image boots** on every PR (`prod-image` job: build → run → `/ready`);

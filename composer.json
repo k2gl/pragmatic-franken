@@ -1,6 +1,6 @@
 {
     "name": "k2gl/pragmatic-franken",
-    "description": "Pragmatic Symfony skeleton on FrankenPHP: Vertical Slices + CQRS over Messenger, worker mode, agent-ready docs",
+    "description": "Pragmatic FrankenPHP — PHP 8.5 / Symfony 8 starter: Vertical Slices + CQRS over Messenger, FrankenPHP worker mode, real prod image, agent-ready docs",
     "type": "project",
     "license": "MIT",
     "keywords": [

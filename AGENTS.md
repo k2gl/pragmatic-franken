@@ -5,7 +5,7 @@ budget_tokens: 2000
 last_reviewed: 2026-04-28
 ---
 
-# AGENTS.md — Pragmatic Franken
+# AGENTS.md — Pragmatic FrankenPHP
 
 PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Vertical Slices + CQRS over Messenger, worker mode. This file is the **only** AI-default context — everything else loads on demand from `docs/`.
 

@@ -24,7 +24,7 @@ BLUE   := $(shell tput setaf 4)
 CYAN   := $(shell tput setaf 6)
 RESET  := $(shell tput sgr0)
 
-##—————— Pragmatic Franken ——————
+##—————— Pragmatic FrankenPHP ——————
 help: ## Show this help message
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | \
 	awk -v c1="$(YELLOW)" -v c2="$(CYAN)" -v c3="$(BLUE)" -v rst="$(RESET)" \
@@ -49,7 +49,7 @@ env-create: ## Create .env from .env.dist
 
 install: env-create build up composer-install db-migrate ## 🚀 Full setup: containers, dependencies, database
 	@echo ""
-	@echo "🐘 $(BLUE)Pragmatic Franken is igniting...$(RESET)"
+	@echo "🐘 $(BLUE)Pragmatic FrankenPHP is igniting...$(RESET)"
 	@echo "🔥 $(GREEN)Done! Open https://pragmatic-franken.localhost:$${HTTPS_PORT:-4750} (set in .env).$(RESET)"
 
 ##—————— 🐳 Docker ——————

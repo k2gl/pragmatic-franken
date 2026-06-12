@@ -15,6 +15,6 @@ final class IndexControllerTest extends ApiTestCase
         $this->client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h1', 'Pragmatic Franken');
+        self::assertSelectorTextContains('h1', 'Pragmatic FrankenPHP');
     }
 }

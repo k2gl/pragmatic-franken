@@ -1,4 +1,4 @@
-# Contributing to Pragmatic Franken
+# Contributing to Pragmatic FrankenPHP
 
 Thank you for wanting to make the PHP world better! 🚀
 
