@@ -4,6 +4,14 @@ Templates aren't merged — they're applied. Each release lists the few changes
 worth porting into projects built from this skeleton, smallest diff first.
 How-to: [`docs/guides/fork-maintenance.md`](docs/guides/fork-maintenance.md).
 
+## v1.0.1
+
+Docs accuracy release — nothing to port. If your fork vendored `docs/guides/`,
+re-sync `testing.md`, `worker-mode.md` and `mercure-integration.md`: examples
+now match the real conventions (`UnitTestCase`/`ApiTestCase` + `fact()`,
+internal `MERCURE_URL` on the private `:3000` hub site, Doctrine-backed async
+transport). Optional: remaining `self::assert*` tests moved to `fact()`.
+
 ## v1.0.0
 
 The first tagged release. Both waves below are already inside it; the lists
