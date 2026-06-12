@@ -36,8 +36,6 @@ node_modules/
 # Symfony auto-generated config reference (IDE hints only)
 /config/reference.php
 
-# AI Agents
-AGENTS.local.md
 
 docs/openapi.yaml
 

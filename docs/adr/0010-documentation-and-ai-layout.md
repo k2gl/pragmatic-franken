@@ -6,7 +6,7 @@ date: 2026-04-28
 supersedes: []
 superseded_by: []
 audience: both
-summary: "Three-tier doc model: AGENTS.md is the only Tier-1 file always loaded by agents (≤2000 tokens). ADRs and guides are Tier 2 with YAML front-matter for cheap skimming. README and roadmap are Tier 3 (humans only). No per-IDE rule files."
+summary: "Three-tier doc model: AGENTS.md is the only Tier-1 file always loaded by agents (≤2000 tokens). ADRs and guides are Tier 2 with YAML front-matter for cheap skimming. README is Tier 3 (humans only). No per-IDE rule files."
 ---
 
 # ADR-0010: Documentation and AI-Instruction Layout
@@ -25,7 +25,7 @@ The repository previously held AI instructions in **four** places: root (`AGENTS
 |---|---|---|---|
 | **1** | `/AGENTS.md` (≤ 200 lines, ≤ 2 000 tokens, ≤ 8 KB) | every AI tool, every developer | always loaded |
 | **2** | `docs/adr/*.md`, `docs/guides/*.md` | agents on demand, devs on demand | lazy, by `summary` front-matter or `audience` filter |
-| **3** | `README.md`, `docs/roadmap.md` | humans | not loaded by agents by default |
+| **3** | `README.md` | humans | not loaded by agents by default |
 
 ### Required front-matter for Tier 2
 
@@ -44,10 +44,6 @@ summary: "≤300 character one-liner suitable for skimming without loading the b
 
 `dev/check-docs.sh` (invoked via `make docs-check`) enforces presence of these fields and the `AGENTS.md` size budget.
 
-### Per-developer overrides
-
-`AGENTS.local.md` (gitignored, copy from `AGENTS.local.md.example`). Local overrides may adjust tone, language, paths, IDE quirks. **Local overrides cannot redefine architectural rules from ADRs.**
-
 ### What is not maintained
 
 - **Per-IDE rule files** (`.cursorrules`, `.windsurfrules`, `.cursor/rules/*`, etc.). Every actively-developed AI tool resolves `AGENTS.md` either by direct convention (Cursor 0.45+, Claude Code, OpenAI Codex CLI, Aider, Codeium, Cline) or by being pointed at it. If a contributor's tool refuses, they create a local symlink and gitignore it. We will not duplicate.
@@ -55,7 +51,7 @@ summary: "≤300 character one-liner suitable for skimming without loading the b
 
 ### Carve-out: tool configuration is not context
 
-The single-source rule targets *context/prompt duplication* — knowledge that can drift. Tool **configuration** carries no architectural knowledge and is allowed, like `.editorconfig`: the repo ships `.claude/settings.json` (a shared command allowlist that reduces permission friction for Claude Code users). Machine-local variants (`.claude/settings.local.json`, `AGENTS.local.md`) stay gitignored.
+The single-source rule targets *context/prompt duplication* — knowledge that can drift. Tool **configuration** carries no architectural knowledge and is allowed, like `.editorconfig`: the repo ships `.claude/settings.json` (a shared command allowlist that reduces permission friction for Claude Code users). Machine-local variants (`.claude/settings.local.json`) stay gitignored.
 
 ### Rename of `scripts/`
 

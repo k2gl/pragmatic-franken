@@ -4,6 +4,38 @@ Templates aren't merged — they're applied. Each release lists the few changes
 worth porting into projects built from this skeleton, smallest diff first.
 How-to: [`docs/guides/fork-maintenance.md`](docs/guides/fork-maintenance.md).
 
+## Unreleased (the convention-alignment release)
+
+Worth porting, smallest diff first:
+
+1. **Pint ruleset** (`pint.json`): `new_with_parentheses {named_class:false}`,
+   `single_line_empty_body`, `not_operator_with_successor_space`,
+   `blank_line_before_statement`, `global_namespace_import`. Run `make lint`
+   once, commit the reformat, add the SHA to `.git-blame-ignore-revs`.
+2. **Slice anatomy** (ADR-0001): inside `Application/` the handler stays at the
+   root; move `*Command`/`*Query` to `Application/Message/`, `*Request`/`*Result`
+   and other DTOs to `Application/Dto/` (`git mv` + namespace line + imports).
+   If you use `dev/generate-sdk.sh`, port its updated Result regex.
+3. **HTTP response contract** (ADR-0016): success bodies wrap in
+   `{"data": ...}`; input is a validated `*Request` DTO that the controller
+   maps into a pure command. Errors/probes unchanged.
+4. **PHPUnit 12**: `phpunit/phpunit ^12`, `k2gl/phpunit-fluent-assertions
+   ^12.5`, XSD bump in `phpunit.xml`; replace expectation-less `createMock`
+   with `createStub`.
+5. **ADR renumbering**: supply-chain ADR is now 0014 (was 0018); new ADRs
+   0015 (scheduler), 0016 (HTTP contract), 0017 (parallel agent sessions).
+6. **Worker scheduler probe** (`docker/docker-entrypoint.sh`): the worker now
+   checks `messenger.transport.scheduler_default` exists before consuming it —
+   a fork with zero `#[AsPeriodicTask]` no longer crash-loops with
+   `SCHEDULER_ENABLED=true`.
+7. **`make test` idempotency**: Foundry `ResetDatabase` resets via migrations
+   (`config/packages/test/zenstruck_foundry.yaml`), keeping
+   `doctrine_migration_versions` consistent between runs.
+8. **Init prune fixes** (`dev/init.sh`): prune also removes `TaskFactory`,
+   deletes only the example migration, and rewrites the composer description.
+9. **AGENTS.local.md pattern removed**: machine-local agent settings live in
+   `.claude/settings.local.json`; `AGENTS.md` stays the single context file.
+
 ## v1.0.0 (the honesty release)
 
 If your fork predates v1.0.0, port at minimum:

@@ -2,7 +2,7 @@
 audience: agent,human
 tier: 1
 budget_tokens: 2000
-last_reviewed: 2026-04-28
+last_reviewed: 2026-06-12
 ---
 
 # AGENTS.md — Pragmatic FrankenPHP

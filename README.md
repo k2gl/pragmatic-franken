@@ -64,7 +64,7 @@ pushes a Mercure live update on `/tasks`.
 
 | | **pragmatic-franken** | symfony/skeleton | dunglas/symfony-docker | API Platform |
 |---|---|---|---|---|
-| Architecture opinion | Vertical Slices + CQRS, 14 ADRs | none | none | API-first framework |
+| Architecture opinion | Vertical Slices + CQRS, 17 ADRs | none | none | API-first framework |
 | Prod image | built, booted & scanned per PR | — | built | built |
 | Real example vertical | entity→migration→factory→tests | — | — | generated CRUD |
 | Deploy story | blue-green to a VDS + backups + DR drill | — | — | k8s helm |
@@ -73,7 +73,7 @@ pushes a Mercure live update on `/tasks`.
 | Best when | product API/app on one VDS, agents in the loop | you want vanilla | you want plain Docker | your product *is* the API |
 
 Honest non-goals: no auth in core (recipe instead), no bundled SPA, no
-Kubernetes, no multi-DB. See [`docs/roadmap.md`](docs/roadmap.md#non-goals).
+Kubernetes, no multi-DB.
 
 ## Daily commands
 
@@ -110,7 +110,6 @@ ops/                              # deployment scripts
 tests/                            # mirrors src/ — tests/Context/{Name}/Features/{Feature}/
 docker/                           # Dockerfile, Caddyfile, php.ini
 AGENTS.md                         # Tier-1 agent context, ≤ 2 000 tokens
-AGENTS.local.md.example           # per-developer overrides template (gitignored target)
 ```
 
 The example slices (`Health/Healthz`, `Home/Index`, `Task`) are reference implementations — `Healthz` is normative for ADR-0005 health checks, `Task` for the full entity → migration → factory → tests vertical; `Home/Index` is non-normative (drop it for API-only or SPA projects).
@@ -150,7 +149,6 @@ All decisions live in [`docs/adr/`](docs/adr/). Each ADR carries YAML front-matt
 - [`docs/guides/disaster-recovery.md`](docs/guides/disaster-recovery.md) — backups and the restore drill
 - [`docs/guides/parallel-sessions.md`](docs/guides/parallel-sessions.md) — isolated worktree stacks for parallel agents
 - [`docs/guides/supply-chain.md`](docs/guides/supply-chain.md) — sign releases, verify before deploying
-- [`docs/roadmap.md`](docs/roadmap.md) — roadmap
 
 ## Recipes (opt-in capabilities)
 
@@ -170,7 +168,7 @@ Forks don't merge templates — they apply changes. Each release ships an
 
 The repository ships with a single `AGENTS.md` at the root, intended to be read by every AI tool by convention. There are no `.cursorrules`, `.windsurfrules`, `.cursor/rules/*` or per-tool prompt files — see [ADR-0010](docs/adr/0010-documentation-and-ai-layout.md) for the rationale.
 
-For per-developer overrides (tone, language, IDE quirks), copy `AGENTS.local.md.example` to `AGENTS.local.md` (gitignored).
+Machine-local Claude Code settings live in `.claude/settings.local.json` (gitignored); parallel agent sessions get isolated stacks via `dev/worktree.sh` ([ADR-0017](docs/adr/0017-parallel-agent-sessions.md)).
 
 ## Contributing
 
