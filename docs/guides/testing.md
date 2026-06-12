@@ -1,13 +1,13 @@
 ---
 audience: both
 tier: 2
-last_reviewed: 2026-04-28
-summary: "Concrete testing patterns: unit handlers, integration via Foundry+DAMA, e2e via WebTestCase, async via Messenger-Test. Architectural rules and coverage thresholds live in ADR-0008."
+last_reviewed: 2026-06-12
+summary: "Concrete testing patterns: unit handlers via UnitTestCase, integration via Foundry+DAMA, e2e via ApiTestCase, async via Messenger-Test, fluent fact() assertions. Architectural rules and coverage policy live in ADR-0008."
 ---
 
 # Testing Guide
 
-This guide is the *operational* complement to [ADR-0008](../adr/0008-testing-strategy.md). The ADR is the source of truth for the *what* (framework, layout, coverage thresholds, pyramid ratio); this guide is the *how* (concrete examples).
+This guide is the *operational* complement to [ADR-0008](../adr/0008-testing-strategy.md). The ADR is the source of truth for the *what* (framework, layout, coverage policy, pyramid ratio); this guide is the *how*. Every example below is a trimmed copy of a real test in this repo — when in doubt, open the linked file.
 
 ## Layout
 
@@ -17,124 +17,156 @@ Tests mirror `src/` one-to-one:
 tests/
 ├── bootstrap.php
 ├── Support/                                   # framework helpers (not tests)
-│   └── TestCase/{UnitTestCase,IntegrationTestCase,ApiTestCase}.php
-└── {Context}/Features/{Feature}/{Feature}*Test.php
+│   ├── TestCase/{UnitTestCase,IntegrationTestCase,ApiTestCase}.php
+│   └── Factory/                               # Foundry factories
+└── Context/{Name}/Features/{Feature}/{Feature}*Test.php
 ```
 
-Test type is encoded by the base class plus a `#[Group]` attribute:
+Test type is encoded by the base class (`UnitTestCase` / `IntegrationTestCase` / `ApiTestCase`) plus the matching `#[Group]` attribute (`unit` / `integration` / `e2e`) — see the table in [ADR-0008](../adr/0008-testing-strategy.md#test-layout).
 
-| Type | Base class | `#[Group]` | Make target |
-|---|---|---|---|
-| Unit | `UnitTestCase` (extends `PHPUnit\Framework\TestCase`) | `unit` | `make test-unit` |
-| Integration | `IntegrationTestCase` (extends `KernelTestCase` + Foundry + DAMA) | `integration` | `make test-integration` |
-| API / E2E | `ApiTestCase` (extends `WebTestCase`) | `e2e` | `make test-e2e` |
+## Assertions
 
-Coverage thresholds are defined in [ADR-0008](../adr/0008-testing-strategy.md#decision) and enforced in CI.
-
-## Unit test (handler with mocked dependencies)
+House style is the fluent `fact()` from `k2gl/phpunit-fluent-assertions` (the base classes use it themselves):
 
 ```php
-namespace App\Tests\User\Features\Login;
+use function K2gl\PHPUnitFluentAssertions\fact;
 
-use App\User\Features\Login\Application\LoginCommand;
-use App\User\Features\Login\Application\LoginHandler;
-use App\User\Features\Login\Application\LoginResult;
-use App\User\Features\Login\Infrastructure\UserRepository;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\TestCase;
-
-#[Group('unit')]
-final class LoginHandlerTest extends TestCase
-{
-    public function test_returns_token_on_valid_credentials(): void
-    {
-        $repo = $this->createMock(UserRepository::class);
-        $repo->method('findByEmail')->willReturn(/* ... */);
-
-        $handler = new LoginHandler($repo);
-        $result = $handler(new LoginCommand('user@example.com', 'password'));
-
-        self::assertInstanceOf(LoginResult::class, $result);
-        self::assertNotEmpty($result->token);
-    }
-}
+fact($status->ok())->true();
+fact($repository->count())->is(2);
+fact($result)->instanceOf(LiveUpdateResult::class);
 ```
 
-The reference unit test in this repo is [`tests/Context/Health/Features/Healthz/CheckHealthHandlerTest.php`](../../tests/Context/Health/Features/Healthz/CheckHealthHandlerTest.php).
+For HTML pages, Symfony's DOM assertions (`assertSelectorTextContains()`, …) remain the right tool — see `tests/Context/Home/Features/Index/IndexControllerTest.php`.
 
-## Integration test (real database, Foundry factories)
+## Unit test (handler with stubbed dependencies)
 
-```php
-namespace App\Tests\User\Features\Register;
-
-use App\Tests\Support\TestCase\IntegrationTestCase;
-use App\User\Features\Register\Application\RegisterCommand;
-use App\User\Features\Register\Application\RegisterHandler;
-use PHPUnit\Framework\Attributes\Group;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
-
-#[Group('integration')]
-final class RegisterHandlerTest extends IntegrationTestCase
-{
-    use ResetDatabase;
-    use Factories;
-
-    public function test_persists_a_new_user(): void
-    {
-        $handler = self::getContainer()->get(RegisterHandler::class);
-        $result = $handler(new RegisterCommand('user@example.com', 'password'));
-
-        self::assertNotNull($result->id);
-    }
-}
-```
-
-`ResetDatabase` (Foundry) wraps every test in a transaction that rolls back on tearDown. `dama/doctrine-test-bundle` keeps the DB connection across the test for assertion convenience.
-
-## E2E test (HTTP via WebTestCase)
+Trimmed from [`tests/Context/Health/Features/Healthz/CheckHealthHandlerTest.php`](../../tests/Context/Health/Features/Healthz/CheckHealthHandlerTest.php):
 
 ```php
 namespace App\Tests\Context\Health\Features\Healthz;
 
+use App\Context\Health\Features\Healthz\Application\CheckHealthHandler;
+use App\Context\Health\Features\Healthz\Application\Message\CheckHealthQuery;
+use App\Context\Health\Features\Healthz\Infrastructure\DbPingInterface;
+use App\Context\Health\Features\Healthz\Infrastructure\RedisPingInterface;
+use App\Tests\Support\TestCase\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-#[Group('e2e')]
-final class HealthzControllerTest extends WebTestCase
+use function K2gl\PHPUnitFluentAssertions\fact;
+
+#[Group('unit')]
+final class CheckHealthHandlerTest extends UnitTestCase
 {
-    public function test_healthz_returns_json(): void
+    public function test_returns_not_ok_when_db_is_down(): void
     {
-        $client = self::createClient();
-        $client->request('GET', '/healthz');
+        $db = $this->createStub(DbPingInterface::class);
+        $db->method('isAlive')->willReturn(false);
 
-        self::assertResponseIsSuccessful();
-        $payload = json_decode((string) $client->getResponse()->getContent(), true);
-        self::assertArrayHasKey('ok', $payload);
+        $redis = $this->createStub(RedisPingInterface::class);
+        $redis->method('isAlive')->willReturn(true);
+
+        $handler = new CheckHealthHandler($db, $redis);
+        $status = $handler(new CheckHealthQuery);
+
+        fact($status->ok())->false();
+        fact($status->db)->false();
+        fact($status->redis)->true();
     }
 }
 ```
 
-The reference e2e test lives at [`tests/Context/Health/Features/Healthz/HealthzControllerTest.php`](../../tests/Context/Health/Features/Healthz/HealthzControllerTest.php).
+## Integration test (real database, Foundry factories)
+
+`IntegrationTestCase` already carries Foundry's `Factories` + `ResetDatabase` — don't re-`use` them. Isolation: DAMA (registered in `phpunit.xml`) wraps each test in a transaction rolled back on teardown; `ResetDatabase` rebuilds the schema once up front. Trimmed from [`tests/Context/Task/Features/PurgeCompletedTasks/PurgeCompletedTasksHandlerTest.php`](../../tests/Context/Task/Features/PurgeCompletedTasks/PurgeCompletedTasksHandlerTest.php):
+
+```php
+namespace App\Tests\Context\Task\Features\PurgeCompletedTasks;
+
+use App\Context\Task\Features\PurgeCompletedTasks\Application\PurgeCompletedTasksHandler;
+use App\Tests\Support\Factory\TaskFactory;
+use App\Tests\Support\TestCase\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\Group;
+
+use function K2gl\PHPUnitFluentAssertions\fact;
+
+#[Group('integration')]
+final class PurgeCompletedTasksHandlerTest extends IntegrationTestCase
+{
+    public function test_purges_only_tasks_completed_before_retention(): void
+    {
+        $stale = TaskFactory::new()->completed()->create();
+        $fresh = TaskFactory::new()->completed()->create();
+        TaskFactory::createOne(); // open task — never purged
+
+        $this->ageCompletedAt($stale, '-30 days'); // reflection helper — see the full test
+
+        $handler = self::getContainer()->get(PurgeCompletedTasksHandler::class);
+        \assert($handler instanceof PurgeCompletedTasksHandler);
+        $handler();
+
+        fact(TaskFactory::repository()->count())->is(2);
+        fact(TaskFactory::repository()->find($fresh->id))->notNull();
+    }
+}
+```
+
+## E2E test (full HTTP via ApiTestCase)
+
+`ApiTestCase` boots the full stack through `KernelBrowser` and ships helpers: `sendJsonRequest()` (pass `executor:` and override `authHeaders()` for your auth scheme — see the [JWT recipe](../recipes/jwt-auth.md)), `responseReader()` (type-safe body reads via `k2gl/array-reader`), `responseStatusCode()`, `assertResponseContainsViolation()` (422 problem+json), `postJson()` / `getJson()`. Trimmed from [`tests/Context/Task/Features/CreateTask/CreateTaskTest.php`](../../tests/Context/Task/Features/CreateTask/CreateTaskTest.php):
+
+```php
+namespace App\Tests\Context\Task\Features\CreateTask;
+
+use App\Tests\Support\Factory\TaskFactory;
+use App\Tests\Support\TestCase\ApiTestCase;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\Validator\Constraints\NotBlank;
+
+use function K2gl\PHPUnitFluentAssertions\fact;
+
+#[Group('e2e')]
+final class CreateTaskTest extends ApiTestCase
+{
+    public function test_creates_task(): void
+    {
+        $this->sendJsonRequest('POST', '/tasks', json: ['title' => 'Ship Wave 2']);
+
+        fact($this->responseStatusCode())->is(201);
+        fact($this->responseReader()->nested('data')->string('title'))->is('Ship Wave 2');
+        fact(TaskFactory::repository()->count())->is(1);
+    }
+
+    public function test_blank_title_is_rejected_with_problem_json(): void
+    {
+        $this->sendJsonRequest('POST', '/tasks', json: ['title' => '']);
+
+        $this->assertResponseContainsViolation('title', NotBlank::IS_BLANK_ERROR);
+    }
+}
+```
 
 ## Async / Messenger
 
-Use `zenstruck/messenger-test` to assert dispatched messages without booting a real worker:
+`zenstruck/messenger-test` asserts queued messages without booting a worker. The shipped example is an e2e test: HTTP call → domain event queued on the `async` transport. Trimmed from [`tests/Context/Task/Features/CompleteTask/CompleteTaskTest.php`](../../tests/Context/Task/Features/CompleteTask/CompleteTaskTest.php):
 
 ```php
+use App\Context\Task\Features\CompleteTask\Domain\TaskCompleted;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
-#[Group('integration')]
-final class RegisterDispatchesEventTest extends IntegrationTestCase
+#[Group('e2e')]
+final class CompleteTaskTest extends ApiTestCase
 {
     use InteractsWithMessenger;
 
-    public function test_register_dispatches_user_registered_event(): void
+    public function test_completes_task_and_emits_domain_event(): void
     {
-        $bus = self::getContainer()->get(MessageBusInterface::class);
-        $bus->dispatch(new RegisterCommand(/* ... */));
+        $task = TaskFactory::createOne(['title' => 'Close the loop']);
 
-        $this->transport('async')->queue()->assertContains(UserRegisteredEvent::class);
+        $this->sendJsonRequest('POST', sprintf('/tasks/%s/complete', $task->id));
+
+        fact($this->responseStatusCode())->is(200);
+        // Domain event routed async (ADR-0011) — queued, not handled inline.
+        $this->transport('async')->queue()->assertContains(TaskCompleted::class, 1);
     }
 }
 ```
@@ -150,6 +182,6 @@ make test-coverage          # text coverage
 make coverage-html          # HTML report (build/coverage/index.html)
 ```
 
-## Coverage thresholds
+## Coverage
 
-See [ADR-0008](../adr/0008-testing-strategy.md). Domain ≥ 90 %, Application ≥ 80 %, Infrastructure ≥ 60 %, UI ≥ 40 %. CI fails below these thresholds.
+CI enforces one global floor — 60 % of statements (`dev/check-coverage.php`). The per-layer targets in [ADR-0008](../adr/0008-testing-strategy.md#decision) are recommended fork policy, not a CI gate.

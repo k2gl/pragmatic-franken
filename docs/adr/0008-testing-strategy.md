@@ -20,16 +20,16 @@ Choosing a testing strategy for a PHP/Symfony/FrankenPHP project affects develop
 ## Decision
 
 1. **Framework: PHPUnit 12.** Mature, deeply integrated with Symfony Test framework, abundant AI training data, full PHPStan compatibility. Pest is rejected for this boilerplate (less AI training data, extra plugin layer with Symfony).
-2. **Layout: mirror of `src/`** at `tests/{Context}/Features/{Feature}/`. Test *type* is communicated via the base class (`UnitTestCase` / `IntegrationTestCase` / `ApiTestCase`) and PHPUnit `#[Group]` attribute (`unit` / `integration` / `e2e`).
+2. **Layout: mirror of `src/`** at `tests/Context/{Name}/Features/{Feature}/`. Test *type* is communicated via the base class (`UnitTestCase` / `IntegrationTestCase` / `ApiTestCase`) and PHPUnit `#[Group]` attribute (`unit` / `integration` / `e2e`).
 3. **Pyramid: 60 / 30 / 10** (unit / integration / e2e). Most logic is exercised in cheap unit tests; integration covers persistence, Messenger, and external adapters; e2e validates HTTP contracts.
 4. **Coverage targets** (global 60 % floor enforced in CI; per-layer values are recommended fork policy):
 
 | Layer | Path glob | Minimum line coverage |
 |---|---|---|
-| Domain | `src/*/Features/*/Domain/`, `src/*/Domain/` | **90 %** |
-| Application | `src/*/Features/*/Application/` | **80 %** |
-| Infrastructure | `src/*/Features/*/Infrastructure/`, `src/*/Infrastructure/` | **60 %** |
-| UI / EntryPoint | `src/*/Features/*/EntryPoint/` | **40 %** |
+| Domain | `src/Context/*/Features/*/Domain/`, `src/Context/*/Entity/`, `src/SharedKernel/Domain/` | **90 %** |
+| Application | `src/Context/*/Features/*/Application/` | **80 %** |
+| Infrastructure | `src/Context/*/Features/*/Infrastructure/`, `src/Context/*/Repository/`, `src/SharedKernel/Infrastructure/` | **60 %** |
+| UI / EntryPoint | `src/Context/*/Features/*/EntryPoint/` | **40 %** |
 
 5. **Async support:** `zenstruck/messenger-test` for in-memory bus assertions; `zenstruck/foundry` + `dama/doctrine-test-bundle` for database isolation.
 
@@ -42,7 +42,7 @@ tests/
 │   ├── TestCase/{UnitTestCase, IntegrationTestCase, ApiTestCase}.php
 │   ├── Factory/                              # Foundry factories
 │   └── Helper/
-└── {Context}/Features/{Feature}/{Feature}HandlerTest.php
+└── Context/{Name}/Features/{Feature}/{Feature}*Test.php
 ```
 
 | Test type | Base class | `#[Group]` | Make target |
