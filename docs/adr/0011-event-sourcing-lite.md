@@ -15,13 +15,7 @@ summary: "Record state changes as immutable domain events dispatched via Messeng
 
 ## Context
 
-Full event sourcing (event store + projections + snapshots) is powerful but expensive to operate and reason about. Most features in this boilerplate do not need event replay — they need *decoupling*: the ability to notify other bounded contexts about something that happened without creating direct dependencies.
-
-### Forces
-
-- Bounded contexts must not call each other's internals directly (ADR-0001, ADR-0009).
-- Async side effects (emails, webhooks, analytics) should not block the primary request.
-- The architecture must remain deletable — removing a slice must not cascade.
+Full event sourcing (event store + projections + snapshots) is powerful but expensive to operate and reason about. Most features here do not need event replay — they need *decoupling*: notifying other bounded contexts without direct dependencies. Constraints: contexts must not call each other's internals (ADR-0001, ADR-0009); async side effects (emails, webhooks, analytics) must not block the primary request; removing a slice must not cascade.
 
 ## Decision
 
@@ -88,27 +82,11 @@ framework:
             App\Context\Task\Features\CompleteTask\Domain\TaskCompleted: async
 ```
 
-For tests, override the transport with the zenstruck/messenger-test sink so queued events are inspectable without a real consumer:
-
-```yaml
-# config/packages/test/messenger.yaml
-framework:
-    messenger:
-        transports:
-            async: 'test://'
-```
+Tests override the transport with the zenstruck/messenger-test sink (`config/packages/test/messenger.yaml`: `async: 'test://'`), so queued events are inspectable without a real consumer.
 
 ### 4. What "Lite" excludes
 
-| Full Event Sourcing | Event Sourcing Lite |
-|---|---|
-| Event store (append-only log) | ❌ Not needed |
-| Aggregate rebuilt from events | ❌ Not needed |
-| Projections / read models | ❌ Not needed |
-| Snapshots | ❌ Not needed |
-| Domain events as decoupling mechanism | ✅ Included |
-| Async side-effect handlers | ✅ Included |
-| Audit trail via event log | ✅ Optional (store via a subscriber) |
+No event store (append-only log), no aggregates rebuilt from events, no projections/read models, no snapshots. Included: domain events as the decoupling mechanism and async side-effect handlers; an audit trail is optional (store events via a subscriber).
 
 ## Consequences
 

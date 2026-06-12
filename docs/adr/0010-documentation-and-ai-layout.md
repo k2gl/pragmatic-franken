@@ -15,7 +15,7 @@ summary: "Three-tier doc model: AGENTS.md is the only Tier-1 file always loaded 
 
 ## Context
 
-The repository previously held AI instructions in **four** places: root (`AGENTS.md`, `SYSTEM_PROMPT.md`, `.cursorrules`, `.windsurfrules`), `.config/agents/`, `.cursor/rules/*`, and several files under `docs/guides/`. Total surface area: ~7 000 words across 13 files, with ~70 % content overlap and pairs of byte-identical files (`.cursorrules` ≡ `.windsurfrules`). Every cold-start agent read ~30 000 tokens before touching source code.
+The repository previously held AI instructions in **four** places (root rule files, `.config/agents/`, `.cursor/rules/*`, several guides): ~7 000 words across 13 files, ~70 % overlap, some byte-identical pairs. Every cold-start agent read ~30 000 tokens before touching source code.
 
 ## Decision
 
@@ -46,12 +46,12 @@ summary: "≤300 character one-liner suitable for skimming without loading the b
 
 ### What is not maintained
 
-- **Per-IDE rule files** (`.cursorrules`, `.windsurfrules`, `.cursor/rules/*`, etc.). Every actively-developed AI tool resolves `AGENTS.md` either by direct convention (Cursor 0.45+, Claude Code, OpenAI Codex CLI, Aider, Codeium, Cline) or by being pointed at it. If a contributor's tool refuses, they create a local symlink and gitignore it. We will not duplicate.
-- **Per-tool prompt directories** (`prompts/`, `.config/agents/`, `SYSTEM_PROMPT.md`). The contents that are still load-bearing live in `AGENTS.md`; the rest is removed.
+- **Per-IDE rule files** (`.cursorrules`, `.windsurfrules`, `.cursor/rules/*`, etc.). Every actively-developed AI tool reads `AGENTS.md` by convention or can be pointed at it; a tool that refuses gets a local gitignored symlink. We will not duplicate.
+- **Per-tool prompt directories** (`prompts/`, `.config/agents/`, `SYSTEM_PROMPT.md`). Whatever was load-bearing lives in `AGENTS.md`; the rest is removed.
 
 ### Carve-out: tool configuration is not context
 
-The single-source rule targets *context/prompt duplication* — knowledge that can drift. Tool **configuration** carries no architectural knowledge and is allowed, like `.editorconfig`: the repo ships `.claude/settings.json` (a shared command allowlist that reduces permission friction for Claude Code users). Machine-local variants (`.claude/settings.local.json`) stay gitignored.
+The single-source rule targets *context/prompt duplication* — knowledge that can drift. Tool **configuration** carries no architectural knowledge and is allowed, like `.editorconfig`: the repo ships `.claude/settings.json` (shared command allowlist); machine-local `.claude/settings.local.json` stays gitignored.
 
 ### Rename of `scripts/`
 

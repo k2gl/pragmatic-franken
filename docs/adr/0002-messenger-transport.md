@@ -11,65 +11,28 @@ summary: "Symfony Messenger as the primary bus. CQRS: Commands and Queries are s
 
 # ADR-0002: Messenger Transport
 
-**TL;DR:** All write operations dispatch a `*Command` synchronously through Messenger. Reads dispatch a `*Query`. Cross-feature side effects use asynchronous `*Event`s on the Doctrine transport (`doctrine://default?auto_setup=true` — no extra PHP extension, inspectable queue table, proven in real projects grown from this skeleton; swap the DSN for Redis/AMQP when throughput demands it). ADR-0003 (Pragmatism Charter) defines when this rule may be skipped (single-writer CRUD, legacy migration, perf-critical hot paths).
+**TL;DR:** Writes dispatch a `*Command`, reads a `*Query` — both synchronous. Cross-feature side effects are asynchronous `*Event`s on the Doctrine transport (`doctrine://default?auto_setup=true` — no extra PHP extension, inspectable queue table, production-proven; swap the DSN for Redis/AMQP when throughput demands it). ADR-0003 defines when this rule may be skipped (single-writer CRUD, legacy migration, perf-critical hot paths).
 
 ## Context
 
-We needed a way to:
-1. Separate UI (Controllers) from business logic
-2. Enable loose coupling between modules
-3. Support both synchronous and asynchronous operations
-4. Provide a clean path to microservices in the future
-
-Traditional approach of calling services directly from controllers creates tight coupling and makes testing harder.
+Controllers calling services directly create tight coupling and hard-to-test code. We needed UI separated from business logic, loose coupling between modules, and one mechanism for both synchronous and asynchronous operations.
 
 ## Decision
 
-We use **Symfony Messenger** as the main communication bus implementing CQRS patterns:
+**Symfony Messenger** as the main communication bus, CQRS-style:
 
-- **Commands** for write operations (synchronous)
-- **Queries** for read operations (synchronous)
-- **Events** for cross-context communication (asynchronous by default)
+- **Commands** — write operations (synchronous)
+- **Queries** — read operations (synchronous)
+- **Events** — cross-context communication (asynchronous by default)
 
-See [ADR 3: Pragmatic Symfony Architecture](0003-pragmatic-symfony-architecture.md) for the Message Bus Rule and compliance requirements.
-
-## Command-Query Responsibility Segregation
-
-```mermaid
-graph LR
-    subgraph "Write Path"
-        C[Controller] --> Cmd[Command Bus]
-        Cmd --> H[Command Handler]
-        H --> E[Entity]
-    end
-    
-    subgraph "Read Path"
-        C2[Controller] --> Qry[Query Bus]
-        Qry --> QH[Query Handler]
-        QH --> DTO[Response DTO]
-    end
-    
-    subgraph "Async Events"
-        E --> Ev[Domain Event]
-        Ev --> EB[Event Bus]
-        EB --> OH[Other Handlers]
-    end
-```
+See [ADR-0003](0003-pragmatic-symfony-architecture.md) for the Message Bus Rule and its escape hatches.
 
 ## Implementation
 
-### 1. Command Bus
-
-**Purpose:** Handle write operations (state changes)
-
-**Naming:** `*Command` for commands, `*Handler` for handlers
+### 1. Command Bus — write operations
 
 ```php
 // src/Context/Task/Features/CreateTask/Application/Message/CreateTaskCommand.php
-declare(strict_types=1);
-
-namespace App\Context\Task\Features\CreateTask\Application\Message;
-
 final readonly class CreateTaskCommand
 {
     public function __construct(
@@ -80,15 +43,6 @@ final readonly class CreateTaskCommand
 
 ```php
 // src/Context/Task/Features/CreateTask/Application/CreateTaskHandler.php
-declare(strict_types=1);
-
-namespace App\Context\Task\Features\CreateTask\Application;
-
-use App\Context\Task\Features\CreateTask\Application\Dto\CreateTaskResult;
-use App\Context\Task\Features\CreateTask\Application\Message\CreateTaskCommand;
-use App\Context\Task\Repository\TaskRepository;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-
 #[AsMessageHandler]
 final readonly class CreateTaskHandler
 {
@@ -103,34 +57,14 @@ final readonly class CreateTaskHandler
 }
 ```
 
-### 2. Query Bus
+### 2. Query Bus — read operations
 
-**Purpose:** Handle read operations (data retrieval)
+`*Query` messages have the same shape; their handlers return `*Result` DTOs, never entities. Shipped example: `ListTasksQuery` → `ListTasksHandler` in `src/Context/Task/Features/ListTasks/`.
 
-```php
-// src/Context/Task/Features/GetTask/Application/Message/GetTaskQuery.php
-declare(strict_types=1);
-
-namespace App\Context\Task\Features\GetTask\Application\Message;
-
-final readonly class GetTaskQuery
-{
-    public function __construct(public string $taskId) {}
-}
-```
-
-### 3. Event Bus
-
-**Purpose:** Notify other modules of domain changes
+### 3. Event Bus — cross-context notifications
 
 ```php
 // src/Context/Task/Features/CompleteTask/Domain/TaskCompleted.php
-declare(strict_types=1);
-
-namespace App\Context\Task\Features\CompleteTask\Domain;
-
-use DateTimeImmutable;
-
 final readonly class TaskCompleted
 {
     public function __construct(
@@ -141,113 +75,24 @@ final readonly class TaskCompleted
 }
 ```
 
-Past-tense names, no `Event` suffix: `TaskCompleted`, not `TaskCompletedEvent` (ADR-0011).
-
-## AI Use Cases
-
-Messenger is particularly useful for AI workloads:
-
-### 1. Async LLM Processing
-
-```php
-// Command for AI processing
-final readonly class GenerateSummaryCommand
-{
-    public function __construct(
-        public string $taskId,
-        public string $content,
-        public string $model,
-    ) {}
-}
-
-// Handler processes asynchronously
-#[AsMessageHandler]
-final readonly class GenerateSummaryHandler
-{
-    public function __construct(
-        private LlmService $llm,
-        private TaskRepository $tasks,
-    ) {}
-
-    public function __invoke(GenerateSummaryCommand $command): void
-    {
-        $summary = $this->llm->generate($command->content, $command->model);
-        // Store result, notify user
-    }
-}
-```
-
-### 2. Streaming Responses
-
-For real-time AI streaming, use FrankenPHP streaming with Messenger as bridge:
-
-```php
-// Controller initiates async job
-public function __invoke(
-    #[MapRequestPayload] GenerateSummaryMessage $message,
-    MessageBusInterface $bus,
-): Response {
-    $jobId = uniqid('job_');
-    
-    // Dispatch async job
-    $bus->dispatch(new GenerateSummaryJob(
-        jobId: $jobId,
-        content: $message->content,
-    ));
-    
-    // Return immediately with job ID
-    return $this->json(['jobId' => $jobId]);
-}
-```
-
-### 3. Rate Limiting via Transport
-
-```yaml
-framework:
-    messenger:
-        transports:
-            ai:
-                dsn: 'redis://localhost/ai'
-                options:
-                    max_pending: 100
-```
+Past-tense names, no `Event` suffix: `TaskCompleted`, not `TaskCompletedEvent` (ADR-0011). Async AI/LLM jobs are ordinary async messages — same pattern, no special machinery.
 
 ## Consequences
 
-### Positive
+**Positive:** controllers stay free of business logic; handlers unit-test in isolation; implementations change without touching UI; async events enable eventual consistency; commands are an audit trail of intent; messages map naturally onto distributed systems if that day ever comes.
 
-1. **Separation of Concerns**: Controllers don't contain business logic
-2. **Testability**: Handlers are easy to unit test in isolation
-3. **Flexibility**: Easy to change handler implementation without touching UI
-4. **Scalability**: Async events enable eventual consistency patterns
-5. **Audit Trail**: Commands provide clear intent for every state change
-6. **Microservices Ready**: Commands/events are natural fit for distributed systems
-
-### Negative
-
-1. **More Classes**: Each operation needs Message + Handler (+ DTOs)
-2. **Learning Curve**: Team must understand Messenger patterns
-3. **Debugging**: Stack traces span multiple classes
-4. **Performance**: Small overhead from bus middleware
+**Negative:** more classes per operation (message + handler + DTOs); Messenger learning curve; stack traces span multiple classes; small bus-middleware overhead.
 
 ## Guidelines
-
-### When to Use Commands vs Queries
 
 | Scenario | Bus | Example |
 |----------|-----|---------|
 | Create/Update/Delete state | Command Bus | `CreateTaskCommand` |
 | Trigger side effects | Command Bus | `PublishLiveUpdateCommand` |
-| Retrieve data only | Query Bus | `GetTaskQuery` |
+| Retrieve data only | Query Bus | `ListTasksQuery` |
 | Notify other modules | Event Bus | `TaskCompleted` |
 
-### Handler Best Practices
-
-1. **One handler per message**: Keep handlers focused
-2. **Commands may return a Result DTO** for the HTTP layer — never an entity
-3. **Return DTOs for queries**: Never return entities
-4. **Use transaction middleware**: Ensure atomicity for commands
-5. **Validate early**: Validate DTOs before reaching handlers
+One handler per message. Commands may return a Result DTO for the HTTP layer — never an entity (ADR-0016). Validate input before it reaches the handler (`#[MapRequestPayload]` on the Request DTO).
 
 ## References
 

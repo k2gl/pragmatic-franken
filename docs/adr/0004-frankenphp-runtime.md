@@ -15,104 +15,31 @@ summary: "FrankenPHP (Caddy + PHP) is the primary application server with worker
 
 ## Decision
 
-Use FrankenPHP as the primary application server for PHP applications.
+Use FrankenPHP as the primary application server, in worker mode.
 
 ## Context
 
-We needed a modern application server that provides:
-- Superior performance over traditional PHP-FPM
-- Native support for Symfony Messenger workers
-- HTTP/3 and automatic HTTPS
-- Worker Mode for long-running processes
-- 103 Early Hints support
+We needed a modern application server: better throughput than PHP-FPM, native worker mode (no separate consumer processes for Messenger), HTTP/3 with automatic HTTPS, and a built-in Mercure hub.
 
 ## Consequences
 
-### Positive
+**Positive:** worker mode removes per-request bootstrap; a single binary replaces PHP-FPM + web server + Supervisor; HTTP/3 and automatic HTTPS out of the box; built-in Mercure hub for real-time updates.
 
-- **Performance**: Go-based Caddy integration provides 2-3x throughput over PHP-FPM
-- **Worker Mode**: No separate consumer processes needed
-- **Early Hints**: 103 responses improve perceived loading time by 30-50%
-- **Mercure Native**: Built-in real-time updates without separate server
-- **Simplified Infrastructure**: Single binary instead of PHP-FPM + Caddy + Supervisor
+**Negative:** learning curve for developers accustomed to PHP-FPM; debugging requires understanding the worker lifecycle; handlers must be stateless.
 
-### Negative
+## Stateless design
 
-- Learning curve for developers accustomed to PHP-FPM
-- Debugging requires understanding FrankenPHP worker lifecycle
+Worker mode keeps the kernel — and anything static — alive across requests: no static request state, no request-keyed in-memory caches, external cache (Redis) for shared state. Patterns, pitfalls and per-request cleanup live in `docs/guides/worker-mode.md`; memory bounds and worker recycling in ADR-0006.
 
-## Technical Details
+## Worker configuration
 
-### Performance Comparison
-
-| Metric | PHP-FPM | FrankenPHP |
-|--------|---------|------------|
-| Requests/sec | ~500 | ~1500 |
-| Memory usage | ~256MB | ~128MB |
-| Cold start | 500ms | 50ms |
-| Worker Mode | Separate | Native |
-
-### 103 Early Hints
-
-```php
-// FrankenPHP automatically sends 103 when:
-// 1. Route is preloading entities
-// 2. Preloading is configured in Caddyfile
-```
-
-## Stateless Design Required
-
-FrankenPHP worker mode requires stateless application design.
-
-### Requirements
-
-1. **No static state**: Do not use static properties to store request data
-2. **No session affinity**: Workers handle multiple requests, avoid in-memory caches
-3. **External caching**: Use Redis/Memcached for shared state
-4. **Clean shutdown**: Handle signals properly for graceful worker shutdown
-
-### Anti-Patterns to Avoid
-
-```php
-// ❌ WRONG - static property across requests
-static $cache = [];
-
-public function getData(): array
-{
-    return $this->cache[$this->id] ?? [];
-}
-
-// ✅ CORRECT - stateless
-public function getData(EntityManagerInterface $em, int $id): ?Entity
-{
-    return $em->find(Entity::class, $id);
-}
-```
-
-### Worker Configuration
-
-```caddy
-# Caddyfile
-{
-    frankenphp {
-        worker {
-            file ./public/index.php
-            num 4
-        }
-    }
-}
-
-localhost {
-    root * public
-    php_server
-}
-```
+Worker count and server config live in `docker/frankenphp/Caddyfile`; memory and OPcache tuning in `docker/php/prod-optimizations.ini` (ADR-0006).
 
 ## Alternatives Considered
 
-- **RoadRunner**: Good performance but requires separate binary
-- **Swoole**: Excellent performance but limited Symfony integration
-- **PHP-FPM**: Standard but lacks worker capabilities
+- **RoadRunner** — good performance, but a separate binary and process model
+- **Swoole** — excellent performance, limited Symfony integration
+- **PHP-FPM** — standard, but no worker mode
 
 ## References
 

@@ -15,12 +15,12 @@ summary: "PHPUnit 12 with mirror-of-src test layout; pyramid 60/30/10 (unit/inte
 
 ## Context
 
-Choosing a testing strategy for a PHP/Symfony/FrankenPHP project affects developer productivity, the predictability of AI-generated code, CI cost, and how easy it is to delete a feature. We considered PHPUnit and Pest; we considered three layouts (separated `Unit/Integration/EndToEnd` directories, mirror-of-`src/` with grouping, and feature-local tests next to handlers).
+We considered PHPUnit vs Pest, and three layouts: separated `Unit/Integration/EndToEnd` directories, mirror-of-`src/` with grouping, feature-local tests next to handlers. Criteria: developer productivity, predictability of AI-generated code, CI cost, ease of feature deletion.
 
 ## Decision
 
 1. **Framework: PHPUnit 12.** Mature, deeply integrated with Symfony Test framework, abundant AI training data, full PHPStan compatibility. Pest is rejected for this boilerplate (less AI training data, extra plugin layer with Symfony).
-2. **Layout: mirror of `src/`** at `tests/Context/{Name}/Features/{Feature}/`. Test *type* is communicated via the base class (`UnitTestCase` / `IntegrationTestCase` / `ApiTestCase`) and PHPUnit `#[Group]` attribute (`unit` / `integration` / `e2e`).
+2. **Layout: mirror of `src/`** at `tests/Context/{Name}/Features/{Feature}/`; test *type* via base class + `#[Group]` attribute (table below).
 3. **Pyramid: 60 / 30 / 10** (unit / integration / e2e). Most logic is exercised in cheap unit tests; integration covers persistence, Messenger, and external adapters; e2e validates HTTP contracts.
 4. **Coverage targets** (global 60 % floor enforced in CI; per-layer values are recommended fork policy):
 

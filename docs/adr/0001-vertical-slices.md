@@ -36,7 +36,7 @@ src/Context/{Context}/Features/{Feature}/
 
 The context root also holds the context-wide pieces: `Entity/` and `Repository/` (ADR-0012, ADR-0013), and — when the project grows them — `Shared/` (Rule of Three, ADR-0009), `Reference/` (context enums/constants) and `Security/` (voters, role logic).
 
-`{Context}` here is a **DDD Bounded Context** (Eric Evans, Vaughn Vernon) — a part of the system with its own ubiquitous language, model, and consistency boundary. `User`, `Task`, `Inventory`, `Health` are bounded contexts; `User.Login` and `User.Register` are slices within the `User` context. The term `{Context}` is preferred over `{Module}` because the top-level dir is a strategic boundary, not just a code-organisation namespace.
+`{Context}` is a **DDD Bounded Context** (Eric Evans) — its own ubiquitous language, model and consistency boundary. `User`, `Task`, `Health` are contexts; `User.Login` is a slice within `User`. We say `{Context}`, not `{Module}`: the boundary is strategic, not just a namespace.
 
 ### 2. Canonical slice layout
 
@@ -82,14 +82,7 @@ Rules:
 
 ### 5. Cron jobs
 
-A cron job is a trigger, not a feature. The work it performs is a feature; place it under `Features/` and schedule it with `#[AsPeriodicTask]` (symfony/scheduler — ADR-0015):
-
-```
-src/Context/Task/Features/PurgeCompletedTasks/
-└── Application/PurgeCompletedTasksHandler.php   # #[AsPeriodicTask(frequency: '1 hour')]
-```
-
-Add an `EntryPoint/Cli/` command only when the same work also needs manual runs.
+A cron job is a trigger, not a feature. The work it performs is an ordinary slice scheduled with `#[AsPeriodicTask]` (symfony/scheduler — ADR-0015); shipped example: `src/Context/Task/Features/PurgeCompletedTasks/`. Add an `EntryPoint/Cli/` command only when the same work also needs manual runs.
 
 ## Consequences
 

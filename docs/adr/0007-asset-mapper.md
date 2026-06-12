@@ -11,7 +11,7 @@ summary: "Symfony AssetMapper is the default for HTML-first apps (no Webpack/Vit
 
 # ADR-0007: AssetMapper
 
-**TL;DR:** Default frontend tooling is AssetMapper. The shipped `src/Context/Home/Features/Index/` slice is a reference example, **not** an architectural commitment. Projects building an SPA can replace it with a `frontend/` workspace driven by Vite without violating any other ADR.
+**TL;DR:** Default frontend tooling is AssetMapper. The shipped `src/Context/Home/Features/Index/` slice is a reference example, **not** an architectural commitment. Projects building an SPA can replace it with a `frontend/` workspace driven by Vite without violating any other ADR (see `docs/recipes/spa-frontend.md`).
 
 ## Decision
 
@@ -19,52 +19,22 @@ Use Symfony AssetMapper as the default for managing frontend assets in HTML-firs
 
 ## Context
 
-We needed a simple asset management solution that:
-- Works without complex build tools (Webpack, Vite)
-- Provides hot reload in development
-- Works seamlessly with FrankenPHP
+We needed asset management that works without build tools (Webpack, Vite), provides hot reload in development, and runs seamlessly under FrankenPHP.
 
 ## Consequences
 
 ### Positive
 
-- **Zero Build Configuration**: Works out of the box with PHP
-- **Hot Reload**: Development mode auto-refreshes assets
-- **Versioning**: Automatic asset versioning via content hash
-- **Import Maps**: Native browser ES module support
+- **Zero build configuration** — works out of the box with PHP
+- **Hot reload** in development; automatic content-hash versioning
+- **Import Maps** — native browser ES modules
 
 ### Negative
 
-- **Limited Transpilation**: Not suitable for complex JS frameworks
-- **Browser Support**: Requires modern browsers with Import Maps
-- **SPA escape hatch:** Projects shipping an SPA should replace the AssetMapper integration with a `frontend/` workspace driven by Vite/Bun/etc. The example `Home/Index` slice can be deleted without architectural impact.
+- **Limited transpilation** — not suitable for complex JS frameworks; SPAs swap in Vite (recipe above)
+- **Browser support** — requires modern browsers with Import Maps
 
-## Usage
-
-### Basic Asset
-
-```php
-// templates/base.html.twig
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
-</head>
-<body>
-    <script type="module" src="{{ asset('app.js') }}"></script>
-</body>
-</html>
-```
-
-### Import Maps
-
-```javascript
-// assets/app.js
-import { Controller } from '@hotwired/stimulus';
-import TomSelect from 'tom-select';
-
-console.log('App loaded');
-```
+Shipped usage lives in the `Home/Index` slice and `assets/` — delete both without architectural impact when going API-only or SPA.
 
 ## References
 

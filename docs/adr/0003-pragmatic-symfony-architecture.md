@@ -75,7 +75,7 @@ If unsure: dispatch a command. The cost of the bus is small; the cost of refacto
 | **Domain code framework-aware?** | Forbidden. Ports + adapters mediate. | Encouraged. `#[AsMessageHandler]` lives on the handler. |
 | **Class count per feature** | 8–15 (entity, VO, repo iface, repo impl, port, adapter, mapper, command, handler, dto…) | 3–6 (command, handler, result, controller; optional: domain VO, infra adapter) |
 | **Time-to-first-feature** | Days | Hours |
-| **Tests** | Pure unit on domain | Unit on handler + e2e via WebTestCase |
+| **Tests** | Pure unit on domain | Unit on handler + e2e via ApiTestCase |
 | **Validation lives in** | Domain Value Objects | `#[Assert]` on the command |
 | **API spec lives in** | Separate YAML | `#[OA]` on the same command/result |
 | **Cost of framework migration** | Low (domain is portable) | High (rewrite). **Accepted trade-off.** |
