@@ -4,7 +4,12 @@ Templates aren't merged — they're applied. Each release lists the few changes
 worth porting into projects built from this skeleton, smallest diff first.
 How-to: [`docs/guides/fork-maintenance.md`](docs/guides/fork-maintenance.md).
 
-## Unreleased (the convention-alignment release)
+## v1.0.0
+
+The first tagged release. Both waves below are already inside it; the lists
+matter for forks cut from pre-release `main` — port newest first.
+
+### Convention alignment
 
 Worth porting, smallest diff first:
 
@@ -38,9 +43,9 @@ Worth porting, smallest diff first:
 9. **AGENTS.local.md pattern removed**: machine-local agent settings live in
    `.claude/settings.local.json`; `AGENTS.md` stays the single context file.
 
-## v1.0.0 (the honesty release)
+### The honesty pass
 
-If your fork predates v1.0.0, port at minimum:
+If your fork predates the honesty pass, port at minimum:
 
 1. **Prod image fixes** (`docker/frankenphp/Dockerfile`): `composer
    dump-autoload --no-dev --classmap-authoritative` in `php_prod`, `COPY bin
