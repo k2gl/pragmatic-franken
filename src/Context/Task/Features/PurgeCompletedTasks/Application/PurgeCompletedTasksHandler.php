@@ -7,6 +7,7 @@ namespace App\Context\Task\Features\PurgeCompletedTasks\Application;
 use App\Context\Task\Repository\TaskRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
+use DateTimeImmutable;
 
 /**
  * Reference symfony/scheduler task in worker mode: completed tasks older than
@@ -22,12 +23,11 @@ final readonly class PurgeCompletedTasksHandler
     public function __construct(
         private TaskRepository $tasks,
         private LoggerInterface $logger,
-    ) {
-    }
+    ) {}
 
     public function __invoke(): void
     {
-        $purged = $this->tasks->deleteCompletedBefore(new \DateTimeImmutable(self::RETENTION));
+        $purged = $this->tasks->deleteCompletedBefore(new DateTimeImmutable(self::RETENTION));
 
         if ($purged > 0) {
             $this->logger->info('Purged completed tasks.', ['count' => $purged]);

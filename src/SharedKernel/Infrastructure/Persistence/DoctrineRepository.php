@@ -112,8 +112,8 @@ abstract class DoctrineRepository extends ServiceEntityRepository
         $entityManager = $this->doctrine->getManagerForClass($this->entityClass);
 
         if (
-            !$entityManager instanceof EntityManagerInterface
-            || !$entityManager->isOpen()
+            ! $entityManager instanceof EntityManagerInterface
+            || ! $entityManager->isOpen()
         ) {
             $this->doctrine->resetManager();
             $entityManager = $this->doctrine->getManagerForClass($this->entityClass);

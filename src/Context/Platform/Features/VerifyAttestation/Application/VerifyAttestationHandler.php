@@ -35,7 +35,7 @@ final readonly class VerifyAttestationHandler
         );
         $subject = new SubjectPolicy('sha256', $this->sha256Of($query->artifactPath));
 
-        $verifier = new SigstoreVerifier();
+        $verifier = new SigstoreVerifier;
         $lastFailure = null;
 
         // `gh attestation trusted-root` emits one trusted root per line
@@ -71,6 +71,7 @@ final readonly class VerifyAttestationHandler
     private function loadBundle(string $path): Bundle
     {
         $raw = @file_get_contents($path);
+
         if ($raw === false) {
             throw new RuntimeException(sprintf('Cannot read attestation bundle "%s".', $path));
         }
@@ -94,6 +95,7 @@ final readonly class VerifyAttestationHandler
         }
 
         $raw = @file_get_contents($path);
+
         if ($raw === false) {
             throw new RuntimeException(sprintf('Cannot read trusted root "%s".', $path));
         }
@@ -108,6 +110,7 @@ final readonly class VerifyAttestationHandler
     private function sha256Of(string $path): string
     {
         $digest = @hash_file('sha256', $path);
+
         if ($digest === false) {
             throw new RuntimeException(sprintf('Cannot read artifact "%s".', $path));
         }

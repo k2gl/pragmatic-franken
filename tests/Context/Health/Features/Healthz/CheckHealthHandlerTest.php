@@ -24,7 +24,7 @@ final class CheckHealthHandlerTest extends UnitTestCase
         $redis->method('isAlive')->willReturn(true);
 
         $handler = new CheckHealthHandler($db, $redis);
-        $status = $handler(new CheckHealthQuery());
+        $status = $handler(new CheckHealthQuery);
 
         self::assertInstanceOf(HealthStatus::class, $status);
         self::assertTrue($status->ok());
@@ -39,7 +39,7 @@ final class CheckHealthHandlerTest extends UnitTestCase
         $redis->method('isAlive')->willReturn(true);
 
         $handler = new CheckHealthHandler($db, $redis);
-        $status = $handler(new CheckHealthQuery());
+        $status = $handler(new CheckHealthQuery);
 
         self::assertFalse($status->ok());
         self::assertFalse($status->db);

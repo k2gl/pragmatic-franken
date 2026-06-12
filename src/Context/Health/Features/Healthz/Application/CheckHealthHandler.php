@@ -14,8 +14,7 @@ final readonly class CheckHealthHandler
     public function __construct(
         private DbPingInterface $dbPing,
         private RedisPingInterface $redisPing,
-    ) {
-    }
+    ) {}
 
     public function __invoke(CheckHealthQuery $query): HealthStatus
     {

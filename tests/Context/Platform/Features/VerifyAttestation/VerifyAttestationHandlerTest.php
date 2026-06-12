@@ -23,7 +23,7 @@ final class VerifyAttestationHandlerTest extends UnitTestCase
 
     public function test_valid_attestation_verifies(): void
     {
-        $result = (new VerifyAttestationHandler())(new VerifyAttestationQuery(
+        $result = (new VerifyAttestationHandler)(new VerifyAttestationQuery(
             artifactPath: self::FIXTURES.'/artifact.tar.gz',
             bundlePath: self::FIXTURES.'/artifact.tar.gz.sigstore.jsonl',
             repository: 'k2gl/sigstore-verify',
@@ -44,7 +44,7 @@ final class VerifyAttestationHandlerTest extends UnitTestCase
         try {
             $this->expectException(SigstoreException::class);
 
-            (new VerifyAttestationHandler())(new VerifyAttestationQuery(
+            (new VerifyAttestationHandler)(new VerifyAttestationQuery(
                 artifactPath: $tampered,
                 bundlePath: self::FIXTURES.'/artifact.tar.gz.sigstore.jsonl',
                 repository: 'k2gl/sigstore-verify',
@@ -60,7 +60,7 @@ final class VerifyAttestationHandlerTest extends UnitTestCase
     {
         $this->expectException(SigstoreException::class);
 
-        (new VerifyAttestationHandler())(new VerifyAttestationQuery(
+        (new VerifyAttestationHandler)(new VerifyAttestationQuery(
             artifactPath: self::FIXTURES.'/artifact.tar.gz',
             bundlePath: self::FIXTURES.'/artifact.tar.gz.sigstore.jsonl',
             repository: 'evil/sigstore-verify',

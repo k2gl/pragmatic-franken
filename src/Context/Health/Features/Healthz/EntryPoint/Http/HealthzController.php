@@ -36,7 +36,7 @@ final class HealthzController
     public function ready(): JsonResponse
     {
         /** @var HealthStatus $status */
-        $status = $this->handle(new CheckHealthQuery());
+        $status = $this->handle(new CheckHealthQuery);
 
         return new JsonResponse(
             data: [

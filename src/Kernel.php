@@ -18,6 +18,7 @@ class Kernel extends BaseKernel
         foreach (glob($this->getProjectDir().'/src/Context/*/Features/*/EntryPoint/Http', GLOB_ONLYDIR) ?: [] as $dir) {
             $routes->import($dir, 'attribute');
         }
+
         // Optional global controllers under src/Controller/ if a project adds one.
         if (is_dir($this->getProjectDir().'/src/Controller')) {
             $routes->import($this->getProjectDir().'/src/Controller', 'attribute');

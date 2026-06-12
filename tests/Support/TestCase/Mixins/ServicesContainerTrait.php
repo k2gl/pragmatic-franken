@@ -35,7 +35,7 @@ trait ServicesContainerTrait
         foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             $type = (string) $property->getType();
 
-            if (!static::getContainer()->has($type)) {
+            if (! static::getContainer()->has($type)) {
                 throw new RuntimeException(sprintf('Service "%s" is not registered in the test container.', $type));
             }
 

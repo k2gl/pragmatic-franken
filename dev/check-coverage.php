@@ -10,13 +10,14 @@ declare(strict_types=1);
 $file = $argv[1] ?? 'coverage.xml';
 $floor = (float) ($argv[2] ?? 60);
 
-if (!is_file($file)) {
+if (! is_file($file)) {
     fwrite(STDERR, "check-coverage: clover report '$file' not found\n");
     exit(2);
 }
 
 $xml = simplexml_load_file($file);
-if ($xml === false || !isset($xml->project->metrics)) {
+
+if ($xml === false || ! isset($xml->project->metrics)) {
     fwrite(STDERR, "check-coverage: cannot parse '$file'\n");
     exit(2);
 }

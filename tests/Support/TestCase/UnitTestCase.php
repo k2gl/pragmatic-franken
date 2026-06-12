@@ -10,6 +10,4 @@ use PHPUnit\Framework\TestCase;
  * Base for pure unit tests — no kernel, no database.
  * Tag your test class with #[Group('unit')].
  */
-abstract class UnitTestCase extends TestCase
-{
-}
+abstract class UnitTestCase extends TestCase {}

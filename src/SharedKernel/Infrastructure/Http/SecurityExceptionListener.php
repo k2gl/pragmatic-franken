@@ -28,8 +28,7 @@ final readonly class SecurityExceptionListener
     public function __construct(
         private Security $security,
         private AppEnv $appEnv,
-    ) {
-    }
+    ) {}
 
     public function __invoke(ExceptionEvent $event): void
     {

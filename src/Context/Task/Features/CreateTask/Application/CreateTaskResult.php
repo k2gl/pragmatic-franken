@@ -11,6 +11,5 @@ final readonly class CreateTaskResult
         public string $title,
         public bool $completed,
         public string $createdAt,
-    ) {
-    }
+    ) {}
 }

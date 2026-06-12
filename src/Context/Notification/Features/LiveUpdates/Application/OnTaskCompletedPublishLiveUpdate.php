@@ -7,6 +7,7 @@ namespace App\Context\Notification\Features\LiveUpdates\Application;
 use App\Context\Task\Features\CompleteTask\Domain\TaskCompleted;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
+use DateTimeInterface;
 
 /**
  * Cross-context subscription (ADR-0011): the Task context fires TaskCompleted,
@@ -18,8 +19,7 @@ final readonly class OnTaskCompletedPublishLiveUpdate
 {
     public function __construct(
         private MessageBusInterface $messageBus,
-    ) {
-    }
+    ) {}
 
     public function __invoke(TaskCompleted $event): void
     {
@@ -29,7 +29,7 @@ final readonly class OnTaskCompletedPublishLiveUpdate
                 'type' => 'task.completed',
                 'taskId' => $event->taskId,
                 'title' => $event->title,
-                'completedAt' => $event->completedAt->format(\DateTimeInterface::ATOM),
+                'completedAt' => $event->completedAt->format(DateTimeInterface::ATOM),
             ],
         ));
     }

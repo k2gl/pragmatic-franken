@@ -11,6 +11,7 @@ use App\Tests\Support\Factory\TaskFactory;
 use App\Tests\Support\TestCase\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use ReflectionProperty;
+use DateTimeImmutable;
 
 use function K2gl\PHPUnitFluentAssertions\fact;
 
@@ -37,7 +38,7 @@ final class PurgeCompletedTasksHandlerTest extends IntegrationTestCase
     private function ageCompletedAt(Task $task, string $modifier): void
     {
         $property = new ReflectionProperty(Task::class, 'completedAt');
-        $property->setValue($task, new \DateTimeImmutable($modifier));
+        $property->setValue($task, new DateTimeImmutable($modifier));
 
         $tasks = self::getContainer()->get(TaskRepository::class);
         \assert($tasks instanceof TaskRepository);

@@ -11,6 +11,5 @@ final readonly class CompleteTaskResult
         public string $title,
         public bool $completed,
         public string $completedAt,
-    ) {
-    }
+    ) {}
 }

@@ -13,6 +13,5 @@ final readonly class VerifyAttestationQuery
         public string $workflow = 'release.yml',
         public ?string $ref = null,
         public ?string $trustedRootPath = null,
-    ) {
-    }
+    ) {}
 }

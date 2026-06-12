@@ -11,6 +11,5 @@ final readonly class VerifyAttestationResult
         public string $subjectDigest,
         public string $builderId,
         public ?string $sourceCommit,
-    ) {
-    }
+    ) {}
 }

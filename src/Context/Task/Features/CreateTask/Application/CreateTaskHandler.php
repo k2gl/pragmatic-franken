@@ -7,14 +7,14 @@ namespace App\Context\Task\Features\CreateTask\Application;
 use App\Context\Task\Entity\Task;
 use App\Context\Task\Repository\TaskRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use DateTimeInterface;
 
 #[AsMessageHandler]
 final readonly class CreateTaskHandler
 {
     public function __construct(
         private TaskRepository $tasks,
-    ) {
-    }
+    ) {}
 
     public function __invoke(CreateTaskCommand $command): CreateTaskResult
     {
@@ -25,7 +25,7 @@ final readonly class CreateTaskHandler
             id: (string) $task->id(),
             title: $task->title(),
             completed: $task->isCompleted(),
-            createdAt: $task->createdAt()->format(\DateTimeInterface::ATOM),
+            createdAt: $task->createdAt()->format(DateTimeInterface::ATOM),
         );
     }
 }

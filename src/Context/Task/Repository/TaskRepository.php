@@ -6,6 +6,7 @@ namespace App\Context\Task\Repository;
 
 use App\Context\Task\Entity\Task;
 use App\SharedKernel\Infrastructure\Persistence\DoctrineRepository;
+use DateTimeImmutable;
 
 /**
  * @method Task|null find($id, $lockMode = null, $lockVersion = null)
@@ -28,7 +29,7 @@ final class TaskRepository extends DoctrineRepository
     }
 
     /** Bulk-delete tasks completed before the cutoff; returns the count. */
-    public function deleteCompletedBefore(\DateTimeImmutable $cutoff): int
+    public function deleteCompletedBefore(DateTimeImmutable $cutoff): int
     {
         $deleted = $this->createQueryBuilder('task')
             ->delete()

@@ -11,6 +11,5 @@ final readonly class ListTasksResult
      */
     public function __construct(
         public array $items,
-    ) {
-    }
+    ) {}
 }

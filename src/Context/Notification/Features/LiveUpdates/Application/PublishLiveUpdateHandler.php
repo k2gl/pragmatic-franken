@@ -13,8 +13,7 @@ final readonly class PublishLiveUpdateHandler
 {
     public function __construct(
         private HubInterface $hub,
-    ) {
-    }
+    ) {}
 
     public function __invoke(PublishLiveUpdateCommand $command): LiveUpdateResult
     {

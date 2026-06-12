@@ -13,6 +13,5 @@ final readonly class PublishLiveUpdateCommand
         public string $topic,
         public array $data,
         public bool $private = false,
-    ) {
-    }
+    ) {}
 }

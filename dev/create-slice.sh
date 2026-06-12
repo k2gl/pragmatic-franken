@@ -43,8 +43,7 @@ final readonly class ${FEATURE}Command
 {
     public function __construct(
         // Add input fields here.
-    ) {
-    }
+    ) {}
 }
 EOF
 
@@ -63,7 +62,7 @@ final readonly class ${FEATURE}Handler
     public function __invoke(${FEATURE}Command \$command): ${FEATURE}Result
     {
         // Business logic.
-        return new ${FEATURE}Result();
+        return new ${FEATURE}Result;
     }
 }
 EOF
@@ -79,8 +78,7 @@ final readonly class ${FEATURE}Result
 {
     public function __construct(
         // Add output fields here.
-    ) {
-    }
+    ) {}
 }
 EOF
 
@@ -109,7 +107,7 @@ final class ${FEATURE}Controller
     #[Route('/${LCC}/${LCF}', methods: ['POST'])]
     public function __invoke(): JsonResponse
     {
-        \$result = \$this->handle(new ${FEATURE}Command());
+        \$result = \$this->handle(new ${FEATURE}Command);
 
         return new JsonResponse(['data' => \$result]);
     }
@@ -134,8 +132,8 @@ final class ${FEATURE}HandlerTest extends UnitTestCase
 {
     public function test_handler_returns_result(): void
     {
-        \$handler = new ${FEATURE}Handler();
-        \$result = \$handler(new ${FEATURE}Command());
+        \$handler = new ${FEATURE}Handler;
+        \$result = \$handler(new ${FEATURE}Command);
 
         self::assertInstanceOf(${FEATURE}Result::class, \$result);
     }

@@ -8,6 +8,7 @@ use App\Context\Task\Repository\TaskRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use DateTimeImmutable;
 
 /**
  * Reference aggregate (ADR-0012): entities live at context level so multiple
@@ -25,16 +26,16 @@ class Task
     private string $title;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $completedAt = null;
+    private ?DateTimeImmutable $completedAt = null;
 
     #[ORM\Column]
-    private \DateTimeImmutable $createdAt;
+    private DateTimeImmutable $createdAt;
 
     public function __construct(string $title)
     {
         $this->id = Uuid::v7();
         $this->title = $title;
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable;
     }
 
     public function id(): Uuid
@@ -52,12 +53,12 @@ class Task
         return $this->completedAt !== null;
     }
 
-    public function completedAt(): ?\DateTimeImmutable
+    public function completedAt(): ?DateTimeImmutable
     {
         return $this->completedAt;
     }
 
-    public function createdAt(): \DateTimeImmutable
+    public function createdAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -65,6 +66,6 @@ class Task
     /** Idempotent: completing a completed task keeps the original timestamp. */
     public function complete(): void
     {
-        $this->completedAt ??= new \DateTimeImmutable();
+        $this->completedAt ??= new DateTimeImmutable;
     }
 }

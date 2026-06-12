@@ -11,6 +11,4 @@ use RuntimeException;
  * given id. The message is already formatted by the repository
  * (`<FQCN> with id "<id>" is not found`).
  */
-final class EntityNotFoundException extends RuntimeException
-{
-}
+final class EntityNotFoundException extends RuntimeException {}

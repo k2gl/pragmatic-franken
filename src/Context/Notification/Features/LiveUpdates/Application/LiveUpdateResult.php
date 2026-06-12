@@ -8,6 +8,5 @@ final readonly class LiveUpdateResult
 {
     public function __construct(
         public string $messageId,
-    ) {
-    }
+    ) {}
 }

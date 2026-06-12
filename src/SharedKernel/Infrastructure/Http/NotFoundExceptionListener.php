@@ -22,8 +22,7 @@ final readonly class NotFoundExceptionListener
 {
     public function __construct(
         private AppEnv $appEnv,
-    ) {
-    }
+    ) {}
 
     public function __invoke(ExceptionEvent $event): void
     {

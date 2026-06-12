@@ -24,7 +24,7 @@ final class ListTasksController
     public function __invoke(): JsonResponse
     {
         /** @var ListTasksResult $result */
-        $result = $this->handle(new ListTasksQuery());
+        $result = $this->handle(new ListTasksQuery);
 
         return new JsonResponse($result);
     }

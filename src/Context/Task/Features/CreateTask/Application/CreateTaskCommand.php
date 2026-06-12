@@ -13,6 +13,5 @@ final readonly class CreateTaskCommand
         #[Assert\NotBlank]
         #[Assert\Length(max: 255)]
         public string $title,
-    ) {
-    }
+    ) {}
 }

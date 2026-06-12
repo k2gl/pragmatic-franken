@@ -9,9 +9,7 @@ use Throwable;
 
 final readonly class RedisPing implements RedisPingInterface
 {
-    public function __construct(private ClientInterface $redis)
-    {
-    }
+    public function __construct(private ClientInterface $redis) {}
 
     public function isAlive(): bool
     {
