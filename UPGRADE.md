@@ -4,6 +4,20 @@ Templates aren't merged — they're applied. Each release lists the few changes
 worth porting into projects built from this skeleton, smallest diff first.
 How-to: [`docs/guides/fork-maintenance.md`](docs/guides/fork-maintenance.md).
 
+## v1.1.0
+
+1. **Invariants moved into the core** (ADR-0018). `Task` now has a private
+   constructor plus the named constructor `Task::create()`, and its title is a
+   `TaskTitle` value object (mapped by a `task_title` Doctrine type — same
+   column, no migration). If your fork builds tasks: replace `new Task($title)`
+   with `Task::create($title)`; instantiate in factories via Foundry
+   `Instantiator::namedConstructor('create')`; read the title as `$task->title->value`.
+2. **`*Command` is now pure** — no `#[Assert]`. HTTP input stays validated on the
+   `*Request`; an aggregate-less command guards in its constructor
+   (`PublishLiveUpdateCommand` rejects a blank `topic`).
+3. **Scaffolder** (`dev/create-slice.sh`) now emits a `*Request` DTO +
+   `#[MapRequestPayload]` for payload slices; the `*Command` stays flat.
+
 ## v1.0.2
 
 Docs compaction (ADRs/guides/AGENTS.md got leaner — re-sync `docs/` if your

@@ -41,6 +41,9 @@ isolation, or copy-paste that violates sanity.
 5. **One glossary per project.** Forks document their domain glossary in an ADR
    (a real project's glossary lists Deal, Prospect, Activity, …) so humans and agents
    share the same vocabulary.
+6. **Aggregates guard their own invariants.** Creation goes through a named
+   constructor (`Task::create()`) with a non-public `__construct`; the rule lives
+   in the aggregate (or a value object), not only behind the HTTP edge (ADR-0018).
 
 ## Consequences
 

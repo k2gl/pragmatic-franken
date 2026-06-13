@@ -3,6 +3,8 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
         charset: 'utf8'
         server_version: '17'
+        types:
+            task_title: App\Context\Task\Shared\TaskTitleType
     orm:
         enable_native_lazy_objects: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware

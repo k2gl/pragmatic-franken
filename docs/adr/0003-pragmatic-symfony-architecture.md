@@ -35,7 +35,7 @@ We use Symfony attributes (`#[Route]`, `#[Assert]`, `#[OA]`, `#[AsMessageHandler
 ### 2. No extra layers without justification
 
 - **No interface for a single implementation.** Add an interface only when there are ≥ 2 implementations or when test substitution genuinely cannot be done with a mocked concrete class.
-- **One input contract, one bus message — nothing between.** The `*Request` DTO (`#[MapRequestPayload]` + `#[Assert]`) is the single wire contract; the controller maps it into a pure `*Command` (ADR-0016 §4). No further wrappers, mappers or assemblers around that pair.
+- **One input contract, one bus message — nothing between.** The `*Request` DTO (`#[MapRequestPayload]` + `#[Assert]`) is the single wire contract; the controller maps it into a pure `*Command` (ADR-0016 §4). No further wrappers, mappers or assemblers around that pair. The `*Command` carries no `#[Assert]` — input validation is the edge's job, invariants the aggregate's (ADR-0018).
 - **No repository abstraction for trivial Doctrine queries.** Use `EntityManagerInterface` directly when the call is one-line.
 - **The default chain is** Controller → Message Bus → Handler → Entity. Anything else needs a sentence of justification in the PR description.
 
@@ -76,7 +76,7 @@ If unsure: dispatch a command. The cost of the bus is small; the cost of refacto
 | **Class count per feature** | 8–15 (entity, VO, repo iface, repo impl, port, adapter, mapper, command, handler, dto…) | 3–6 (command, handler, result, controller; optional: domain VO, infra adapter) |
 | **Time-to-first-feature** | Days | Hours |
 | **Tests** | Pure unit on domain | Unit on handler + e2e via ApiTestCase |
-| **Validation lives in** | Domain Value Objects | `#[Assert]` on the Request DTO (ADR-0016) |
+| **Validation lives in** | Domain Value Objects | input on the `*Request` (`#[Assert]`, ADR-0016); invariants in the aggregate / VO (ADR-0018) |
 | **API spec lives in** | Separate YAML | generated from routes and DTO types (`make open-api`) |
 | **Cost of framework migration** | Low (domain is portable) | High (rewrite). **Accepted trade-off.** |
 

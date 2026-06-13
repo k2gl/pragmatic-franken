@@ -33,14 +33,14 @@ final readonly class CompleteTaskHandler
 
             $this->eventBus->dispatch(new TaskCompleted(
                 taskId: (string) $task->id,
-                title: $task->title,
+                title: $task->title->value,
                 completedAt: $this->completedAtOf($task),
             ));
         }
 
         return new CompleteTaskResult(
             id: (string) $task->id,
-            title: $task->title,
+            title: $task->title->value,
             completed: true,
             completedAt: $this->completedAtOf($task)->format(DateTimeInterface::ATOM),
         );

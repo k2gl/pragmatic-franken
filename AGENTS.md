@@ -50,6 +50,7 @@ tests/   Context/{Name}/Features/{Feature}/   # mirror of src/
 - **DO** name Symfony Console classes `*CliCommand extends Command` in `EntryPoint/Cli/`.
 - **DO** use attributes for routing, validation, Doctrine mapping. No XML/YAML for those.
 - **DO** keep controllers slim: parse input → dispatch command/query → return result.
+- **DO** build aggregates via a named constructor (`Task::create()`, private `__construct`) that guards invariants; keep `*Command` pure — `#[Assert]` goes on the `*Request`, not the command. ADR-0018.
 - **DO-NOT** create global `Controllers/`, `Services/`, `Repositories/` directories.
 - **DO-NOT** create an interface unless ≥ 2 implementations or test substitution is unavoidable.
 - **DO-NOT** hold mutable static state — FrankenPHP worker mode reuses the kernel between requests. See ADR-0004.
@@ -63,13 +64,14 @@ tests/   Context/{Name}/Features/{Feature}/   # mirror of src/
 src/Context/User/Features/Register/
   Application/RegisterHandler.php
   Application/Message/RegisterCommand.php
+  Application/Dto/RegisterRequest.php     # HTTP input + #[Assert] (payload entries)
   Application/Dto/RegisterResult.php
   Infrastructure/PasswordHasher.php
   EntryPoint/Http/RegisterController.php   # POST /user/register
   EntryPoint/Cli/RegisterUserCliCommand.php  # bin/console user:register (optional)
 ```
 
-`Domain/` is added only when the feature has its own value objects or domain events. Cross-feature shared code lives at the next level up (`src/Context/{Name}/Shared/`) only after the Rule of Three (used in 3+ slices); cross-context infrastructure goes to `src/SharedKernel/`. See ADR-0009.
+`Domain/` is added only when the feature owns value objects or domain events. Cross-feature code goes up to `src/Context/{Name}/Shared/` after the Rule of Three; cross-context infra to `src/SharedKernel/`. See ADR-0009.
 
 ## Naming cheat-sheet
 

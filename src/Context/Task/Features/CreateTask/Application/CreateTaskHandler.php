@@ -20,12 +20,12 @@ final readonly class CreateTaskHandler
 
     public function __invoke(CreateTaskCommand $command): CreateTaskResult
     {
-        $task = new Task($command->title);
+        $task = Task::create($command->title);
         $this->tasks->save($task);
 
         return new CreateTaskResult(
             id: (string) $task->id,
-            title: $task->title,
+            title: $task->title->value,
             completed: $task->completed,
             createdAt: $task->createdAt->format(DateTimeInterface::ATOM),
         );

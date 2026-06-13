@@ -41,10 +41,31 @@ declare(strict_types=1);
 
 namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Message;
 
+// Pure transport message (ADR-0018): no #[Assert] here. Input is validated on the
+// *Request; invariants belong to the aggregate / value object.
 final readonly class ${FEATURE}Command
 {
     public function __construct(
-        // Add input fields here.
+        public string \$title,
+    ) {}
+}
+EOF
+
+cat > "$DIR/Application/Dto/${FEATURE}Request.php" <<EOF
+<?php
+
+declare(strict_types=1);
+
+namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Dto;
+
+use Symfony\\Component\\Validator\\Constraints as Assert;
+
+/** HTTP input contract — validated by #[MapRequestPayload] before the command is built (ADR-0018). */
+final readonly class ${FEATURE}Request
+{
+    public function __construct(
+        #[Assert\\NotBlank]
+        public string \$title,
     ) {}
 }
 EOF
@@ -65,7 +86,7 @@ final readonly class ${FEATURE}Handler
 {
     public function __invoke(${FEATURE}Command \$command): ${FEATURE}Result
     {
-        // Business logic.
+        // Business logic — build aggregates via their named constructor (e.g. Task::create()); see ADR-0018.
         return new ${FEATURE}Result;
     }
 }
@@ -93,8 +114,10 @@ declare(strict_types=1);
 
 namespace App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\EntryPoint\\Http;
 
+use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Dto\\${FEATURE}Request;
 use App\\Context\\${CONTEXT}\\Features\\${FEATURE}\\Application\\Message\\${FEATURE}Command;
 use Symfony\\Component\\HttpFoundation\\JsonResponse;
+use Symfony\\Component\\HttpKernel\\Attribute\\MapRequestPayload;
 use Symfony\\Component\\Messenger\\HandleTrait;
 use Symfony\\Component\\Messenger\\MessageBusInterface;
 use Symfony\\Component\\Routing\\Attribute\\Route;
@@ -109,9 +132,9 @@ final class ${FEATURE}Controller
     }
 
     #[Route('/${LCC}/${LCF}', methods: ['POST'])]
-    public function __invoke(): JsonResponse
+    public function __invoke(#[MapRequestPayload] ${FEATURE}Request \$request): JsonResponse
     {
-        \$result = \$this->handle(new ${FEATURE}Command);
+        \$result = \$this->handle(new ${FEATURE}Command(\$request->title));
 
         return new JsonResponse(['data' => \$result]);
     }
@@ -140,7 +163,7 @@ final class ${FEATURE}HandlerTest extends UnitTestCase
         \$handler = new ${FEATURE}Handler;
 
         // act
-        \$result = \$handler(new ${FEATURE}Command);
+        \$result = \$handler(new ${FEATURE}Command('Probe title'));
 
         // assert
         self::assertInstanceOf(${FEATURE}Result::class, \$result);

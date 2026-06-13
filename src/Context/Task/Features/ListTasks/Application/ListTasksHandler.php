@@ -25,7 +25,7 @@ final readonly class ListTasksHandler
         foreach ($this->tasks->findNewestFirst() as $task) {
             $items[] = new TaskItem(
                 id: (string) $task->id,
-                title: $task->title,
+                title: $task->title->value,
                 completed: $task->completed,
                 createdAt: $task->createdAt->format(DateTimeInterface::ATOM),
             );

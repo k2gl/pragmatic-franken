@@ -55,7 +55,7 @@ final class SeedCliCommand extends Command
         ];
 
         foreach ($titles as $index => $title) {
-            $task = new Task($title);
+            $task = Task::create($title);
 
             if ($index < 2) {
                 $task->complete();
