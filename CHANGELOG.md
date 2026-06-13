@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/k2gl/pragmatic-franken/compare/v1.1.0...v1.1.1) (2026-06-13)
+
+
+### Bug Fixes
+
+* align ADRs, AGENTS.md and slice scaffolder with shipped code ([46b361f](https://github.com/k2gl/pragmatic-franken/commit/46b361fb21366079dd10ab32d7119d227f8ad3be))
+
 ## [1.1.0](https://github.com/k2gl/pragmatic-franken/compare/v1.0.2...v1.1.0) (2026-06-13)
 
 
