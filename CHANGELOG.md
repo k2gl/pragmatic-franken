@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.2](https://github.com/k2gl/pragmatic-franken/compare/v1.0.1...v1.0.2) (2026-06-13)
+
+
+### Bug Fixes
+
+* **http:** validate live-update payload via a Request DTO ([d9fdac2](https://github.com/k2gl/pragmatic-franken/commit/d9fdac2cde375117175b8fa83250097272b5bd07))
+
+
+### Documentation
+
+* add v1.0.2 upgrade note ([12b0dc8](https://github.com/k2gl/pragmatic-franken/commit/12b0dc884baaf4828ccf649f9d29a41bef3c19d2))
+
 ## [1.0.1](https://github.com/k2gl/pragmatic-franken/compare/v1.0.0...v1.0.1) (2026-06-12)
 
 
