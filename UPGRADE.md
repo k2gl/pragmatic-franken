@@ -4,6 +4,22 @@ Templates aren't merged — they're applied. Each release lists the few changes
 worth porting into projects built from this skeleton, smallest diff first.
 How-to: [`docs/guides/fork-maintenance.md`](docs/guides/fork-maintenance.md).
 
+## v1.0.2
+
+Docs compaction (ADRs/guides/AGENTS.md got leaner — re-sync `docs/` if your
+fork vendored it) plus one fix from a code-vs-ADR audit:
+
+1. **`TaskCompleted` moved** to `src/Context/Task/Shared/Events/` — an event
+   consumed by another bounded context is a context contract, and the move
+   keeps the `CompleteTask` slice deletable (ADR-0001, ADR-0011). If your fork
+   subscribes to it: update the imports and the routing FQN in
+   `config/packages/messenger.yaml`.
+2. **`LiveUpdatesController` now validates input** via a `PublishLiveUpdateRequest`
+   DTO + `#[MapRequestPayload]` instead of hand-parsing the body (ADR-0016 §4):
+   a blank `topic` is now a 422 problem+json instead of a silent publish to `''`.
+3. **ADR-0003 §2** no longer contradicts ADR-0016: the input chain is a
+   validated `*Request` DTO mapped by the controller into a pure `*Command`.
+
 ## v1.0.1
 
 Docs accuracy release — nothing to port. If your fork vendored `docs/guides/`,
@@ -18,8 +34,6 @@ The first tagged release. Both waves below are already inside it; the lists
 matter for forks cut from pre-release `main` — port newest first.
 
 ### Convention alignment
-
-Worth porting, smallest diff first:
 
 1. **Pint ruleset** (`pint.json`): `new_with_parentheses {named_class:false}`,
    `single_line_empty_body`, `not_operator_with_successor_space`,
