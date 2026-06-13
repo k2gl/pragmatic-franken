@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/k2gl/pragmatic-franken/compare/v1.0.2...v1.1.0) (2026-06-13)
+
+
+### Features
+
+* enforce domain invariants in the aggregate (ADR-0018) ([c24a98e](https://github.com/k2gl/pragmatic-franken/commit/c24a98e2cc0e25c66f407155b4f14b69feb77889))
+
+
+### Bug Fixes
+
+* **init:** drop TaskTitle Doctrine type on --prune-examples ([56097a7](https://github.com/k2gl/pragmatic-franken/commit/56097a749bd695cc12100af01b85d4c4a75b7e32))
+
 ## [1.0.2](https://github.com/k2gl/pragmatic-franken/compare/v1.0.1...v1.0.2) (2026-06-13)
 
 
