@@ -21,7 +21,7 @@ We considered PHPUnit vs Pest, and three layouts: separated `Unit/Integration/En
 
 1. **Framework: PHPUnit 12.** Mature, deeply integrated with Symfony Test framework, abundant AI training data, full PHPStan compatibility. Pest is rejected for this boilerplate (less AI training data, extra plugin layer with Symfony).
 2. **Layout: mirror of `src/`** at `tests/Context/{Name}/Features/{Feature}/`; test *type* via base class + `#[Group]` attribute (table below).
-3. **Pyramid: 60 / 30 / 10** (unit / integration / e2e). Most logic is exercised in cheap unit tests; integration covers persistence, Messenger, and external adapters; e2e validates HTTP contracts.
+3. **Pyramid: 60 / 30 / 10** (unit / integration / e2e). Most logic is exercised in cheap unit tests; integration covers persistence, Messenger, and external adapters; e2e validates HTTP contracts. The shipped example slices intentionally skew toward e2e to demonstrate the HTTP contracts end-to-end; the 60/30/10 ratio is the target for a fork's own code, not a property of this template's reference suite.
 4. **Coverage targets** (global 60 % floor enforced in CI; per-layer values are recommended fork policy):
 
 | Layer | Path glob | Minimum line coverage |

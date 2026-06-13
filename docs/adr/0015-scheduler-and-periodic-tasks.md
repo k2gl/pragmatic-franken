@@ -11,7 +11,7 @@ summary: "Recurring work is a slice handler with #[AsPeriodicTask] (symfony/sche
 
 # ADR-0015: Scheduler & Periodic Tasks
 
-**TL;DR:** No crond in containers. A recurring job is ordinary slice code: a `#[AsMessageHandler]` handler whose message is scheduled with `#[AsPeriodicTask]` (symfony/scheduler). The existing Messenger worker consumes `scheduler_default` next to `async`. The worker entrypoint verifies the transport exists before subscribing, so pruned forks (zero periodic tasks) keep working with the default `SCHEDULER_ENABLED=true`.
+**TL;DR:** No crond in containers. A recurring job is ordinary slice code: an invokable handler annotated with `#[AsPeriodicTask]` (symfony/scheduler) — no separate message and no `#[AsMessageHandler]`; the scheduler invokes the service directly. The existing Messenger worker consumes `scheduler_default` next to `async`. The worker entrypoint verifies the transport exists before subscribing, so pruned forks (zero periodic tasks) keep working with the default `SCHEDULER_ENABLED=true`.
 
 ## Context
 
@@ -23,15 +23,17 @@ Containers ship no cron daemon, and host cron knows nothing about deploys, env o
 
 ```php
 // src/Context/Task/Features/PurgeCompletedTasks/Application/PurgeCompletedTasksHandler.php
-#[AsPeriodicTask(frequency: '1 hour')]
-#[AsMessageHandler]
+#[AsPeriodicTask(frequency: '1 hour', schedule: 'default')]
 final readonly class PurgeCompletedTasksHandler
 {
-    // ...
+    public function __invoke(): void
+    {
+        // ...
+    }
 }
 ```
 
-The shipped reference is `src/Context/Task/Features/PurgeCompletedTasks/`. The schedule name defaults to `default`, which materialises as the `scheduler_default` transport.
+The shipped reference is `src/Context/Task/Features/PurgeCompletedTasks/`. No message class and no `#[AsMessageHandler]` are needed — symfony/scheduler invokes the service directly. The schedule name is `default` (the attribute's default, shown explicitly above), which materialises as the `scheduler_default` transport.
 
 ### 2. The existing worker consumes the schedule
 

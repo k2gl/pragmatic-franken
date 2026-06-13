@@ -2,7 +2,7 @@
 audience: agent,human
 tier: 1
 budget_tokens: 2000
-last_reviewed: 2026-06-12
+last_reviewed: 2026-06-13
 ---
 
 # AGENTS.md — Pragmatic FrankenPHP
@@ -14,7 +14,7 @@ PHP 8.5 / Symfony 8 / FrankenPHP boilerplate. Vertical Slices + CQRS over Messen
 ```bash
 make install     # env, containers, deps, migrations
 make up          # start containers
-make smoke       # bin/console list && curl /healthz
+make smoke       # bin/console list && curl /ready
 make test        # PHPUnit
 make ci          # lint-check + analyze + test (matches CI)
 make slice context=Foo feature=Bar  # scaffold a new slice
@@ -87,7 +87,7 @@ src/Context/User/Features/Register/
 
 ## Runtime mode
 
-FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless handlers only. Worker command comes from the `FRANKENPHP_CONFIG` env (compose / Dockerfile); PHP limits live in `docker/php/*.ini`. Health probes at `/healthz` (liveness) and `/ready` (readiness). See ADR-0004, ADR-0005, `docs/guides/worker-mode.md`.
+FrankenPHP worker mode keeps the Symfony kernel hot between requests. Stateless handlers only. Worker command comes from the `FRANKENPHP_CONFIG` env; PHP limits live in `docker/php/*.ini`. Health probes at `/healthz` (liveness) and `/ready` (readiness). See ADR-0004, ADR-0005, `docs/guides/worker-mode.md`.
 
 ## Testing
 
@@ -114,6 +114,7 @@ Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % state
 | `docs/adr/0015-scheduler-and-periodic-tasks.md` | recurring/cron work |
 | `docs/adr/0016-http-response-contract.md` | response shape, `data` envelope |
 | `docs/adr/0017-parallel-agent-sessions.md` | parallel sessions, worktree forks |
+| `docs/adr/0018-input-validation-and-invariants.md` | edge validation vs core invariants, VOs, named constructors |
 | `docs/guides/supply-chain.md` | sign/verify how-to, deploy gate |
 | `docs/guides/development.md` | day-to-day commands, scaffolding details |
 | `docs/guides/testing.md` | concrete testing examples |
@@ -124,7 +125,7 @@ Pyramid 60 / 30 / 10 (unit / integration / e2e). CI enforces a global 60 % state
 | `docs/guides/disaster-recovery.md` | backups, restore drill |
 | `docs/guides/parallel-sessions.md` | worktree forks how-to |
 
-ADR-0003 is the umbrella *Pragmatism Charter* — load it before adding any extra layer/interface, or to skip the Message Bus for a CRUD case. Optional capability recipes live in `docs/recipes/`.
+ADR-0003 (*Pragmatism Charter*) — load before adding any extra layer/interface, or to skip the Message Bus for CRUD. Capability recipes live in `docs/recipes/`.
 
 ## Forbidden patterns (agent-targeted)
 

@@ -61,7 +61,7 @@ final readonly class CompleteTaskHandler
 
             $this->eventBus->dispatch(new TaskCompleted(
                 taskId: (string) $task->id,
-                title: $task->title,
+                title: $task->title->value,
                 completedAt: $task->completedAt ?? new DateTimeImmutable,
             ));
         }

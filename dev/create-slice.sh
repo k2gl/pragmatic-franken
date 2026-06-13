@@ -29,7 +29,9 @@ if [[ -e "$DIR" ]]; then
     exit 1
 fi
 
-mkdir -p "$DIR/Application/Message" "$DIR/Application/Dto" "$DIR/Infrastructure" "$DIR/EntryPoint/Http" "$TEST_DIR"
+# Domain/ and Infrastructure/ are optional (ADR-0001 §2) — created by hand when the
+# feature actually owns value objects/events or adapters, not pre-scaffolded empty.
+mkdir -p "$DIR/Application/Message" "$DIR/Application/Dto" "$DIR/EntryPoint/Http" "$TEST_DIR"
 
 LCC=$(echo "$CONTEXT" | tr '[:upper:]' '[:lower:]')
 LCF=$(echo "$FEATURE" | tr '[:upper:]' '[:lower:]')
@@ -171,4 +173,4 @@ final class ${FEATURE}HandlerTest extends UnitTestCase
 }
 EOF
 
-echo "Created $DIR (Application: Handler at root + Message/, Dto/; Infrastructure, EntryPoint/Http) and $TEST_DIR"
+echo "Created $DIR (Application: Handler at root + Message/, Dto/; EntryPoint/Http) and $TEST_DIR"

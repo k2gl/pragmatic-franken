@@ -66,7 +66,7 @@ pushes a Mercure live update on `/tasks`.
 
 | | **pragmatic-franken** | symfony/skeleton | dunglas/symfony-docker | API Platform |
 |---|---|---|---|---|
-| Architecture opinion | Vertical Slices + CQRS, 17 ADRs | none | none | API-first framework |
+| Architecture opinion | Vertical Slices + CQRS, 18 ADRs | none | none | API-first framework |
 | Prod image | built, booted & scanned per PR | — | built | built |
 | Real example vertical | entity→migration→factory→tests | — | — | generated CRUD |
 | Deploy story | blue-green to a VDS + backups + DR drill | — | — | k8s helm |
