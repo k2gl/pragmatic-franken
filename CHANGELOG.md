@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/k2gl/pragmatic-franken/compare/v1.1.1...v1.1.2) (2026-06-13)
+
+
+### Bug Fixes
+
+* **ci:** bump docker actions to Node 24 majors ([1f03c1a](https://github.com/k2gl/pragmatic-franken/commit/1f03c1ade2b400e9b5944e446c22fd02c1de3267))
+
 ## [1.1.1](https://github.com/k2gl/pragmatic-franken/compare/v1.1.0...v1.1.1) (2026-06-13)
 
 
