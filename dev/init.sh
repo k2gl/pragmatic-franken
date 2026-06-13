@@ -80,6 +80,9 @@ if [ "$PRUNE" = 1 ]; then
     # Drop their async routes; the file keeps the documented pattern.
     sed -i '/App\\Context\\Task\\/d' config/packages/messenger.yaml
 
+    # Drop the Task value-object Doctrine type (TaskTitleType) registration.
+    sed -i '/^        types:$/d; /task_title:/d' config/packages/doctrine.yaml
+
     # app:seed referenced the Task example — reset it to a stub awaiting the
     # first real entity.
     cat > src/SharedKernel/Infrastructure/Cli/SeedCliCommand.php <<'PHP'
