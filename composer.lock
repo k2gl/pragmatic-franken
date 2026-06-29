@@ -8472,16 +8472,16 @@
         },
         {
             "name": "k2gl/array-reader",
-            "version": "2.1.0",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/array-reader.git",
-                "reference": "4d4761a93a0bd5ab529ecd4fa31f65917bb7d2b3"
+                "reference": "ea8739a18410a317bc10cdc94ef3a7feb1340284"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/array-reader/zipball/4d4761a93a0bd5ab529ecd4fa31f65917bb7d2b3",
-                "reference": "4d4761a93a0bd5ab529ecd4fa31f65917bb7d2b3",
+                "url": "https://api.github.com/repos/k2gl/array-reader/zipball/ea8739a18410a317bc10cdc94ef3a7feb1340284",
+                "reference": "ea8739a18410a317bc10cdc94ef3a7feb1340284",
                 "shasum": ""
             },
             "require": {
@@ -8525,7 +8525,7 @@
                 "issues": "https://github.com/k2gl/array-reader/issues",
                 "source": "https://github.com/k2gl/array-reader"
             },
-            "time": "2026-06-02T19:42:24+00:00"
+            "time": "2026-06-13T17:38:21+00:00"
         },
         {
             "name": "k2gl/phpunit-fluent-assertions",
