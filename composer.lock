@@ -8529,16 +8529,16 @@
         },
         {
             "name": "k2gl/phpunit-fluent-assertions",
-            "version": "12.7.0",
+            "version": "12.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/phpunit-fluent-assertions.git",
-                "reference": "408889d8f7114bf057e7c80193e102855f783594"
+                "reference": "2bf500b5c1eef1c5cfb4e816ed4698b8ac1604a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/phpunit-fluent-assertions/zipball/408889d8f7114bf057e7c80193e102855f783594",
-                "reference": "408889d8f7114bf057e7c80193e102855f783594",
+                "url": "https://api.github.com/repos/k2gl/phpunit-fluent-assertions/zipball/2bf500b5c1eef1c5cfb4e816ed4698b8ac1604a5",
+                "reference": "2bf500b5c1eef1c5cfb4e816ed4698b8ac1604a5",
                 "shasum": ""
             },
             "require": {
@@ -8586,7 +8586,7 @@
                 "issues": "https://github.com/k2gl/phpunit-fluent-assertions/issues",
                 "source": "https://github.com/k2gl/phpunit-fluent-assertions"
             },
-            "time": "2026-06-05T18:04:39+00:00"
+            "time": "2026-06-13T17:52:57+00:00"
         },
         {
             "name": "laravel/pint",
@@ -9245,16 +9245,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.29",
+            "version": "12.5.30",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "9aa66a47db3ea70f1a468e66dd969f67e594945a"
+                "reference": "900400a5b616d6fb306f9549f6da33ba615d3fbb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/9aa66a47db3ea70f1a468e66dd969f67e594945a",
-                "reference": "9aa66a47db3ea70f1a468e66dd969f67e594945a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/900400a5b616d6fb306f9549f6da33ba615d3fbb",
+                "reference": "900400a5b616d6fb306f9549f6da33ba615d3fbb",
                 "shasum": ""
             },
             "require": {
@@ -9323,7 +9323,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.29"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.30"
             },
             "funding": [
                 {
@@ -9331,7 +9331,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-06-04T06:14:42+00:00"
+            "time": "2026-06-15T13:12:30+00:00"
         },
         {
             "name": "sebastian/cli-parser",
