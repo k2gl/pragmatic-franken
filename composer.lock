@@ -1374,16 +1374,16 @@
         },
         {
             "name": "k2gl/enum",
-            "version": "2.1.0",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/enum.git",
-                "reference": "f3baebba88c76907d78ef1db87575c324844e1c6"
+                "reference": "225823251ed735d5c7c26b45687e3ffb5eef0863"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/enum/zipball/f3baebba88c76907d78ef1db87575c324844e1c6",
-                "reference": "f3baebba88c76907d78ef1db87575c324844e1c6",
+                "url": "https://api.github.com/repos/k2gl/enum/zipball/225823251ed735d5c7c26b45687e3ffb5eef0863",
+                "reference": "225823251ed735d5c7c26b45687e3ffb5eef0863",
                 "shasum": ""
             },
             "require": {
@@ -1422,7 +1422,7 @@
                 "issues": "https://github.com/k2gl/enum/issues",
                 "source": "https://github.com/k2gl/enum"
             },
-            "time": "2026-06-05T18:23:04+00:00"
+            "time": "2026-06-13T16:32:53+00:00"
         },
         {
             "name": "k2gl/in-toto-attestation",
