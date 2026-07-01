@@ -1256,16 +1256,16 @@
         },
         {
             "name": "k2gl/dsse",
-            "version": "1.1.1",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/dsse.git",
-                "reference": "d9716be40f51e2bc32f6328a4f1830dd12156a45"
+                "reference": "986675b4d1e5427682df3d27cf83988b03a5d8e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/dsse/zipball/d9716be40f51e2bc32f6328a4f1830dd12156a45",
-                "reference": "d9716be40f51e2bc32f6328a4f1830dd12156a45",
+                "url": "https://api.github.com/repos/k2gl/dsse/zipball/986675b4d1e5427682df3d27cf83988b03a5d8e5",
+                "reference": "986675b4d1e5427682df3d27cf83988b03a5d8e5",
                 "shasum": ""
             },
             "require": {
@@ -1278,7 +1278,7 @@
                 "phpunit/phpunit": "^10|^11|^12"
             },
             "suggest": {
-                "ext-openssl": "Required by EcdsaP256Signer / EcdsaP256Verifier (ECDSA P-256).",
+                "ext-openssl": "Required by the ECDSA (P-256/384/521) and RSA (PKCS#1 v1.5) signers/verifiers.",
                 "ext-sodium": "Required by Ed25519Signer / Ed25519Verifier (Ed25519)."
             },
             "type": "library",
@@ -1317,7 +1317,7 @@
                 "issues": "https://github.com/k2gl/dsse/issues",
                 "source": "https://github.com/k2gl/dsse"
             },
-            "time": "2026-06-10T17:22:55+00:00"
+            "time": "2026-06-30T18:08:21+00:00"
         },
         {
             "name": "k2gl/entity-exist",
@@ -1374,16 +1374,16 @@
         },
         {
             "name": "k2gl/enum",
-            "version": "2.3.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/enum.git",
-                "reference": "225823251ed735d5c7c26b45687e3ffb5eef0863"
+                "reference": "2fae8a708ace085896c63d9386003766be224dd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/enum/zipball/225823251ed735d5c7c26b45687e3ffb5eef0863",
-                "reference": "225823251ed735d5c7c26b45687e3ffb5eef0863",
+                "url": "https://api.github.com/repos/k2gl/enum/zipball/2fae8a708ace085896c63d9386003766be224dd3",
+                "reference": "2fae8a708ace085896c63d9386003766be224dd3",
                 "shasum": ""
             },
             "require": {
@@ -1422,20 +1422,20 @@
                 "issues": "https://github.com/k2gl/enum/issues",
                 "source": "https://github.com/k2gl/enum"
             },
-            "time": "2026-06-13T16:32:53+00:00"
+            "time": "2026-07-01T03:28:01+00:00"
         },
         {
             "name": "k2gl/in-toto-attestation",
-            "version": "1.1.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/in-toto-attestation.git",
-                "reference": "33c618bb4fb4001c2a264db00c8c4a6649eafec1"
+                "reference": "2638c8ee860eaf87cf55b91085a13639918d1b23"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/in-toto-attestation/zipball/33c618bb4fb4001c2a264db00c8c4a6649eafec1",
-                "reference": "33c618bb4fb4001c2a264db00c8c4a6649eafec1",
+                "url": "https://api.github.com/repos/k2gl/in-toto-attestation/zipball/2638c8ee860eaf87cf55b91085a13639918d1b23",
+                "reference": "2638c8ee860eaf87cf55b91085a13639918d1b23",
                 "shasum": ""
             },
             "require": {
@@ -1443,8 +1443,8 @@
                 "php": ">=8.1"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.64",
                 "k2gl/phpunit-fluent-assertions": "^12",
+                "laravel/pint": "~1.20.0",
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^10|^11|^12"
             },
@@ -1484,7 +1484,7 @@
                 "issues": "https://github.com/k2gl/in-toto-attestation/issues",
                 "source": "https://github.com/k2gl/in-toto-attestation"
             },
-            "time": "2026-05-31T14:20:01+00:00"
+            "time": "2026-06-30T18:53:10+00:00"
         },
         {
             "name": "k2gl/sigstore-verify",
@@ -1558,25 +1558,25 @@
         },
         {
             "name": "k2gl/slsa-provenance",
-            "version": "1.1.0",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/slsa-provenance.git",
-                "reference": "d2d4d41810fdd86a3064926442e8acd186d5577a"
+                "reference": "4e673061cfb29175a32542af45d704f765f15e41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/slsa-provenance/zipball/d2d4d41810fdd86a3064926442e8acd186d5577a",
-                "reference": "d2d4d41810fdd86a3064926442e8acd186d5577a",
+                "url": "https://api.github.com/repos/k2gl/slsa-provenance/zipball/4e673061cfb29175a32542af45d704f765f15e41",
+                "reference": "4e673061cfb29175a32542af45d704f765f15e41",
                 "shasum": ""
             },
             "require": {
-                "k2gl/in-toto-attestation": "^1.1",
+                "k2gl/in-toto-attestation": "^1.2",
                 "php": ">=8.1"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.64",
                 "k2gl/phpunit-fluent-assertions": "^12",
+                "laravel/pint": "~1.20.0",
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^10|^11|^12"
             },
@@ -1612,7 +1612,7 @@
                 "issues": "https://github.com/k2gl/slsa-provenance/issues",
                 "source": "https://github.com/k2gl/slsa-provenance"
             },
-            "time": "2026-05-31T14:54:06+00:00"
+            "time": "2026-06-30T19:06:38+00:00"
         },
         {
             "name": "k2gl/tuf",
@@ -8472,16 +8472,16 @@
         },
         {
             "name": "k2gl/array-reader",
-            "version": "2.6.0",
+            "version": "2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/array-reader.git",
-                "reference": "ea8739a18410a317bc10cdc94ef3a7feb1340284"
+                "reference": "461f999bfafa91e43b44e886f03558a5081ab6e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/array-reader/zipball/ea8739a18410a317bc10cdc94ef3a7feb1340284",
-                "reference": "ea8739a18410a317bc10cdc94ef3a7feb1340284",
+                "url": "https://api.github.com/repos/k2gl/array-reader/zipball/461f999bfafa91e43b44e886f03558a5081ab6e8",
+                "reference": "461f999bfafa91e43b44e886f03558a5081ab6e8",
                 "shasum": ""
             },
             "require": {
@@ -8525,7 +8525,7 @@
                 "issues": "https://github.com/k2gl/array-reader/issues",
                 "source": "https://github.com/k2gl/array-reader"
             },
-            "time": "2026-06-13T17:38:21+00:00"
+            "time": "2026-06-30T19:59:30+00:00"
         },
         {
             "name": "k2gl/phpunit-fluent-assertions",
@@ -8836,11 +8836,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.2.2",
+            "version": "2.2.3",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e5cc34d491a90e79c216d824f60fe21fd4d93bd6",
-                "reference": "e5cc34d491a90e79c216d824f60fe21fd4d93bd6",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/4048833dd47b377287818841877fb3087289509c",
+                "reference": "4048833dd47b377287818841877fb3087289509c",
                 "shasum": ""
             },
             "require": {
@@ -8896,7 +8896,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-05T09:00:01+00:00"
+            "time": "2026-06-30T21:15:26+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
