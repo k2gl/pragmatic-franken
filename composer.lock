@@ -1200,16 +1200,16 @@
         },
         {
             "name": "k2gl/app-env",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/app-env.git",
-                "reference": "56c400b3ca9433b6972a4f0ae30fda48bf084635"
+                "reference": "b679122ff12ce334531fc0c8dcc5dd41769aadd7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/app-env/zipball/56c400b3ca9433b6972a4f0ae30fda48bf084635",
-                "reference": "56c400b3ca9433b6972a4f0ae30fda48bf084635",
+                "url": "https://api.github.com/repos/k2gl/app-env/zipball/b679122ff12ce334531fc0c8dcc5dd41769aadd7",
+                "reference": "b679122ff12ce334531fc0c8dcc5dd41769aadd7",
                 "shasum": ""
             },
             "require": {
@@ -1236,11 +1236,11 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "PHP application environment service",
+            "description": "Run code conditionally on the current application environment (prod, dev, test).",
             "homepage": "https://github.com/k2gl/app-env",
             "keywords": [
                 "app env",
@@ -1252,20 +1252,20 @@
                 "issues": "https://github.com/k2gl/app-env/issues",
                 "source": "https://github.com/k2gl/app-env"
             },
-            "time": "2026-06-10T02:01:34+00:00"
+            "time": "2026-07-05T04:58:57+00:00"
         },
         {
             "name": "k2gl/dsse",
-            "version": "1.2.0",
+            "version": "1.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/dsse.git",
-                "reference": "986675b4d1e5427682df3d27cf83988b03a5d8e5"
+                "reference": "feefabfee53205eac81a2d3a1c485deeb9908b57"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/dsse/zipball/986675b4d1e5427682df3d27cf83988b03a5d8e5",
-                "reference": "986675b4d1e5427682df3d27cf83988b03a5d8e5",
+                "url": "https://api.github.com/repos/k2gl/dsse/zipball/feefabfee53205eac81a2d3a1c485deeb9908b57",
+                "reference": "feefabfee53205eac81a2d3a1c485deeb9908b57",
                 "shasum": ""
             },
             "require": {
@@ -1293,11 +1293,11 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "Faithful, zero-dependency PHP implementation of DSSE (Dead Simple Signing Envelope): PAE encoding, envelope (de)serialization, and pluggable signers/verifiers.",
+            "description": "Sign and verify DSSE (Dead Simple Signing Envelope) payloads in PHP, with pluggable keys.",
             "homepage": "https://github.com/k2gl/dsse",
             "keywords": [
                 "ECDSA",
@@ -1317,20 +1317,20 @@
                 "issues": "https://github.com/k2gl/dsse/issues",
                 "source": "https://github.com/k2gl/dsse"
             },
-            "time": "2026-06-30T18:08:21+00:00"
+            "time": "2026-07-05T06:59:56+00:00"
         },
         {
             "name": "k2gl/entity-exist",
-            "version": "1.14.1",
+            "version": "1.15.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/entity-exist.git",
-                "reference": "2793526c379bce16a72c12a8252c6aa771425b51"
+                "reference": "2265824214b66a38f99e59bbc3b55d873ee87081"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/entity-exist/zipball/2793526c379bce16a72c12a8252c6aa771425b51",
-                "reference": "2793526c379bce16a72c12a8252c6aa771425b51",
+                "url": "https://api.github.com/repos/k2gl/entity-exist/zipball/2265824214b66a38f99e59bbc3b55d873ee87081",
+                "reference": "2265824214b66a38f99e59bbc3b55d873ee87081",
                 "shasum": ""
             },
             "require": {
@@ -1361,29 +1361,29 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "Checks if there is at least one row with the required field in the database, for example, a row with the same identifier",
+            "description": "Symfony validation constraint that asserts a matching database row exists (or does not), via Doctrine.",
             "support": {
                 "issues": "https://github.com/k2gl/entity-exist/issues",
                 "source": "https://github.com/k2gl/entity-exist"
             },
-            "time": "2026-06-05T18:14:21+00:00"
+            "time": "2026-07-05T04:51:06+00:00"
         },
         {
             "name": "k2gl/enum",
-            "version": "2.4.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/enum.git",
-                "reference": "2fae8a708ace085896c63d9386003766be224dd3"
+                "reference": "04ccd754d64e95e141350cf6eab324e604433b73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/enum/zipball/2fae8a708ace085896c63d9386003766be224dd3",
-                "reference": "2fae8a708ace085896c63d9386003766be224dd3",
+                "url": "https://api.github.com/repos/k2gl/enum/zipball/04ccd754d64e95e141350cf6eab324e604433b73",
+                "reference": "04ccd754d64e95e141350cf6eab324e604433b73",
                 "shasum": ""
             },
             "require": {
@@ -1407,7 +1407,7 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
@@ -1422,20 +1422,20 @@
                 "issues": "https://github.com/k2gl/enum/issues",
                 "source": "https://github.com/k2gl/enum"
             },
-            "time": "2026-07-01T03:28:01+00:00"
+            "time": "2026-07-05T04:51:23+00:00"
         },
         {
             "name": "k2gl/in-toto-attestation",
-            "version": "1.2.1",
+            "version": "1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/in-toto-attestation.git",
-                "reference": "2638c8ee860eaf87cf55b91085a13639918d1b23"
+                "reference": "dacf97a718892e1d9474a9bcce1ef7f6640cfc13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/in-toto-attestation/zipball/2638c8ee860eaf87cf55b91085a13639918d1b23",
-                "reference": "2638c8ee860eaf87cf55b91085a13639918d1b23",
+                "url": "https://api.github.com/repos/k2gl/in-toto-attestation/zipball/dacf97a718892e1d9474a9bcce1ef7f6640cfc13",
+                "reference": "dacf97a718892e1d9474a9bcce1ef7f6640cfc13",
                 "shasum": ""
             },
             "require": {
@@ -1463,11 +1463,11 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "Faithful, typed PHP implementation of the in-toto Attestation Framework (Statement v1): build, sign and verify attestations over k2gl/dsse.",
+            "description": "Build, sign and verify in-toto attestation Statements (v1 and v0.1) in PHP.",
             "homepage": "https://github.com/k2gl/in-toto-attestation",
             "keywords": [
                 "attestation",
@@ -1484,20 +1484,20 @@
                 "issues": "https://github.com/k2gl/in-toto-attestation/issues",
                 "source": "https://github.com/k2gl/in-toto-attestation"
             },
-            "time": "2026-06-30T18:53:10+00:00"
+            "time": "2026-07-05T04:51:53+00:00"
         },
         {
             "name": "k2gl/sigstore-verify",
-            "version": "1.3.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/sigstore-verify.git",
-                "reference": "7b2c26ef1b4fe48cfe3a3da0f0b956c570df0876"
+                "reference": "cfdb3b5474f087b50b5ddab99a4969ecc8c4df14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/sigstore-verify/zipball/7b2c26ef1b4fe48cfe3a3da0f0b956c570df0876",
-                "reference": "7b2c26ef1b4fe48cfe3a3da0f0b956c570df0876",
+                "url": "https://api.github.com/repos/k2gl/sigstore-verify/zipball/cfdb3b5474f087b50b5ddab99a4969ecc8c4df14",
+                "reference": "cfdb3b5474f087b50b5ddab99a4969ecc8c4df14",
                 "shasum": ""
             },
             "require": {
@@ -1510,9 +1510,12 @@
             },
             "require-dev": {
                 "k2gl/phpunit-fluent-assertions": "^12",
+                "k2gl/sigstore-sign": "^1.1",
                 "laravel/pint": "~1.20.0",
+                "nyholm/psr7": "^1.8",
                 "phpstan/phpstan": "^2.1",
-                "phpunit/phpunit": "^10|^11|^12"
+                "phpunit/phpunit": "^10|^11|^12",
+                "symfony/http-client": "^6.4|^7.0"
             },
             "suggest": {
                 "ext-sodium": "Ed25519 verification — DSSE Ed25519 keys and Rekor v2 checkpoint notes"
@@ -1532,11 +1535,11 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "Offline, fail-closed PHP verifier for Sigstore bundles: Fulcio certificate chain, DSSE or message signature, Rekor v1/v2 transparency-log proof, RFC 3161 timestamp, certificate transparency and identity policy. Passes the official sigstore-conformance suite.",
+            "description": "Offline Sigstore bundle verifier for PHP (Fulcio, Rekor, identity policy).",
             "homepage": "https://github.com/k2gl/sigstore-verify",
             "keywords": [
                 "attestation",
@@ -1554,20 +1557,20 @@
                 "issues": "https://github.com/k2gl/sigstore-verify/issues",
                 "source": "https://github.com/k2gl/sigstore-verify"
             },
-            "time": "2026-06-10T18:09:22+00:00"
+            "time": "2026-07-04T18:10:56+00:00"
         },
         {
             "name": "k2gl/slsa-provenance",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/slsa-provenance.git",
-                "reference": "4e673061cfb29175a32542af45d704f765f15e41"
+                "reference": "d7f481455738ca73eb41a1f5e2a19f60ca9461b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/slsa-provenance/zipball/4e673061cfb29175a32542af45d704f765f15e41",
-                "reference": "4e673061cfb29175a32542af45d704f765f15e41",
+                "url": "https://api.github.com/repos/k2gl/slsa-provenance/zipball/d7f481455738ca73eb41a1f5e2a19f60ca9461b4",
+                "reference": "d7f481455738ca73eb41a1f5e2a19f60ca9461b4",
                 "shasum": ""
             },
             "require": {
@@ -1592,11 +1595,11 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "Faithful, typed PHP implementation of the SLSA Provenance v1 and v0.2 predicates, built on k2gl/in-toto-attestation.",
+            "description": "SLSA Provenance predicates (v1 and v0.2) for PHP.",
             "homepage": "https://github.com/k2gl/slsa-provenance",
             "keywords": [
                 "attestation",
@@ -1612,20 +1615,20 @@
                 "issues": "https://github.com/k2gl/slsa-provenance/issues",
                 "source": "https://github.com/k2gl/slsa-provenance"
             },
-            "time": "2026-06-30T19:06:38+00:00"
+            "time": "2026-07-05T04:54:13+00:00"
         },
         {
             "name": "k2gl/tuf",
-            "version": "1.1.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/tuf.git",
-                "reference": "5e39551349c9842dc1d03c17c2a793da5d150cf7"
+                "reference": "0c324cd765e04c9d47d01fe0e9887d6ab8153bfd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/tuf/zipball/5e39551349c9842dc1d03c17c2a793da5d150cf7",
-                "reference": "5e39551349c9842dc1d03c17c2a793da5d150cf7",
+                "url": "https://api.github.com/repos/k2gl/tuf/zipball/0c324cd765e04c9d47d01fe0e9887d6ab8153bfd",
+                "reference": "0c324cd765e04c9d47d01fe0e9887d6ab8153bfd",
                 "shasum": ""
             },
             "require": {
@@ -1655,11 +1658,11 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "The Update Framework (TUF) client for PHP: a minimal, fail-closed metadata verifier and updater for securely distributed trust roots, such as Sigstore's.",
+            "description": "TUF (The Update Framework) client for PHP: fetch and verify signed metadata and targets.",
             "homepage": "https://github.com/k2gl/tuf",
             "keywords": [
                 "metadata",
@@ -1675,7 +1678,7 @@
                 "issues": "https://github.com/k2gl/tuf/issues",
                 "source": "https://github.com/k2gl/tuf"
             },
-            "time": "2026-06-08T18:27:30+00:00"
+            "time": "2026-07-05T04:55:41+00:00"
         },
         {
             "name": "lcobucci/jwt",
@@ -2043,20 +2046,19 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v5.7.0",
+            "version": "v5.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82"
+                "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/dca41cd15c2ac9d055ad70dbfd011130757d1f82",
-                "reference": "dca41cd15c2ac9d055ad70dbfd011130757d1f82",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
+                "reference": "044a6a392ff8ad0d61f14370a5fbbd0a0107152f",
                 "shasum": ""
             },
             "require": {
-                "ext-ctype": "*",
                 "ext-json": "*",
                 "ext-tokenizer": "*",
                 "php": ">=7.4"
@@ -2095,9 +2097,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
-                "source": "https://github.com/nikic/PHP-Parser/tree/v5.7.0"
+                "source": "https://github.com/nikic/PHP-Parser/tree/v5.8.0"
             },
-            "time": "2025-12-06T11:56:16+00:00"
+            "time": "2026-07-04T14:30:18+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -8472,16 +8474,16 @@
         },
         {
             "name": "k2gl/array-reader",
-            "version": "2.7.0",
+            "version": "2.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/array-reader.git",
-                "reference": "461f999bfafa91e43b44e886f03558a5081ab6e8"
+                "reference": "5bd84f9e33023df9c106e3f2c8f37cc9f592ff96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/array-reader/zipball/461f999bfafa91e43b44e886f03558a5081ab6e8",
-                "reference": "461f999bfafa91e43b44e886f03558a5081ab6e8",
+                "url": "https://api.github.com/repos/k2gl/array-reader/zipball/5bd84f9e33023df9c106e3f2c8f37cc9f592ff96",
+                "reference": "5bd84f9e33023df9c106e3f2c8f37cc9f592ff96",
                 "shasum": ""
             },
             "require": {
@@ -8505,11 +8507,11 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "Tiny, zero-dependency typed reader for mixed arrays (decoded JSON, CSV rows, config, request payloads) with strict and lenient access.",
+            "description": "Read typed values from untyped arrays (JSON, CSV, config, request data) in PHP, with strict and lenient modes.",
             "homepage": "https://github.com/k2gl/array-reader",
             "keywords": [
                 "PHPStan",
@@ -8525,20 +8527,20 @@
                 "issues": "https://github.com/k2gl/array-reader/issues",
                 "source": "https://github.com/k2gl/array-reader"
             },
-            "time": "2026-06-30T19:59:30+00:00"
+            "time": "2026-07-05T04:49:59+00:00"
         },
         {
             "name": "k2gl/phpunit-fluent-assertions",
-            "version": "12.8.0",
+            "version": "12.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/phpunit-fluent-assertions.git",
-                "reference": "2bf500b5c1eef1c5cfb4e816ed4698b8ac1604a5"
+                "reference": "ab7cdf1977af787aec8bca8972f971d5b6be95f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/phpunit-fluent-assertions/zipball/2bf500b5c1eef1c5cfb4e816ed4698b8ac1604a5",
-                "reference": "2bf500b5c1eef1c5cfb4e816ed4698b8ac1604a5",
+                "url": "https://api.github.com/repos/k2gl/phpunit-fluent-assertions/zipball/ab7cdf1977af787aec8bca8972f971d5b6be95f5",
+                "reference": "ab7cdf1977af787aec8bca8972f971d5b6be95f5",
                 "shasum": ""
             },
             "require": {
@@ -8571,7 +8573,7 @@
             ],
             "authors": [
                 {
-                    "name": "Nickolay Harin",
+                    "name": "Nick Harin",
                     "email": "l0gic@ya.ru"
                 }
             ],
@@ -8586,7 +8588,7 @@
                 "issues": "https://github.com/k2gl/phpunit-fluent-assertions/issues",
                 "source": "https://github.com/k2gl/phpunit-fluent-assertions"
             },
-            "time": "2026-06-13T17:52:57+00:00"
+            "time": "2026-07-07T14:57:42+00:00"
         },
         {
             "name": "laravel/pint",
@@ -8836,11 +8838,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.2.3",
+            "version": "2.2.5",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/4048833dd47b377287818841877fb3087289509c",
-                "reference": "4048833dd47b377287818841877fb3087289509c",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/909c1e5fef7989ac0d0c1c5c42e32a5c4f6198a0",
+                "reference": "909c1e5fef7989ac0d0c1c5c42e32a5c4f6198a0",
                 "shasum": ""
             },
             "require": {
@@ -8896,7 +8898,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-30T21:15:26+00:00"
+            "time": "2026-07-05T06:31:06+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -9245,24 +9247,24 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "12.5.30",
+            "version": "12.5.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "900400a5b616d6fb306f9549f6da33ba615d3fbb"
+                "reference": "0608d157a284f15cc73b99a3327eff06b66a176d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/900400a5b616d6fb306f9549f6da33ba615d3fbb",
-                "reference": "900400a5b616d6fb306f9549f6da33ba615d3fbb",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0608d157a284f15cc73b99a3327eff06b66a176d",
+                "reference": "0608d157a284f15cc73b99a3327eff06b66a176d",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
+                "ext-filter": "*",
                 "ext-json": "*",
                 "ext-libxml": "*",
                 "ext-mbstring": "*",
-                "ext-xml": "*",
                 "ext-xmlwriter": "*",
                 "myclabs/deep-copy": "^1.13.4",
                 "phar-io/manifest": "^2.0.4",
@@ -9323,7 +9325,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.30"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/12.5.31"
             },
             "funding": [
                 {
@@ -9331,7 +9333,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2026-06-15T13:12:30+00:00"
+            "time": "2026-07-06T14:54:16+00:00"
         },
         {
             "name": "sebastian/cli-parser",
