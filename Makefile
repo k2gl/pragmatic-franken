@@ -1,5 +1,5 @@
 .PHONY: help shell e d install env-create composer-install \
-        up run down build rebuild ps logs composer-chown \
+        up run down restart build rebuild ps logs composer-chown \
         db-migrate db-rollback db-seed db-console db-fresh db-reset test-db \
         test test-unit test-integration test-e2e test-coverage coverage-html \
         lint lint-check analyze check ci smoke docs-check \
@@ -78,6 +78,8 @@ down: ## Stop and remove containers
 	$(DC) down --remove-orphans
 
 d: down
+
+restart: down up ## Restart containers (down + up; recreates so compose/Caddy config changes apply)
 
 logs: ## Follow container logs
 	@echo "$(YELLOW)Showing and following logs...$(RESET)"
