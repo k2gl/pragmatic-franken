@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/k2gl/pragmatic-franken/compare/v1.1.2...v1.2.0) (2026-07-17)
+
+
+### Features
+
+* **dev:** auto-restart FrankenPHP workers on source changes ([#56](https://github.com/k2gl/pragmatic-franken/issues/56)) ([4fc53f5](https://github.com/k2gl/pragmatic-franken/commit/4fc53f525d4006cd6f549ae78bc91ac033c5d2b1))
+
+
+### Bug Fixes
+
+* **docker:** patch c-ares CVE-2026-33630 in the base image ([#57](https://github.com/k2gl/pragmatic-franken/issues/57)) ([3dd9a6c](https://github.com/k2gl/pragmatic-franken/commit/3dd9a6c8ca02c16f65c26d7f6111aa66ba6552e6))
+
 ## [1.1.2](https://github.com/k2gl/pragmatic-franken/compare/v1.1.1...v1.1.2) (2026-06-13)
 
 
