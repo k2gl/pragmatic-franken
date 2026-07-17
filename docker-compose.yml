@@ -30,7 +30,22 @@ services:
       # (DATABASE_URL, APP_SECRET, …) is NOT duplicated here — Symfony reads it
       # from the mounted .env via symfony/dotenv. Single source of truth.
       SERVER_NAME: "${SERVER_NAME:-localhost}"
-      FRANKENPHP_CONFIG: "worker ./public/index.php"
+      # Dev runs the worker in block form to enable file-watching: worker mode
+      # keeps PHP resident, so source edits aren't visible until the workers
+      # restart — `watch` restarts them on change. Scoped to the dirs a restart
+      # actually needs (PHP + compiled container config); the default glob
+      # (./**/*.{env,php,twig,yaml,yml}) would also match var/cache/*.php, which
+      # Symfony rewrites every request → a restart loop. Twig is left out: dev
+      # recompiles templates lazily, no worker restart needed. Prod overrides
+      # this with a plain single-line worker (docker/compose.prod.yml).
+      FRANKENPHP_CONFIG: |
+        worker {
+          file ./public/index.php
+          watch ./src/**/*.php
+          watch ./config/**/*.{php,yaml,yml}
+          watch ./public/index.php
+          watch ./.env
+        }
       # admin on :2019 (not localhost-only) so the optional prometheus service
       # can scrape /metrics over the compose network; the port stays unpublished.
       CADDY_GLOBAL_OPTIONS: |
