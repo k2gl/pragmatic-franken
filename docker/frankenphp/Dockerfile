@@ -22,6 +22,12 @@ RUN apk add --no-cache \
 # bash for dev/* scripts run inside the container.
 RUN apk add --no-cache curl bash
 
+# Base-image CVE remediation: the frankenphp base ships c-ares 1.34.6-r0, which
+# carries CVE-2026-33630 (HIGH — use-after-free in query completion). Pull the
+# patched build so the prod-image Trivy gate stays green; drop this once the
+# base image ships c-ares >= 1.34.8-r0.
+RUN apk add --no-cache "c-ares>=1.34.8-r0"
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_MEMORY_LIMIT=-1
 
