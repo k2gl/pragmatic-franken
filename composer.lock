@@ -171,16 +171,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "4.4.3",
+            "version": "4.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "61e730f1658814821a85f2402c945f3883407dec"
+                "reference": "fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/61e730f1658814821a85f2402c945f3883407dec",
-                "reference": "61e730f1658814821a85f2402c945f3883407dec",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce",
+                "reference": "fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce",
                 "shasum": ""
             },
             "require": {
@@ -257,7 +257,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/dbal/issues",
-                "source": "https://github.com/doctrine/dbal/tree/4.4.3"
+                "source": "https://github.com/doctrine/dbal/tree/4.4.4"
             },
             "funding": [
                 {
@@ -273,7 +273,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-20T08:52:12+00:00"
+            "time": "2026-07-21T14:34:40+00:00"
         },
         {
             "name": "doctrine/deprecations",
@@ -1561,16 +1561,16 @@
         },
         {
             "name": "k2gl/slsa-provenance",
-            "version": "1.2.1",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/k2gl/slsa-provenance.git",
-                "reference": "d7f481455738ca73eb41a1f5e2a19f60ca9461b4"
+                "reference": "e50f2d3a0c6bc02df7ecc3083562d34a93d0477e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/k2gl/slsa-provenance/zipball/d7f481455738ca73eb41a1f5e2a19f60ca9461b4",
-                "reference": "d7f481455738ca73eb41a1f5e2a19f60ca9461b4",
+                "url": "https://api.github.com/repos/k2gl/slsa-provenance/zipball/e50f2d3a0c6bc02df7ecc3083562d34a93d0477e",
+                "reference": "e50f2d3a0c6bc02df7ecc3083562d34a93d0477e",
                 "shasum": ""
             },
             "require": {
@@ -1578,12 +1578,29 @@
                 "php": ">=8.1"
             },
             "require-dev": {
+                "k2gl/composer-attest": "^1.1",
+                "k2gl/composer-license-gate": "^1.0",
                 "k2gl/phpunit-fluent-assertions": "^12",
                 "laravel/pint": "~1.20.0",
                 "phpstan/phpstan": "^2.1",
                 "phpunit/phpunit": "^10|^11|^12"
             },
             "type": "library",
+            "extra": {
+                "k2gl-attest": {
+                    "mode": "warn"
+                },
+                "k2gl-license-gate": {
+                    "mode": "warn",
+                    "allow": [
+                        "MIT",
+                        "BSD-2-Clause",
+                        "BSD-3-Clause",
+                        "Apache-2.0",
+                        "ISC"
+                    ]
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "K2gl\\Slsa\\": "src/"
@@ -1599,7 +1616,7 @@
                     "email": "l0gic@ya.ru"
                 }
             ],
-            "description": "SLSA Provenance predicates (v1 and v0.2) for PHP.",
+            "description": "SLSA Provenance predicates (v1 and v0.2) for PHP",
             "homepage": "https://github.com/k2gl/slsa-provenance",
             "keywords": [
                 "attestation",
@@ -1615,7 +1632,7 @@
                 "issues": "https://github.com/k2gl/slsa-provenance/issues",
                 "source": "https://github.com/k2gl/slsa-provenance"
             },
-            "time": "2026-07-05T04:54:13+00:00"
+            "time": "2026-07-11T15:37:33+00:00"
         },
         {
             "name": "k2gl/tuf",
@@ -11170,16 +11187,16 @@
         },
         {
             "name": "zenstruck/foundry",
-            "version": "v2.10.1",
+            "version": "v2.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zenstruck/foundry.git",
-                "reference": "34cbd882df0fee5a5f9bd2f0c2f69286e283263d"
+                "reference": "c30a800d5c8a2cf32813bfd89d3f16bbb40e582d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/34cbd882df0fee5a5f9bd2f0c2f69286e283263d",
-                "reference": "34cbd882df0fee5a5f9bd2f0c2f69286e283263d",
+                "url": "https://api.github.com/repos/zenstruck/foundry/zipball/c30a800d5c8a2cf32813bfd89d3f16bbb40e582d",
+                "reference": "c30a800d5c8a2cf32813bfd89d3f16bbb40e582d",
                 "shasum": ""
             },
             "require": {
@@ -11208,7 +11225,7 @@
                 "doctrine/mongodb-odm-bundle": "^4.6|^5.0",
                 "doctrine/orm": "^2.16|^3.0",
                 "doctrine/persistence": "^2.0|^3.0|^4.0",
-                "phpunit/phpunit": "^9.5.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+                "phpunit/phpunit": "^9.5.0 || ^10.0 || ^11.0 || ^12.0 || ~13.1.0",
                 "symfony/browser-kit": "^6.4|^7.0|^8.0",
                 "symfony/console": "^6.4|^7.0|^8.0",
                 "symfony/dotenv": "^6.4|^7.0|^8.0",
@@ -11278,7 +11295,7 @@
             ],
             "support": {
                 "issues": "https://github.com/zenstruck/foundry/issues",
-                "source": "https://github.com/zenstruck/foundry/tree/v2.10.1"
+                "source": "https://github.com/zenstruck/foundry/tree/v2.10.3"
             },
             "funding": [
                 {
@@ -11290,7 +11307,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-19T15:59:32+00:00"
+            "time": "2026-07-20T16:59:23+00:00"
         },
         {
             "name": "zenstruck/messenger-test",
